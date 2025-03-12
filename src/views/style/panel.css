@@ -1,0 +1,25 @@
+.panel-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1)
+}
+
+.panel-icon {
+  font-size: 20px;
+  padding: 0 10px;
+  color: cornflowerblue;
+}
+
+.panel-table-wrapper {
+  padding-top: 4px;
+  background-color: #4b81e0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.panel-table-wrapper .el-table {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px
+}
