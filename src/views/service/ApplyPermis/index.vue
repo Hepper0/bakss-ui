@@ -23,7 +23,7 @@
 
     <div class="panel-container">
       <!-- 备份管理表格 -->
-      <div class="panel-table-wrapper" style="background-color: #f1f1f1">
+      <div class="panel-table-wrapper">
         <el-table size="small" :data="tableData" stripe>
           <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="backupFile" label="备份软件"></el-table-column>
@@ -37,14 +37,7 @@
           <el-table-column prop="owner" label="负责人"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="editRow(row)"></el-button>
-              <el-dropdown @command="handleCommand">
-                <el-button size="mini" type="text">更多操作<i class="el-icon-arrow-down el-icon--right"></i></el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="delete">删除</el-dropdown-item>
-                  <el-dropdown-item command="view">查看详情</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+              <el-button icon="el-icon-user-solid" size="mini" type="text" @click="editRow(row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -53,6 +46,7 @@
       <!-- 分页 -->
       <el-pagination class="pagination" background layout="prev, pager, next" :total="30"></el-pagination>
     </div>
+
   </div>
 </template>
 
