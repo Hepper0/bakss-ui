@@ -23,3 +23,9 @@
   border-top-left-radius: 6px;
   border-top-right-radius: 6px
 }
+
+.pagination {
+  margin: 10px 0;
+  display: flex;
+  justify-content: right
+}
