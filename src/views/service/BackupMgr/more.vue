@@ -1,13 +1,227 @@
 <template>
+  <div class="backup-management">
+    <!-- 基本信息 -->
+    <el-card class="box-card panel-container-raw">
+      <div slot="header" class="clearfix">
+        <span>基本信息</span>
+      </div>
+      <el-form label-width="100px">
+        <el-row :gutter="20">
+          <el-col :span="6">
+            <el-form-item label="备份IP">
+              <el-input v-model="basicInfo.backupIp" disabled></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="备份软件">
+              <el-select v-model="basicInfo.backupSoftwaree" disabled style="width: 100%">
+                <el-option label="NetBackup" value="NetBackup"></el-option>
+                <el-option label="NetWorker" value="NetWorker"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="备份类型">
+              <el-input v-model="basicInfo.backupType" disabled></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="客户端名称">
+              <el-input v-model="basicInfo.client" disabled></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6">
+            <el-form-item label="Master IP">
+              <el-input v-model="basicInfo.masterIp" disabled></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="备份应用">
+              <el-input v-model="basicInfo.backupApp" disabled></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="环境">
+              <el-select v-model="basicInfo.env" disabled style="width: 100%">
+                <el-option label="NetBackup" value="NetBackup"></el-option>
+                <el-option label="NetWorker" value="NetWorker"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="操作系统">
+              <el-select v-model="basicInfo.platform" disabled style="width: 100%">
+                <el-option label="Windows" value="Windows"></el-option>
+                <el-option label="Linux" value="Linux"></el-option>
+                <el-option label="MacOs" value="MacOs"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-card>
 
+    <!-- 备份策略 -->
+    <div class="panel-container">
+      <el-tabs value="first">
+        <el-tab-pane label="数据库全备" name="first">
+          <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
+            <el-collapse-item :name="1">
+              <template slot="title">
+                <div style="font-size: 14px;">
+                  <i class="header-icon el-icon-location" style="color: red; margin-left: 15px"></i>
+                  <span style="font-family: 'Microsoft YaHei', sans-serif;">
+                    备份策略
+                  </span>
+                </div>
+              </template>
+              <div class="collapse-panel">
+                <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
+                  <el-collapse-item :name="1">
+                    <template slot="title">
+                      <div style="width: 100%">
+                        <span style="font-size: 14px;">
+                        <span style="font-family: 'Microsoft YaHei', sans-serif;">
+                          {{ backupStrategy.name }}
+                        </span>
+                        </span>
+                        <span style="float: right; margin-right: 15px">
+                          <el-button type="warning" size="mini">禁用备份</el-button>
+                          <el-button type="danger" size="mini">删除</el-button>
+                        </span>
+                      </div>
+                    </template>
+                    <div class="collapse-panel">
+                      <div style="background-color: #f1f1f1; border-radius: 8px; padding: 15px">
+                        <el-row style="padding: 0 10px">
+                          <el-button size="mini" type="primary" style="float: right">一次性备份</el-button>
+                        </el-row>
+                        <el-row style="margin-bottom: 15px">
+                          <el-col :span="8">备份策略: {{ backupStrategy.name }}</el-col>
+                          <el-col :span="8">数据保留时间: {{ backupStrategy.retention }}</el-col>
+                          <el-col :span="8">调度名称: {{ backupStrategy.retention }}</el-col>
+                        </el-row>
+                        <el-row>
+                          <el-col :span="8">备份目录: {{ backupStrategy.directory }}</el-col>
+                          <el-col :span="8">备份频率: {{ backupStrategy.schedule }}</el-col>
+                        </el-row>
+                      </div>
+                    </div>
+                  </el-collapse-item>
+                </el-collapse>
+              </div>
+            </el-collapse-item>
+          </el-collapse>
+        </el-tab-pane>
+        <el-tab-pane label="数据库日志备份" name="second">数据库日志备份</el-tab-pane>
+      </el-tabs>
+    </div>
+
+    <!-- 备份历史 -->
+    <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
+      <el-collapse-item :name="1">
+        <template slot="title">
+          <div style="font-size: 16px;">
+            <i class="header-icon el-icon-location" style="color: red; margin-left: 15px"></i>
+              <span style="font-family: 'Microsoft YaHei', sans-serif;">
+                备份历史
+              </span>
+          </div>
+        </template>
+        <div class="collapse-panel">
+          <div class="panel-container">
+            <!-- 搜索栏 -->
+            <el-row :gutter="10">
+              <el-col :span="6">
+                时间：
+                <el-date-picker
+                  size="mini"
+                  type="datetimerange"
+                  range-separator="-"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  style="width: calc(100% - 50px)"
+                >
+                </el-date-picker>
+              </el-col>
+              <el-col :span="4" style="display: flex">
+                策略名：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery" placeholder="请输入客户端名称" clearable></el-input>
+              </el-col>
+              <el-col :span="4">
+                客户端名称：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery" placeholder="请输入客户端名称" clearable></el-input>
+              </el-col>
+              <el-col :span="3">
+                <el-select size="mini" clearable v-model="selectedFile" placeholder="状态">
+                  <el-option label="NetBackup" value="NetBackup"></el-option>
+                  <el-option label="NetWorker" value="NetWorker"></el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="3" class="search-buttons">
+                <el-button size="mini" type="primary" icon="el-icon-search">搜索</el-button>
+                <el-button size="mini" icon="el-icon-refresh">重置</el-button>
+              </el-col>
+            </el-row>
+          </div>
+
+          <div class="panel-table-wrapper">
+            <el-table :data="backupHistory" size="small">
+              <el-table-column prop="name" label="策略名"></el-table-column>
+              <el-table-column prop="client" label="客户端名称"></el-table-column>
+              <el-table-column prop="startTime" label="开始时间"></el-table-column>
+              <el-table-column prop="endTime" label="结束时间"></el-table-column>
+              <el-table-column prop="size" label="原始大小"></el-table-column>
+              <el-table-column prop="status" label="备份状态">
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.status === '成功'" type="success">成功</el-tag>
+                  <el-tag v-else type="danger">失败</el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+      </el-collapse-item>
+    </el-collapse>
+  </div>
 </template>
 
 <script>
+require('/src/views/style/panel.css')
 export default {
-  name: "more"
-}
+  name: "more",
+  data() {
+    return {
+      basicInfo: {
+        backupIp: '10.122.145.38',
+        masterIp: 'sltwfqm7huz',
+        backupSoftware: 'NetBackup'
+      },
+      backupStrategy: {
+        name: '10.122.145.38_SQL_Alvayson_FULL',
+        directory: 'WHOLE_DATABASE',
+        retention: '1 month',
+        schedule: 'Every week on Monday at 15:00'
+      },
+      backupHistory: [
+        { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'sltwfqm7huz', startTime: '2022-08-31 16:43:01', endTime: '2022-08-31 16:45:28', size: '2.08GB', status: '成功' },
+        { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
+      ]
+    };
+  }
+};
 </script>
 
 <style scoped>
+.backup-management {
+  padding: 20px;
+}
+.box-card {
+  margin-bottom: 20px;
+}
 
+.collapse-panel {
+  padding: 10px;
+  border-top: 1px solid #f1f1f1;
+}
 </style>

@@ -35,16 +35,20 @@
           <el-table-column prop="appName" label="应用名称"></el-table-column>
           <el-table-column prop="osType" label="操作系统类型"></el-table-column>
           <el-table-column prop="owner" label="负责人"></el-table-column>
-          <el-table-column label="操作" width="120">
+          <el-table-column label="操作" width="150">
             <template v-slot="{ row }">
-              <el-button icon="el-icon-edit" size="mini" type="text" @click="editRow(row)"></el-button>
-              <el-dropdown @command="handleCommand">
-                <el-button size="mini" type="text">更多操作<i class="el-icon-arrow-down el-icon--right"></i></el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="delete">删除</el-dropdown-item>
-                  <el-dropdown-item command="view">查看详情</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top-start">
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="editRow(row)"></el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="授权" placement="top-start">
+                <el-button icon="el-icon-key" size="mini" type="text" @click="editRow(row)"></el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="用户" placement="top-start">
+                <el-button icon="el-icon-s-custom" size="mini" type="text" @click="editRow(row)"></el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="更多操作" placement="top-start">
+                <el-button icon="el-icon-more" size="mini" type="text" @click="gotoMore(row.id)"></el-button>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -81,6 +85,9 @@ export default {
       } else if (command === 'view') {
         this.$message.info('查看详情未实现');
       }
+    },
+    gotoMore(id) {
+      this.$router.push({ path: 'more', query: { id }})
     }
   }
 };
