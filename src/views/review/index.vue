@@ -33,7 +33,7 @@
           <el-table-column prop="backupIP" label="创建日期"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
-              <el-button icon="el-icon-document" size="mini" type="text" @click="editRow(row)"></el-button>
+              <el-button icon="el-icon-document" size="mini" type="text" @click="gotoDetail(row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -70,6 +70,9 @@ export default {
       } else if (command === 'view') {
         this.$message.info('查看详情未实现');
       }
+    },
+    gotoDetail(row) {
+      this.$router.push({ path: '/review/detail', query: { id: row.id } })
     }
   }
 };

@@ -87,6 +87,23 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
+  },
+  {
+    path: '/review',
+    component: Layout,
+    hidden: true,
+    meta: { title: '申请查看' },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/review/index'),
+      },
+      {
+        path: 'detail',
+        component: () => import('@/views/review/detail'),
+        meta: { title: '详情' },
+      }
+    ]
   }
 ]
 

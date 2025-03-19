@@ -21,17 +21,6 @@
     <div class="panel-container" style="padding: 24px; margin-top: 10px">
       <el-row class="form-item">
         <el-col :span="3" class="form-title">
-          <b style="color: red">* </b><b>授权用户：</b>
-        </el-col>
-        <el-col :span="21">
-          <el-select style="width: 500px" size="small">
-            <el-option>A</el-option>
-            <el-option>B</el-option>
-          </el-select>
-        </el-col>
-      </el-row>
-      <el-row class="form-item">
-        <el-col :span="3" class="form-title">
           <b style="color: red">* </b><b>权限类型：</b>
         </el-col>
         <el-col :span="21">
@@ -76,8 +65,9 @@
 <script>
 require('/src/views/style/panel.css')
 export default {
-  name: "grant",
-  methods: {}
+  name: "apply",
+  methods: {
+  }
 }
 </script>
 

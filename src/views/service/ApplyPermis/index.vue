@@ -16,7 +16,7 @@
           <el-button size="mini" type="primary" icon="el-icon-search">搜索</el-button>
           <el-button size="mini" icon="el-icon-refresh">重置</el-button>
           <el-button size="mini" type="success">创建备份</el-button>
-          <el-button size="mini">申请备份管理员权限</el-button>
+          <el-button size="mini" @click="gotoApply">申请备份管理员权限</el-button>
         </el-col>
       </el-row>
     </div>
@@ -37,7 +37,7 @@
           <el-table-column prop="owner" label="负责人"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
-              <el-button icon="el-icon-user-solid" size="mini" type="text" @click="editRow(row)"></el-button>
+              <el-button icon="el-icon-user-solid" size="mini" type="text" @click="gotoApply"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -75,6 +75,12 @@ export default {
       } else if (command === 'view') {
         this.$message.info('查看详情未实现');
       }
+    },
+    gotoApply() {
+      this.goto('applyDetail', { id: []})
+    },
+    goto(path, id) {
+      this.$router.push({ path, query: { id } })
     }
   }
 };

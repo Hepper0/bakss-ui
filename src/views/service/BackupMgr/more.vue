@@ -1,5 +1,68 @@
 <template>
   <div class="backup-management">
+    <el-dialog
+      title="一次性备份"
+      :visible="backupDialogVisible"
+      show-close
+    >
+      <div style="padding: 0 40px">
+        <el-row :gutter="5">
+          <el-col :span="4" style="text-align: right; padding: 3px">
+            <b style="color: red">* </b>备份方式：
+          </el-col>
+          <el-col :span="20">
+            <el-button-group>
+              <el-button size="mini">立即备份</el-button>
+              <el-button size="mini">定时备份</el-button>
+            </el-button-group>
+          </el-col>
+        </el-row>
+        <br />
+        <el-row :gutter="5">
+          <el-col :span="4" style="text-align: right">
+            备注：
+          </el-col>
+          <el-col :span="20">
+            <el-input type="textarea" :rows="3"/>
+          </el-col>
+        </el-row>
+        <br/>
+        <span slot="footer" class="dialog-footer" style="display: flex; justify-content: right; border-top: 1px solid #f1f1f1; padding-top: 10px">
+          <el-button @click="showBackupOnceDialog(false)" size="small">取 消</el-button>
+          <el-button type="primary" @click.stop="backupOnceSubmit" size="small">确 定</el-button>
+        </span>
+      </div>
+    </el-dialog>
+    <el-dialog
+      :title="strategyDialogTitle"
+      :visible="strategyDialogVisible"
+      show-close
+    >
+      <div style="padding: 0 40px">
+        <el-row :gutter="5">
+          <el-col :span="4" style="text-align: right; padding: 3px">
+            <b style="color: red">* </b>备份策略：
+          </el-col>
+          <el-col :span="20">
+            <el-input disabled size="mini" />
+          </el-col>
+        </el-row>
+        <br />
+        <el-row :gutter="5">
+          <el-col :span="4" style="text-align: right">
+            申请理由：
+          </el-col>
+          <el-col :span="20">
+            <el-input type="textarea" :rows="3"/>
+          </el-col>
+        </el-row>
+        <br/>
+        <span slot="footer" class="dialog-footer" style="display: flex; justify-content: right; border-top: 1px solid #f1f1f1; padding-top: 10px">
+          <el-button @click="showStrategyDialog(false)" size="small">取 消</el-button>
+          <el-button type="primary" @click="strategySubmit" size="small">确 定</el-button>
+        </span>
+      </div>
+    </el-dialog>
     <!-- 基本信息 -->
     <el-card class="box-card panel-container-raw">
       <div slot="header" class="clearfix">
@@ -88,15 +151,15 @@
                         </span>
                         </span>
                         <span style="float: right; margin-right: 15px">
-                          <el-button type="warning" size="mini">禁用备份</el-button>
-                          <el-button type="danger" size="mini">删除</el-button>
+                          <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">禁用备份</el-button>
+                          <el-button @click.stop="showStrategyDialog(true, 2)" type="danger" size="mini">删除</el-button>
                         </span>
                       </div>
                     </template>
                     <div class="collapse-panel">
                       <div style="background-color: #f1f1f1; border-radius: 8px; padding: 15px">
                         <el-row style="padding: 0 10px">
-                          <el-button size="mini" type="primary" style="float: right">一次性备份</el-button>
+                          <el-button size="mini" type="primary" style="float: right" @click="showBackupOnceDialog(true)">一次性备份</el-button>
                         </el-row>
                         <el-row style="margin-bottom: 15px">
                           <el-col :span="8">备份策略: {{ backupStrategy.name }}</el-col>
@@ -206,8 +269,41 @@ export default {
       backupHistory: [
         { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'sltwfqm7huz', startTime: '2022-08-31 16:43:01', endTime: '2022-08-31 16:45:28', size: '2.08GB', status: '成功' },
         { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
-      ]
+      ],
+      backupDialogVisible: false,
+      strategyDialogVisible: false,
+      strategyDialogTitle: '禁用备份策略',
+      strategyOperation: 1
     };
+  },
+  methods: {
+    showBackupOnceDialog(flag) {
+      this.backupDialogVisible = flag
+    },
+    showStrategyDialog(flag, type) {
+      this.strategyOperation = type
+      this.strategyDialogVisible = flag
+      // 禁用备份策略
+      if (this.strategyOperation === 1) {
+        this.strategyDialogTitle = '禁用备份策略'
+      } else {
+        // 删除备份策略
+        this.strategyDialogTitle = '删除备份策略'
+      }
+    },
+    backupOnceSubmit() {
+      this.showBackupOnceDialog(false)
+    },
+    strategySubmit() {
+      // 禁用备份策略
+      if (this.strategyOperation === 1) {
+        this.strategyDialogTitle = '禁用备份策略'
+      } else {
+        // 删除备份策略
+        this.strategyDialogTitle = '删除备份策略'
+      }
+      this.showStrategyDialog(false)
+    }
   }
 };
 </script>
