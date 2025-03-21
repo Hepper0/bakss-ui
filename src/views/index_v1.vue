@@ -65,7 +65,6 @@
 
 <script>
 import PanelGroup from './dashboard/PanelGroup'
-require('/src/views/style/panel.css')
 
 export default {
   name: 'Index',
@@ -103,31 +102,6 @@ export default {
     padding: 8px;
   }
 }
-//.panel-container {
-//  background: #fff;
-//  border-radius: 8px;
-//  padding: 10px 15px;
-//  margin-bottom: 10px;
-//  border: 1px solid rgba(0, 0, 0, 0.1)
-//}
-//
-//.panel-icon {
-//  font-size: 20px;
-//  padding: 0 10px;
-//  color: cornflowerblue;
-//}
-//
-//.panel-table-wrapper {
-//  padding-top: 4px;
-//  background-color: #4b81e0;
-//  border-top-left-radius: 10px;
-//  border-top-right-radius: 10px;
-//
-//  .el-table {
-//    border-top-left-radius: 6px;
-//    border-top-right-radius: 6px
-//  }
-//}
 
 font-body {
   font-family: "Microsoft YaHei", "微软雅黑", sans-serif;

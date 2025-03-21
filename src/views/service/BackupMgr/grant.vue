@@ -74,7 +74,6 @@
 </template>
 
 <script>
-require('/src/views/style/panel.css')
 export default {
   name: "grant",
   methods: {}

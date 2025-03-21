@@ -104,6 +104,23 @@ export const constantRoutes = [
         meta: { title: '详情' },
       }
     ]
+  },
+  {
+    path: '/task',
+    component: Layout,
+    hidden: true,
+    meta: { title: '我的任务' },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/task/index'),
+      },
+      {
+        path: 'detail',
+        component: () => import('@/views/task/detail'),
+        meta: { title: '详情' },
+      }
+    ]
   }
 ]
 
