@@ -41,13 +41,13 @@
                 <el-button icon="el-icon-edit" size="mini" type="text" @click="editRow(row)"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="授权" placement="top-start">
-                <el-button icon="el-icon-key" size="mini" type="text" @click="goto('grant', row)"></el-button>
+                <el-button icon="el-icon-key" size="mini" type="text" @click="goto('backup/grant', row.id)"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="用户" placement="top-start">
                 <el-button icon="el-icon-s-custom" size="mini" type="text" @click="editRow(row)"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="更多操作" placement="top-start">
-                <el-button icon="el-icon-more" size="mini" type="text" @click="goto('more', row.id)"></el-button>
+                <el-button icon="el-icon-more" size="mini" type="text" @click="goto('backup/more', row.id)"></el-button>
               </el-tooltip>
             </template>
           </el-table-column>

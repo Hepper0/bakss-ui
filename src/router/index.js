@@ -121,6 +121,29 @@ export const constantRoutes = [
         meta: { title: '详情' },
       }
     ]
+  },
+  {
+    path: '/service/backup',
+    component: Layout,
+    hidden: true,
+    nodirection: true,
+    meta: { title: '备份管理' },
+    children: [
+        {
+          path: '',
+          component: () => import('@/views/service/BackupMgr/index'),
+        },
+        {
+          path: 'more',
+          component: () => import('@/views/service/BackupMgr/more'),
+          meta: { title: '更多操作' },
+        },
+        {
+          path: 'grant',
+          component: () => import('@/views/service/BackupMgr/grant'),
+          meta: { title: '授权' },
+        }
+    ]
   }
 ]
 

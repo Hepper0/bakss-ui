@@ -6,10 +6,10 @@
     </el-row>
     <el-row :gutter="24" class="panel-group">
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-        <div class="card-panel container" @click="handleSetLineChartData('newVisitis')">
+        <div class="card-panel container" @click="gotoApply()">
           <el-row style="width: 100%; text-align: center">
             <el-row>
-              <span class="panel-num-font">100</span>
+              <span class="panel-num-font">{{ applyCount }}</span>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的申请</span>
@@ -18,10 +18,10 @@
         </div>
       </el-col>
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-        <div class="card-panel container" style="background-color: #bb0dbbc7" @click="handleSetLineChartData('newVisitis')">
+        <div class="card-panel container" style="background-color: #bb0dbbc7" @click="gotoPending()">
           <el-row style="width: 100%; text-align: center;">
             <el-row>
-              <span class="panel-num-font">100</span>
+              <span class="panel-num-font">{{ pendingCount }}</span>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的待审批的申请</span>
@@ -30,10 +30,10 @@
         </div>
       </el-col>
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-        <div class="card-panel container" style="background-color: #0b990bdb" @click="handleSetLineChartData('newVisitis')">
+        <div class="card-panel container" style="background-color: #0b990bdb" @click="gotoClient()">
           <el-row style="width: 100%; text-align: center">
             <el-row>
-              <span class="panel-num-font">100</span>
+              <span class="panel-num-font">{{ clientCount }}</span>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的备份客户端</span>
@@ -42,10 +42,10 @@
         </div>
       </el-col>
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-        <div class="card-panel container" style="background-color: #e56001eb" @click="handleSetLineChartData('newVisitis')">
+        <div class="card-panel container" style="background-color: #e56001eb" @click="gotoTask()">
           <el-row style="width: 100%; text-align: center">
             <el-row>
-              <span class="panel-num-font">100</span>
+              <span class="panel-num-font">{{ taskCount }}</span>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的任务</span>
@@ -58,15 +58,36 @@
 </template>
 
 <script>
-import CountTo from 'vue-count-to'
 
 export default {
+  data: function () {
+    return {
+      applyCount: 100,
+      pendingCount: 100,
+      clientCount: 100,
+      taskCount: 100
+    }
+  },
   components: {
-    CountTo
   },
   methods: {
-    handleSetLineChartData(type) {
-      this.$emit('handleSetLineChartData', type)
+    handleClick(type) {
+      this.$emit('clickPanel', type)
+    },
+    gotoApply() {
+      this.goto('review')
+    },
+    gotoPending() {
+      this.goto('review', { status: 'pending' })
+    },
+    gotoClient() {
+      this.goto('client')
+    },
+    gotoTask() {
+      this.goto('task')
+    },
+    goto(fn, query) {
+      this.$router.push({ path: '/' + fn, query})
     }
   }
 }

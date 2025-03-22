@@ -21,7 +21,7 @@
               </el-table>
             </div>
             <div style="height: 60px; padding: 20px 10px">
-              <div style="float: right">
+              <div style="float: right" @click="goto('review')">
                 <b class="font-body" style="color: #558bea; font-size: 15px">
                   >>更多
                 </b>
@@ -40,15 +40,15 @@
           </div>
           <div>
             <div class="panel-table-wrapper">
-              <el-table :data="recentApplications">
+              <el-table :data="recentTask">
+                <el-table-column prop="applyUser" label="申请人"></el-table-column>
                 <el-table-column prop="serviceType" label="服务类型"></el-table-column>
-                <el-table-column prop="status" label="审核状态"></el-table-column>
-                <el-table-column prop="exeStatus" label="执行状态"></el-table-column>
+                <el-table-column prop="taskName" label="任务名称"></el-table-column>
                 <el-table-column prop="applyTime" label="申请时间"></el-table-column>
               </el-table>
             </div>
             <div style="height: 60px; padding: 20px 10px">
-              <div style="float: right">
+              <div style="float: right" @click="goto('task')">
                 <b class="font-body" style="color: #558bea; font-size: 15px">
                   >>更多
                 </b>
@@ -73,12 +73,16 @@ export default {
   },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis
+      recentApplications: [],
+      recentTask: []
     }
   },
   methods: {
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type]
+    },
+    goto(fn) {
+      this.$router.push({ path: '/' + fn })
     }
   }
 }
@@ -103,7 +107,12 @@ export default {
   }
 }
 
-font-body {
+.font-body {
   font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+
 }
+.font-body:hover {
+  cursor: pointer;
+}
+
 </style>

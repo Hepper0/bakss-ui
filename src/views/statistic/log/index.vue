@@ -62,7 +62,7 @@ export default {
       }
     },
     gotoDetail(row) {
-      this.$router.push({ path: '/review/detail', query: { id: row.id } })
+      this.$router.push({ path: '/statistics/detail', query: { id: row.id } })
     }
   }
 };
