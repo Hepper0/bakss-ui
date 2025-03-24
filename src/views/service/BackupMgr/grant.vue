@@ -5,14 +5,14 @@
         <span>需要授权的客户端列表</span>
       </div>
       <div class="panel-table-wrapper">
-        <el-table :data="backupHistory" size="small">
+        <el-table :data="backupList" size="small">
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
-          <el-table-column prop="client" label="客户端名称"></el-table-column>
-          <el-table-column prop="backupType" label="备份内容"></el-table-column>
+          <el-table-column prop="clientName" label="客户端名称"></el-table-column>
+          <el-table-column prop="backupContent" label="备份内容"></el-table-column>
           <el-table-column prop="appName" label="应用名称"></el-table-column>
           <el-table-column prop="backupIP" label="备份IP"></el-table-column>
           <el-table-column prop="platform" label="操作系统类型" />
-          <el-table-column prop="principal" label="负责人" />
+          <el-table-column prop="owner" label="负责人" />
         </el-table>
       </div>
       <!-- 分页 -->
@@ -24,9 +24,8 @@
           <b style="color: red">* </b><b>授权用户：</b>
         </el-col>
         <el-col :span="21">
-          <el-select style="width: 500px" size="small">
-            <el-option>A</el-option>
-            <el-option>B</el-option>
+          <el-select style="width: 500px" size="small" v-model="grantUser">
+            <el-option v-for="u in userList" :label="u.name" :key="u.id" :value="u.id" />
           </el-select>
         </el-col>
       </el-row>
@@ -35,18 +34,19 @@
           <b style="color: red">* </b><b>权限类型：</b>
         </el-col>
         <el-col :span="21">
-          <el-button-group>
-            <el-button size="small">永久</el-button>
-            <el-button size="small">非永久</el-button>
-          </el-button-group>
+          <el-radio-group size="mini" v-model="expiration">
+            <el-radio-button label="forever" :name="EXPIRATION_FOREVER">永久</el-radio-button>
+            <el-radio-button label="temporary" :name="EXPIRATION_TEMPORARY">非永久</el-radio-button>
+          </el-radio-group>
         </el-col>
       </el-row>
-      <el-row class="form-item">
+      <el-row class="form-item" v-show="expiration === EXPIRATION_TEMPORARY">
         <el-col :span="3" class="form-title">
           <b style="color: red">* </b><b>起止时间：</b>
         </el-col>
         <el-col :span="21">
           <el-date-picker
+            v-model="dateRange"
             size="mini"
             type="datetimerange"
             range-separator="-"
@@ -62,21 +62,67 @@
           <b style="color: red">* </b><b>申请理由：</b>
         </el-col>
         <el-col :span="21">
-          <el-input style="width: 500px" type="textarea" :rows="5" />
+          <el-input v-model="reason" style="width: 500px" type="textarea" :rows="5" />
         </el-col>
       </el-row>
       <el-row style="display: flex; justify-content: right">
         <el-button size="small" type="primary">取消</el-button>
-        <el-button size="small" type="success">提交</el-button>
+        <el-button @click="submit" size="small" type="success">提交</el-button>
       </el-row>
     </div>
   </div>
 </template>
 
 <script>
+const EXPIRATION_FOREVER = 'forever'
+const EXPIRATION_TEMPORARY = 'temporary'
+
 export default {
   name: "grant",
-  methods: {}
+  data: function () {
+    return {
+      EXPIRATION_FOREVER,
+      EXPIRATION_TEMPORARY,
+      tableData: [],
+      expiration: EXPIRATION_FOREVER,
+      dateRange: undefined,
+      reason: undefined,
+      grantUser: undefined,
+      userList: [{ name: 'Aaa', id: 1},{ name: 'Baa', id: 2}],
+      backupList: [{
+        id: 1,
+        backupSoftware: 'NetBackup',
+        clientName: 'swtx9ltz7mq',
+        backupContent: 'SQL Server',
+        appName: '--',
+        backupIP: '10.122.145.38',
+        platform: 'Linux',
+        owner: 'wangk7@lenovo.com'
+      }]
+    }
+  },
+  mounted() {
+    const id = this.$route.query.id
+    this.getDetailById(id)
+  },
+  methods: {
+    getDetailById(id) {
+      console.log(id)
+    },
+    submit() {
+      const data = {
+        ids: this.backupList.map((b) => b.id),
+        user: this.grantUser,
+        reason: this.reason,
+        expiration: this.expiration
+      }
+      if (this.expiration === EXPIRATION_TEMPORARY) {
+        data['dateRange'] = this.dateRange
+      }
+      console.log(data)
+      // todo call api
+    }
+  }
 }
 </script>
 
