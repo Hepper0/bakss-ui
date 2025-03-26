@@ -66,7 +66,7 @@
         </el-col>
       </el-row>
       <el-row style="display: flex; justify-content: right">
-        <el-button size="small" type="primary">取消</el-button>
+        <el-button @click="back" size="small" type="primary">取消</el-button>
         <el-button @click="submit" size="small" type="success">提交</el-button>
       </el-row>
     </div>
@@ -120,7 +120,10 @@ export default {
         data['dateRange'] = this.dateRange
       }
       console.log(data)
-      // todo call api
+      // todo call api, goto apply list
+    },
+    back() {
+      history.back()
     }
   }
 }

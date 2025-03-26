@@ -56,7 +56,7 @@
         </el-col>
       </el-row>
       <el-row style="display: flex; justify-content: right">
-        <el-button size="small" type="primary">取消</el-button>
+        <el-button @click="backup" size="small" type="primary">取消</el-button>
         <el-button @click="submit" size="small" type="success">提交</el-button>
       </el-row>
     </div>
@@ -120,6 +120,9 @@ export default {
     },
     getDetailById(id) {
       console.log(id)
+    },
+    backup() {
+      history.back()
     }
   }
 }

@@ -39,3 +39,9 @@
   display: flex;
   justify-content: right
 }
+
+.text {
+  font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+  opacity: 0.9;
+}
+

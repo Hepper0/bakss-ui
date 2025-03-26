@@ -9,31 +9,31 @@
           <el-input disabled v-model="formData.id" class="form-item"></el-input>
         </el-col>
         <el-col :span="6">申请类型
-          <el-input disabled v-model="formData.applyType" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.applyType" class="form-item"></el-input></el-col>
         <el-col :span="6">申请人
-          <el-input disabled v-model="formData.applyUser" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.applyUser" class="form-item"></el-input></el-col>
         <el-col :span="6">申请时间
-          <el-input disabled v-model="formData.applyTime" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.applyTime" class="form-item"></el-input></el-col>
       </el-row>
       <el-row :gutter="24">
         <el-col :span="6">备份软件
-          <el-input disabled v-model="formData.backupSoftware" class="form-item"></el-input>
+          <el-input size="small" disabled v-model="formData.backupSoftware" class="form-item"></el-input>
         </el-col>
         <el-col :span="6">备份内容
-          <el-input disabled v-model="formData.backupType" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.backupType" class="form-item"></el-input></el-col>
         <el-col :span="6">备份时间
-          <el-input disabled v-model="formData.backupDate" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.backupDate" class="form-item"></el-input></el-col>
         <el-col :span="6">备份状态
-          <el-input disabled v-model="formData.backupStatus" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.backupStatus" class="form-item"></el-input></el-col>
       </el-row>
       <el-row :gutter="24">
         <el-col :span="6">客户端名称
-          <el-input disabled v-model="formData.client" class="form-item"></el-input>
+          <el-input size="small" disabled v-model="formData.client" class="form-item"></el-input>
         </el-col>
         <el-col :span="6">备份策略
-          <el-input disabled v-model="formData.strategy" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.strategy" class="form-item"></el-input></el-col>
         <el-col :span="6">调度名称
-          <el-input disabled v-model="formData.dispatch" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.dispatch" class="form-item"></el-input></el-col>
         <el-col :span="6">备份进度
           <el-progress :percentage="backupProgress" />
         </el-col>
@@ -42,15 +42,7 @@
         备注
         <el-input disabled class="form-item" type="textarea" :rows="3" />
       </el-row>
-      <div class="header" style="">
-        <span>操作区</span>
-      </div>
-      <div style="margin-top: 15px">
-        <el-button @click="cancel" style="color: orangered">取消备份申请</el-button>
-        <el-button @click="back">返回</el-button>
-      </div>
     </el-card>
-
   </div>
 </template>
 
@@ -84,14 +76,7 @@ export default {
     }
   },
   methods: {
-    back() {
-      window.history.back()
-    },
-    cancel() {
-      this.$confirm('确定取消备份申请吗？', '提示', { type: 'warning' }).then(() => {
-        // todo api
-      })
-    }
+
   }
 }
 </script>
@@ -106,7 +91,7 @@ export default {
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
   margin-top: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #f1f1f1
+  /*border-bottom: 1px solid #f1f1f1*/
 }
 
 </style>
