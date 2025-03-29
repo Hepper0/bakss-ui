@@ -45,3 +45,15 @@
   opacity: 0.9;
 }
 
+.tips {
+  height: 40px;
+  width: 100%;
+  padding: 0 20px;
+  font-size: 14px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  background-color: #fffbe6;
+  margin-bottom: 10px;
+  border: 2px solid #fbeda3;
+}

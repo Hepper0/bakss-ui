@@ -24,12 +24,12 @@
       <div class="panel-table-wrapper" style="background-color: #f1f1f1">
         <el-table size="small" :data="tableData" stripe>
           <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="backupFile" label="ID"></el-table-column>
-          <el-table-column prop="softwareVersion" label="备份软件"></el-table-column>
-          <el-table-column prop="clientName" label="申请类型"></el-table-column>
-          <el-table-column prop="clientName" label="申请人"></el-table-column>
-          <el-table-column prop="backupContent" label="审批状态"></el-table-column>
-          <el-table-column prop="vCenter" label="执行状态"></el-table-column>
+          <el-table-column prop="id" label="ID"></el-table-column>
+          <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
+          <el-table-column prop="applyType" label="申请类型"></el-table-column>
+          <el-table-column prop="applyUser" label="申请人"></el-table-column>
+          <el-table-column prop="reviewStatus" label="审批状态"></el-table-column>
+          <el-table-column prop="backupStatus" label="执行状态"></el-table-column>
           <el-table-column prop="backupIP" label="创建日期"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
