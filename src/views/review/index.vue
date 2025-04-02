@@ -4,16 +4,16 @@
       <!-- 搜索栏 -->
       <el-row :gutter="10">
         <el-col :span="6">
-          <el-select size="mini" clearable v-model="selectedFile" placeholder="请选择">
+          <el-select size="mini" clearable v-model="column" placeholder="请选择">
             <el-option label="ID" value="ID"></el-option>
             <el-option label="NetWorker" value="NetWorker"></el-option>
           </el-select>
         </el-col>
         <el-col :span="6">
-          <el-input size="mini" v-model="searchQuery" placeholder="请输入" clearable></el-input>
+          <el-input size="mini" v-model="data" placeholder="请输入" clearable></el-input>
         </el-col>
         <el-col :span="12" class="search-buttons">
-          <el-button size="mini" type="primary" icon="el-icon-search">搜索</el-button>
+          <el-button size="mini" @click="getList" type="primary" icon="el-icon-search">搜索</el-button>
           <el-button size="mini" icon="el-icon-refresh">重置</el-button>
         </el-col>
       </el-row>
@@ -22,15 +22,27 @@
     <div class="panel-container">
       <!-- 备份管理表格 -->
       <div class="panel-table-wrapper" style="background-color: #f1f1f1">
-        <el-table size="small" :data="tableData" stripe>
+        <el-table :data="tableData" stripe>
           <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
-          <el-table-column prop="applyType" label="申请类型"></el-table-column>
+          <el-table-column prop="applyType" label="申请类型">
+            <template v-slot="{ row }">
+              <span>{{ APPLY_TYPE[row.applyType] }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="applyUser" label="申请人"></el-table-column>
-          <el-table-column prop="reviewStatus" label="审批状态"></el-table-column>
-          <el-table-column prop="backupStatus" label="执行状态"></el-table-column>
-          <el-table-column prop="backupIP" label="创建日期"></el-table-column>
+          <el-table-column prop="reviewStatus" label="审批状态">
+            <template v-slot="{ row }">
+              <span :style="{ color: reviewColor[row.reviewStatus] }">{{ reviewStatus[row.reviewStatus] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="backupStatus" label="执行状态">
+            <template v-slot="{ row }">
+              <span :style="{ color: backupColor[row.backupStatus] }">{{ backupStatus[row.backupStatus] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建日期"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
               <el-button icon="el-icon-document" size="mini" type="text" @click="gotoDetail(row)"></el-button>
@@ -46,19 +58,41 @@
 </template>
 
 <script>
+import { listApply } from '@/api/review/apply'
+import { APPLY_TYPE, APPLY_MAP } from '@/views/common/config'
+
+const reviewStatus = ['待审批', '审批同意', '审批不同意']
+const reviewColor = ['#ffba00', '#42d885', '#ff4949']
+const backupStatus = ['待执行', '执行中', '执行成功', '执行失败']
+const backupColor = ['rgb(205 197 195)', '#ffba00', '#42d885', '#ff4949']
+
 export default {
   name: 'review',
-  data() {
+  data: function() {
     return {
-      selectedFile: '',
-      searchQuery: '',
+      reviewStatus,
+      reviewColor,
+      APPLY_TYPE,
+      backupStatus,
+      backupColor,
+      column: undefined,
+      data: undefined,
+      queryParams: {},
       tableData: [
-        { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
-        { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
+        // { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
+        // { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
       ]
     };
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
+    getList() {
+      listApply(this.queryParams).then(resp => {
+        this.tableData = resp.rows
+      })
+    },
     editRow(row) {
       this.$message.info(`编辑 ${row.clientName}`);
     },
@@ -70,7 +104,10 @@ export default {
       }
     },
     gotoDetail(row) {
-      this.$router.push({ path: '/review/detail', query: { id: row.id } })
+      this.$router.push({ path: '/review/detail', query: { id: row.id, taskType: APPLY_MAP[row.applyType] } })
+    },
+    reset() {
+      this.data = undefined
     }
   }
 };

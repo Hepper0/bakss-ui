@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询申请列表
 export function listApply(query) {
   return request({
-    url: '/system/apply/list',
+    url: '/service/apply/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listApply(query) {
 // 查询申请详细
 export function getApply(id) {
   return request({
-    url: '/system/apply/' + id,
+    url: '/service/apply/' + id,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getApply(id) {
 // 新增申请
 export function addApply(data) {
   return request({
-    url: '/system/apply',
+    url: '/service/apply',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addApply(data) {
 // 修改申请
 export function updateApply(data) {
   return request({
-    url: '/system/apply',
+    url: '/service/apply',
     method: 'put',
     data: data
   })
@@ -38,7 +38,7 @@ export function updateApply(data) {
 // 删除申请
 export function delApply(id) {
   return request({
-    url: '/system/apply/' + id,
+    url: '/service/apply/' + id,
     method: 'delete'
   })
 }
