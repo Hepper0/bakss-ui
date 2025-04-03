@@ -5,7 +5,7 @@
     <backup-permission v-else-if="taskType === TYPE_BACKUP_PERMISSION" />
     <create-backup v-else-if="taskType === TYPE_CREATE_BACKUP" />
     <create-restore v-else-if="taskType === TYPE_CREATE_RESTORE" />
-    <modify-direction v-else-if="taskType === TYPE_MODIFY_DIRECTION" />
+    <modify-directory v-else-if="taskType === TYPE_MODIFY_DIRECTORY" />
     <el-card>
       <div slot="header" class="clearfix">
         <span>操作区</span>
@@ -24,12 +24,12 @@ import BackupOnce from '@/views/review/modules/BackupOnce'
 import BackupPermission from '@/views/review/modules/BackupPermission'
 import CreateBackup from '@/views/review/modules/CreateBackup'
 import CreateRestore from '@/views/review/modules/CreateRestore'
-import ModifyDirection from '@/views/review/modules/ModifyDirection'
-import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTION } from '@/views/common/config'
+import ModifyDirectory from '@/views/review/modules/ModifyDirectory'
+import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY } from '@/views/common/config'
 
 export default {
   name: 'detail',
-  components: {ModifyDirection, CreateRestore, CreateBackup, BackupOnce, BackupPermission, Strategy},
+  components: {ModifyDirectory, CreateRestore, CreateBackup, BackupOnce, BackupPermission, Strategy},
   data: function () {
     return {
       TYPE_STRATEGY,
@@ -37,8 +37,8 @@ export default {
       TYPE_BACKUP_PERMISSION,
       TYPE_CREATE_BACKUP,
       TYPE_CREATE_RESTORE,
-      TYPE_MODIFY_DIRECTION,
-      taskType: TYPE_MODIFY_DIRECTION
+      TYPE_MODIFY_DIRECTORY,
+      taskType: TYPE_MODIFY_DIRECTORY
     }
   },
   mounted() {

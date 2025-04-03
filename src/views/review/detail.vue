@@ -1,11 +1,11 @@
 <template>
   <div style="padding: 10px">
-    <stratagy v-if="taskType === TYPE_STRATEGY" />
-    <backup-once v-else-if="taskType === TYPE_BACKUP_ONCE" />
-    <backup-permission v-else-if="taskType === TYPE_BACKUP_PERMISSION" />
-    <create-backup v-else-if="taskType === TYPE_CREATE_BACKUP" />
+    <backup-permission v-if="taskType === TYPE_BACKUP_PERMISSION" />
     <create-restore v-else-if="taskType === TYPE_CREATE_RESTORE" />
-    <modify-direction v-else-if="taskType === TYPE_MODIFY_DIRECTION" />
+    <create-backup v-else-if="taskType === TYPE_CREATE_BACKUP" />
+    <backup-once v-else-if="taskType === TYPE_BACKUP_ONCE" />
+    <modify-directory v-else-if="taskType === TYPE_MODIFY_DIRECTORY" />
+    <stratagy v-else-if="taskType === TYPE_STRATEGY" />
     <el-card>
       <div slot="header" class="clearfix">
         <span>操作区</span>
@@ -24,13 +24,13 @@ import BackupOnce from './modules/BackupOnce'
 import BackupPermission from './modules/BackupPermission'
 import CreateBackup from './modules/CreateBackup'
 import CreateRestore from './modules/CreateRestore'
-import ModifyDirection from './modules/ModifyDirection'
-import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTION } from '@/views/common/config'
+import ModifyDirectory from './modules/ModifyDirectory'
+import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY } from '@/views/common/config'
 
 
 export default {
   name: 'detail',
-  components: {ModifyDirection, CreateRestore, CreateBackup, BackupOnce, BackupPermission, Strategy},
+  components: {ModifyDirectory, CreateRestore, CreateBackup, BackupOnce, BackupPermission, Strategy},
   data: function () {
     return {
       TYPE_STRATEGY,
@@ -38,12 +38,12 @@ export default {
       TYPE_BACKUP_PERMISSION,
       TYPE_CREATE_BACKUP,
       TYPE_CREATE_RESTORE,
-      TYPE_MODIFY_DIRECTION,
-      taskType: TYPE_MODIFY_DIRECTION
+      TYPE_MODIFY_DIRECTORY,
+      taskType: TYPE_MODIFY_DIRECTORY
     }
   },
   mounted() {
-    this.taskType = parseInt(this.$route.query.taskType) || 2
+    this.taskType = parseInt(this.$route.query.taskType)
   },
   methods: {
     back() {

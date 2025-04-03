@@ -26,7 +26,11 @@
           <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
           <el-table-column prop="softwareVersion" label="备份软件"></el-table-column>
-          <el-table-column prop="applyType" label="申请类型"></el-table-column>
+          <el-table-column prop="applyType" label="申请类型">
+            <template v-slot="{ row }">
+              <span>{{ APPLY_TYPE[row.applyType] }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="applyUser" label="申请人"></el-table-column>
           <el-table-column prop="reviewUser" label="审批人"></el-table-column>
           <el-table-column prop="reviewStatus" :label="taskType === 'done' ? '任务名称' : '当前任务'">
@@ -51,16 +55,18 @@
 </template>
 
 <script>
+import { APPLY_TYPE, getComponentType } from '@/views/common/config'
+
 // 代办状态 0 指派人/owner  1 dba/管理员 2 管理员
 const WAIT_STATUS = [['指派人审批', '客户端owner审批'], ['dba审批', '备份管理员审批'], '备份管理员审批']
 // 已完成状态 1 指派人/owner  2 dba 3 管理员
 const DONE_STATUS = ['', ['指派人审批', '客户端owner审批'], 'dba审批', '备份管理员审批']
 
-
 export default {
   name: "TaskList",
   data: function () {
     return {
+      APPLY_TYPE,
       selectedFile: '',
       searchQuery: '',
       tableData: [

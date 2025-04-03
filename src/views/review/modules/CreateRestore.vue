@@ -1,5 +1,7 @@
 <template>
-
+  <div>
+    create store
+  </div>
 </template>
 
 <script>

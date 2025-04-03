@@ -1,5 +1,7 @@
 <template>
-
+  <div>
+    strategy
+  </div>
 </template>
 
 <script>

@@ -1,5 +1,6 @@
 <template>
   <div>
+    modify directory
     <el-card>
       <div slot="header" class="clearfix">
         <span>基本信息</span>
@@ -81,7 +82,7 @@ const backupTypeMap = {
 }
 
 export default {
-  name: "ModifyDirection",
+  name: "ModifyDirectory",
   data: function () {
     return {
       formData: {

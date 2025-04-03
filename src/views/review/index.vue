@@ -59,7 +59,7 @@
 
 <script>
 import { listApply } from '@/api/review/apply'
-import { APPLY_TYPE, APPLY_MAP } from '@/views/common/config'
+import { APPLY_TYPE, getComponentType } from '@/views/common/config'
 
 const reviewStatus = ['待审批', '审批同意', '审批不同意']
 const reviewColor = ['#ffba00', '#42d885', '#ff4949']
@@ -104,7 +104,7 @@ export default {
       }
     },
     gotoDetail(row) {
-      this.$router.push({ path: '/review/detail', query: { id: row.id, taskType: APPLY_MAP[row.applyType] } })
+      this.$router.push({ path: '/review/detail', query: { id: row.id, taskType: getComponentType(row.applyType) } })
     },
     reset() {
       this.data = undefined
