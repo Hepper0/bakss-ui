@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { listApply } from '@/api/review/apply'
+import { listApplication } from '@/api/review/application'
 import { APPLY_TYPE, getComponentType } from '@/views/common/config'
 
 const reviewStatus = ['待审批', '审批同意', '审批不同意']
@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     getList() {
-      listApply(this.queryParams).then(resp => {
+      listApplication(this.queryParams).then(resp => {
         this.tableData = resp.rows
       })
     },

@@ -74,6 +74,8 @@
 </template>
 
 <script>
+import { applyPermission } from '@/api/review/apply'
+
 const EXPIRATION_FOREVER = 'forever'
 const EXPIRATION_TEMPORARY = 'temporary'
 
@@ -120,7 +122,10 @@ export default {
         data['dateRange'] = this.dateRange
       }
       console.log(data)
-      // todo call api, goto apply list
+      applyPermission(data).then(() => {
+        this.$route.push({ path: 'review' })
+      })
+
     },
     back() {
       history.back()
