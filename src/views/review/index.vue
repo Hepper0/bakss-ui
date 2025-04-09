@@ -26,12 +26,12 @@
           <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
-          <el-table-column prop="applyType" label="申请类型">
+          <el-table-column prop="appType" label="申请类型">
             <template v-slot="{ row }">
-              <span>{{ APPLY_TYPE[row.applyType] }}</span>
+              <span>{{ APPLY_TYPE[row.appType] }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="applyUser" label="申请人"></el-table-column>
+          <el-table-column prop="appUser" label="申请人"></el-table-column>
           <el-table-column prop="reviewStatus" label="审批状态">
             <template v-slot="{ row }">
               <span :style="{ color: reviewColor[row.reviewStatus] }">{{ reviewStatus[row.reviewStatus] }}</span>
@@ -104,7 +104,7 @@ export default {
       }
     },
     gotoDetail(row) {
-      this.$router.push({ path: '/review/detail', query: { id: row.id, taskType: getComponentType(row.applyType) } })
+      this.$router.push({ path: '/review/detail', query: { id: row.id, taskType: getComponentType(row.appType) } })
     },
     reset() {
       this.data = undefined

@@ -154,7 +154,7 @@ export default {
       }
     },
     createBackup() {
-      this.goto('CreateBackup')
+      this.goto('create')
     }
   }
 };

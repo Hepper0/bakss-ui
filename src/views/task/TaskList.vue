@@ -26,12 +26,12 @@
           <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="id" label="ID"></el-table-column>
           <el-table-column prop="softwareVersion" label="备份软件"></el-table-column>
-          <el-table-column prop="applyType" label="申请类型">
+          <el-table-column prop="appType" label="申请类型">
             <template v-slot="{ row }">
-              <span>{{ APPLY_TYPE[row.applyType] }}</span>
+              <span>{{ APPLY_TYPE[row.appType] }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="applyUser" label="申请人"></el-table-column>
+          <el-table-column prop="appUser" label="申请人"></el-table-column>
           <el-table-column prop="reviewUser" label="审批人"></el-table-column>
           <el-table-column prop="reviewStatus" :label="taskType === 'done' ? '任务名称' : '当前任务'">
             <template v-slot="{ row }">

@@ -17,7 +17,7 @@
                 <el-table-column prop="serviceType" label="服务类型"></el-table-column>
                 <el-table-column prop="status" label="审核状态"></el-table-column>
                 <el-table-column prop="exeStatus" label="执行状态"></el-table-column>
-                <el-table-column prop="applyTime" label="申请时间"></el-table-column>
+                <el-table-column prop="appTime" label="申请时间"></el-table-column>
               </el-table>
             </div>
             <div style="height: 60px; padding: 20px 10px">
@@ -41,10 +41,10 @@
           <div>
             <div class="panel-table-wrapper">
               <el-table :data="recentTask">
-                <el-table-column prop="applyUser" label="申请人"></el-table-column>
+                <el-table-column prop="appUser" label="申请人"></el-table-column>
                 <el-table-column prop="serviceType" label="服务类型"></el-table-column>
                 <el-table-column prop="taskName" label="任务名称"></el-table-column>
-                <el-table-column prop="applyTime" label="申请时间"></el-table-column>
+                <el-table-column prop="appTime" label="申请时间"></el-table-column>
               </el-table>
             </div>
             <div style="height: 60px; padding: 20px 10px">

@@ -34,9 +34,9 @@ export const APPROVAL_STATUS_WAIT_LEADER = 0;
 export const APPROVAL_STATUS_WAIT_DBA = 1;
 export const APPROVAL_STATUS_WAIT_MANAGER = 2;
 
-export const getComponentType = (applyType) => {
+export const getComponentType = (appType) => {
   for (const t in APPLY_MAP) {
-    if (APPLY_MAP[t].includes(applyType)) {
+    if (APPLY_MAP[t].includes(appType)) {
       return t
     }
   }

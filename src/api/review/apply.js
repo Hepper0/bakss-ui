@@ -1,44 +1,58 @@
 import request from '@/utils/request'
 
-// 查询申请列表
-export function listApply(query) {
+// 申请客户端管理权列表
+export function applyPermission(data) {
   return request({
-    url: '/service/apply/list',
-    method: 'get',
-    params: query
-  })
-}
-
-// 查询申请详细
-export function getApply(id) {
-  return request({
-    url: '/service/apply/' + id,
-    method: 'get'
-  })
-}
-
-// 新增申请
-export function addApply(data) {
-  return request({
-    url: '/service/apply',
+    url: '/service/apply/permission',
     method: 'post',
     data: data
   })
 }
 
-// 修改申请
-export function updateApply(data) {
+export function applyModifyDirectory(data) {
   return request({
-    url: '/service/apply',
-    method: 'put',
+    url: '/service/apply/modifyDirectory',
+    method: 'post',
     data: data
   })
 }
 
-// 删除申请
-export function delApply(id) {
+export function applyCreateBackup(data) {
   return request({
-    url: '/service/apply/' + id,
-    method: 'delete'
+    url: '/service/apply/createBackup',
+    method: 'post',
+    data: data
+  })
+}
+
+export function applyCreateRestore(data) {
+  return request({
+    url: '/service/apply/createRestore',
+    method: 'post',
+    data: data
+  })
+}
+
+export function applyStrategy(data) {
+  return request({
+    url: '/service/apply/strategy',
+    method: 'post',
+    data: data
+  })
+}
+
+export function applyModifyUser(data) {
+  return request({
+    url: '/service/apply/modifyUser',
+    method: 'post',
+    data: data
+  })
+}
+
+export function applyBackup(data) {
+  return request({
+    url: '/service/apply/backup',
+    method: 'post',
+    data: data
   })
 }

@@ -10,11 +10,11 @@
           <el-input disabled v-model="formData.id" class="form-item"></el-input>
         </el-col>
         <el-col :span="6">申请类型
-          <el-input size="small" disabled v-model="formData.applyType" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.appType" class="form-item"></el-input></el-col>
         <el-col :span="6">申请人
-          <el-input size="small" disabled v-model="formData.applyUser" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.appUser" class="form-item"></el-input></el-col>
         <el-col :span="6">申请时间
-          <el-input size="small" disabled v-model="formData.applyTime" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.appTime" class="form-item"></el-input></el-col>
       </el-row>
       <el-row :gutter="24">
         <el-col :span="6">备份软件
@@ -63,9 +63,9 @@ export default {
     return {
       formData: {
         id: 1,
-        applyType: backupTypeMap[BACKUP_TYPE_ONCE],
-        applyUser: undefined,
-        applyTime: undefined,
+        appType: backupTypeMap[BACKUP_TYPE_ONCE],
+        appUser: undefined,
+        appTime: undefined,
         backupSoftware: undefined,
         backupType: undefined,
         backupDate: undefined,

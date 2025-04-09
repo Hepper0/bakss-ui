@@ -42,3 +42,11 @@ export function delBackup(id) {
     method: 'delete'
   })
 }
+
+export function grantBackup(data) {
+  return request({
+    url: '/service/backup',
+    method: 'post',
+    data: data
+  })
+}
