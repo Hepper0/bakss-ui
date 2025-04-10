@@ -103,6 +103,11 @@ export default {
       }]
     }
   },
+  computed: {
+    user: function () {
+      return this.$store.getters.user
+    }
+  },
   mounted() {
     const id = this.$route.query.id
     this.getDetailById(id)
@@ -114,8 +119,9 @@ export default {
     submit() {
       const data = {
         ids: this.backupList.map((b) => b.id),
-        user: this.grantUser,
-        reason: this.reason,
+        applyUser: this.user.username,
+        grantUser: this.grantUser,
+        remark: this.reason,
         expiration: this.expiration
       }
       if (this.expiration === EXPIRATION_TEMPORARY) {
@@ -123,6 +129,7 @@ export default {
       }
       console.log(data)
       applyPermission(data).then(() => {
+        this.$message.success('申请提交成功!')
         this.$route.push({ path: 'review' })
       })
 

@@ -43,10 +43,26 @@ export function delBackup(id) {
   })
 }
 
-export function grantBackup(data) {
+// export function grantBackup(data) {
+//   return request({
+//     url: '/service/backup',
+//     method: 'post',
+//     data: data
+//   })
+// }
+
+export function backupStrategy(params) {
   return request({
-    url: '/service/backup',
-    method: 'post',
-    data: data
+    url: '/service/backup/strategy',
+    method: 'get',
+    params: params
+  })
+}
+
+export function backupHistory(params) {
+  return request({
+    url: '/service/backup/history',
+    method: 'get',
+    params: params
   })
 }

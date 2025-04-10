@@ -151,7 +151,7 @@
                         </span>
                         </span>
                         <span style="float: right; margin-right: 15px">
-                          <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">禁用备份</el-button>
+                          <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">{{ backupStrategy.status ? '禁用' : '启用' }}备份</el-button>
                           <el-button @click.stop="showStrategyDialog(true, 2)" type="danger" size="mini">删除</el-button>
                         </span>
                       </div>
@@ -164,7 +164,7 @@
                         <el-row style="margin-bottom: 15px">
                           <el-col :span="8">备份策略: {{ backupStrategy.name }}</el-col>
                           <el-col :span="8">数据保留时间: {{ backupStrategy.retention }}</el-col>
-                          <el-col :span="8">调度名称: {{ backupStrategy.retention }}</el-col>
+                          <el-col :span="8">调度名称: {{ backupStrategy.dispatch }}</el-col>
                         </el-row>
                         <el-row>
                           <el-col :span="8">备份目录: {{ backupStrategy.directory }}</el-col>
@@ -200,6 +200,7 @@
               <el-col :span="6">
                 时间：
                 <el-date-picker
+                  v-model="searchQuery.dataRange"
                   size="mini"
                   type="datetimerange"
                   range-separator="-"
@@ -210,20 +211,20 @@
                 </el-date-picker>
               </el-col>
               <el-col :span="4" style="display: flex">
-                策略名：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery" placeholder="请输入客户端名称" clearable></el-input>
+                策略名：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery.strategy" placeholder="请输入策略名称" clearable></el-input>
               </el-col>
               <el-col :span="4">
-                客户端名称：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery" placeholder="请输入客户端名称" clearable></el-input>
+                客户端名称：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery.clientName" placeholder="请输入客户端名称" clearable></el-input>
               </el-col>
               <el-col :span="3">
-                <el-select size="mini" clearable v-model="selectedFile" placeholder="状态">
-                  <el-option label="NetBackup" value="NetBackup"></el-option>
-                  <el-option label="NetWorker" value="NetWorker"></el-option>
+                <el-select size="mini" clearable v-model="searchQuery.status" placeholder="状态">
+                  <el-option label="备份成功" value="success"></el-option>
+                  <el-option label="备份失败" value="failure"></el-option>
                 </el-select>
               </el-col>
               <el-col :span="3" class="search-buttons">
-                <el-button size="mini" type="primary" icon="el-icon-search">搜索</el-button>
-                <el-button size="mini" icon="el-icon-refresh">重置</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-search" @click="getBackupHistory">搜索</el-button>
+                <el-button size="mini" icon="el-icon-refresh" @click="resetBackupQuery">重置</el-button>
               </el-col>
             </el-row>
           </div>
@@ -250,6 +251,9 @@
 </template>
 
 <script>
+import { applyStrategy } from '@/api/review/apply'
+import { backupHistory } from '@/api/service/backup'
+
 export default {
   name: "more",
   data() {
@@ -260,15 +264,18 @@ export default {
         backupSoftware: 'NetBackup'
       },
       backupStrategy: {
+        id: '123',
         name: '10.122.145.38_SQL_Alvayson_FULL',
         directory: 'WHOLE_DATABASE',
         retention: '1 month',
-        schedule: 'Every week on Monday at 15:00'
+        schedule: 'Every week on Monday at 15:00',
+        status: 1
       },
       backupHistory: [
         { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'sltwfqm7huz', startTime: '2022-08-31 16:43:01', endTime: '2022-08-31 16:45:28', size: '2.08GB', status: '成功' },
         { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
       ],
+      searchQuery: { dataRange: [], strategy: undefined, clientName: undefined, status: undefined },
       backupDialogVisible: false,
       strategyDialogVisible: false,
       strategyDialogTitle: '禁用备份策略',
@@ -284,7 +291,11 @@ export default {
       this.strategyDialogVisible = flag
       // 禁用备份策略
       if (this.strategyOperation === 1) {
-        this.strategyDialogTitle = '禁用备份策略'
+        if (this.backupStrategy.status === 1) {
+          this.strategyDialogTitle = '禁用备份策略'
+        } else {
+          this.strategyDialogTitle = '启用备份策略'
+        }
       } else {
         // 删除备份策略
         this.strategyDialogTitle = '删除备份策略'
@@ -294,14 +305,35 @@ export default {
       this.showBackupOnceDialog(false)
     },
     strategySubmit() {
+      const data = {
+        id: this.backupStrategy.id
+      }
       // 禁用备份策略
       if (this.strategyOperation === 1) {
-        this.strategyDialogTitle = '禁用备份策略'
+        if (this.backupStrategy.status === 1) {
+          // this.strategyDialogTitle = '禁用备份策略'
+          data.type = 2
+        } else {
+          // this.strategyDialogTitle = '启用备份策略'
+          data.type = 1
+        }
       } else {
         // 删除备份策略
-        this.strategyDialogTitle = '删除备份策略'
+        // this.strategyDialogTitle = '删除备份策略'
+        data.type = 3
       }
-      this.showStrategyDialog(false)
+      applyStrategy(data).then(resp => {
+        this.$message.success('提交成功!')
+        this.showStrategyDialog(false)
+      })
+    },
+    getBackupHistory() {
+      backupHistory({ id: this.backupStrategy.id}).then(resp => {
+        this.backupHistory = resp.rows
+      })
+    },
+    resetBackupQuery() {
+      this.searchQuery = { dataRange: [], strategy: undefined, clientName: undefined, status: undefined }
     }
   }
 };
