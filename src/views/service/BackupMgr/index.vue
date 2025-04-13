@@ -69,7 +69,7 @@
 
 <script>
 
-import { listBackup } from "@/api/service/backup";
+import { myBackup } from "@/api/service/backup"
 
 export default {
   name: 'BackupMgr',
@@ -139,7 +139,7 @@ export default {
     },
     getList() {
       this.loading = true
-      listBackup(this.queryParams).then((resp) => {
+      myBackup(this.queryParams).then((resp) => {
         this.tableData = resp.rows
         this.total = resp.total;
         this.loading = false;

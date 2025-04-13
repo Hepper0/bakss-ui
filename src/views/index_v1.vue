@@ -86,6 +86,7 @@
 import PanelGroup from './dashboard/PanelGroup'
 import { listApplication } from "@/api/review/application"
 import { getAllTaskList, getTodoTaskList } from "@/api/task"
+import { myBackup } from "@/api/service/backup"
 import { TASK_STATUS_DICT, APPLY_TYPE, REVIEW_STATUS_DICT } from "./common/config"
 
 const recordLimit = 10
@@ -140,9 +141,9 @@ export default {
       })
     },
     getClientList() {
-      // listApplication().then(resp => {
-      //   this.applyCount = resp.total
-      // })
+      myBackup().then(resp => {
+        this.clientCount = resp.total
+      })
     }
 
   }

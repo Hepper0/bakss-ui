@@ -67,19 +67,19 @@ export default {
   props: {
     applyCount: {
       type: Number,
-      default: 100
+      default: 0
     },
     pendingCount: {
       type: Number,
-      default: 100
+      default: 0
     },
     clientCount: {
       type: Number,
-      default: 100
+      default: 0
     },
     taskCount: {
       type: Number,
-      default: 100
+      default: 0
     }
   },
   methods: {
@@ -93,7 +93,7 @@ export default {
       this.goto('review', { status: 'pending' })
     },
     gotoClient() {
-      this.goto('client')
+      this.goto('service/backup')
     },
     gotoTask() {
       this.goto('task')

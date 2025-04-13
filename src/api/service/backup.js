@@ -9,6 +9,14 @@ export function listBackup(query) {
   })
 }
 
+export function myBackup(query) {
+  return request({
+    url: '/service/backup/my',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询备份详细
 export function getBackup(id) {
   return request({
