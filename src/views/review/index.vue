@@ -52,7 +52,6 @@
       </div>
 
       <!-- 分页 -->
-      <!-- 分页 -->
       <pagination
         v-show="total>0"
         :total="total"

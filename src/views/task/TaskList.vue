@@ -3,18 +3,16 @@
     <div class="panel-container">
       <!-- 搜索栏 -->
       <el-row :gutter="10">
-        <el-col :span="6">
-          <el-select size="mini" clearable v-model="selectedFile" placeholder="请选择">
+        <el-col :span="10">
+          <el-select style="width: 30%;margin-right: 15px" size="mini" clearable v-model="conditionType" placeholder="请选择">
             <el-option label="ID" value="ID"></el-option>
             <el-option label="NetWorker" value="NetWorker"></el-option>
           </el-select>
-        </el-col>
-        <el-col :span="6">
-          <el-input size="mini" v-model="searchQuery" placeholder="请输入" clearable></el-input>
+          <el-input style="width: 60%" size="mini" v-model="conditionValue" placeholder="请输入" clearable></el-input>
         </el-col>
         <el-col :span="12" class="search-buttons">
-          <el-button size="mini" type="primary" icon="el-icon-search">搜索</el-button>
-          <el-button size="mini" icon="el-icon-refresh">重置</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="getTaskList">搜索</el-button>
+          <el-button size="mini" icon="el-icon-refresh" @click="reset">重置</el-button>
         </el-col>
       </el-row>
     </div>
@@ -33,14 +31,13 @@
           </el-table-column>
           <el-table-column prop="appUser" label="申请人"></el-table-column>
           <el-table-column prop="reviewUser" label="审批人"></el-table-column>
-          <el-table-column prop="reviewStatus" :label="taskType === 'done' ? '任务名称' : '当前任务'">
+          <el-table-column prop="flowStep" :label="taskType === 'done' ? '任务名称' : '当前任务'">
             <template v-slot="{ row }">
-              <span v-if="taskType === 'done'">{{ getDoneBackupStatus(row) }}</span>
-              <span v-else>{{ getWaitingBackupStatus(row) }}</span>
+              {{ TASK_STATUS_DICT[row.flowStep] }}
             </template>
           </el-table-column>
           <el-table-column prop="createTime" :label="taskType === 'done' ? '开始时间' : '创建时间'"></el-table-column>
-          <el-table-column prop="endTime" v-if="taskType === 'done'" label="结束时间"></el-table-column>
+          <el-table-column prop="reviewTime" v-if="taskType === 'done'" label="结束时间"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
               <el-button icon="el-icon-document" size="mini" type="text" @click="gotoDetail(row)"></el-button>
@@ -49,13 +46,20 @@
         </el-table>
       </div>
       <!-- 分页 -->
-      <el-pagination class="pagination" background layout="prev, pager, next" :total="30"></el-pagination>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="pageNum"
+        :limit.sync="pageSize"
+        @pagination="getTaskList"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { APPLY_TYPE, getComponentType } from '@/views/common/config'
+import { APPLY_TYPE, TASK_STATUS_DICT } from '@/views/common/config'
+import { getDoneTaskList, getTodoTaskList } from "@/api/task"
 
 // 代办状态 0 指派人/owner  1 dba/管理员 2 管理员
 const WAIT_STATUS = [['指派人审批', '客户端owner审批'], ['dba审批', '备份管理员审批'], '备份管理员审批']
@@ -67,12 +71,24 @@ export default {
   data: function () {
     return {
       APPLY_TYPE,
-      selectedFile: '',
-      searchQuery: '',
+      TASK_STATUS_DICT,
+      conditionType: undefined,
+      conditionValue: undefined,
+      pageNum: 0,
+      pageSize: 10,
       tableData: [
         { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
         { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
       ]
+    }
+  },
+  computed: {
+    queryParams: function () {
+      return {
+        [this.conditionType]: this.conditionValue,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize
+      }
     }
   },
   props: {
@@ -80,6 +96,9 @@ export default {
       type: String,
       default: 'todo'
     }
+  },
+  mounted() {
+    this.getTaskList()
   },
   methods: {
     editRow(row) {
@@ -119,6 +138,21 @@ export default {
         case 3:
           return DONE_STATUS[3]
       }
+    },
+    getTaskList() {
+      if (this.taskType === 'todo') {
+        getTodoTaskList(this.queryParams).then(resp => {
+          this.tableData = resp.rows
+        })
+      } else {
+        getDoneTaskList(this.queryParams).then(resp => {
+          this.tableData = resp.rows
+        })
+      }
+    },
+    reset() {
+      this.conditionValue = undefined
+      this.conditionType = undefined
     }
   }
 }
