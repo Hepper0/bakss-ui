@@ -52,7 +52,14 @@
       </div>
 
       <!-- 分页 -->
-      <el-pagination class="pagination" background layout="prev, pager, next" :total="30"></el-pagination>
+      <!-- 分页 -->
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
     </div>
   </div>
 </template>
@@ -77,11 +84,15 @@ export default {
       backupColor,
       column: undefined,
       data: undefined,
-      queryParams: {},
+      queryParams: {
+        pageNum: 0,
+        pageSize: 10
+      },
       tableData: [
         // { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
         // { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
-      ]
+      ],
+      total: 0,
     };
   },
   mounted() {
@@ -91,6 +102,7 @@ export default {
     getList() {
       listApplication(this.queryParams).then(resp => {
         this.tableData = resp.rows
+        this.total = resp.total
       })
     },
     editRow(row) {

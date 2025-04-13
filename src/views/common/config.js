@@ -30,6 +30,19 @@ export const APPLY_MAP = [
 ]
 
 export const TASK_STATUS = ['指派人审批', '客户端owner审批', 'dba审批', '备份管理员审批']
+export const TASK_STATUS_DICT = {
+  'assign': '指派人审批',
+  'leader': '直接上级审批',
+  'owner': '客户端owner审批',
+  'dba': 'dba审批',
+  'dbaLeader': 'dba经理审批',
+  'admin': '备份管理员审批'
+}
+export const REVIEW_STATUS_DICT = {
+  0: '待审批',
+  1: '审批同意',
+  2: '审批不同意'
+}
 export const APPROVAL_STATUS_WAIT_LEADER = 0;
 export const APPROVAL_STATUS_WAIT_DBA = 1;
 export const APPROVAL_STATUS_WAIT_MANAGER = 2;

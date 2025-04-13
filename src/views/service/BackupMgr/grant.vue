@@ -25,7 +25,7 @@
         </el-col>
         <el-col :span="21">
           <el-select style="width: 500px" size="small" v-model="grantUser">
-            <el-option v-for="u in userList" :label="u.name" :key="u.id" :value="u.id" />
+            <el-option v-for="u in userList" :label="u.name" :key="u.id" :value="u.name" />
           </el-select>
         </el-col>
       </el-row>
@@ -35,8 +35,8 @@
         </el-col>
         <el-col :span="21">
           <el-radio-group size="mini" v-model="expiration">
-            <el-radio-button label="forever" :name="EXPIRATION_FOREVER">永久</el-radio-button>
-            <el-radio-button label="temporary" :name="EXPIRATION_TEMPORARY">非永久</el-radio-button>
+            <el-radio-button :label="EXPIRATION_FOREVER" name="forever">永久</el-radio-button>
+            <el-radio-button :label="EXPIRATION_TEMPORARY" name="temporary">非永久</el-radio-button>
           </el-radio-group>
         </el-col>
       </el-row>
@@ -75,9 +75,11 @@
 
 <script>
 import { applyPermission } from '@/api/review/apply'
+import { getBackup } from "@/api/service/backup"
+import { GRANT_BACKUP_PERMISSION } from '@/views/common/config'
 
-const EXPIRATION_FOREVER = 'forever'
-const EXPIRATION_TEMPORARY = 'temporary'
+const EXPIRATION_FOREVER = 1
+const EXPIRATION_TEMPORARY = 2
 
 export default {
   name: "grant",
@@ -93,14 +95,24 @@ export default {
       userList: [{ name: 'Aaa', id: 1},{ name: 'Baa', id: 2}],
       backupList: [{
         id: 1,
-        backupSoftware: 'NetBackup',
+        backupSoftware: 'Veeam',
         clientName: 'swtx9ltz7mq',
         backupContent: 'SQL Server',
         appName: '--',
         backupIP: '10.122.145.38',
         platform: 'Linux',
         owner: 'wangk7@lenovo.com'
-      }]
+      },
+        {
+          id: 2,
+          backupSoftware: 'Veeam',
+          clientName: 'swtx9ltz7mq',
+          backupContent: 'MySQL',
+          appName: '--',
+          backupIP: '10.122.145.39',
+          platform: 'Linux',
+          owner: 'wangk7@lenovo.com'
+        }]
     }
   },
   computed: {
@@ -114,23 +126,26 @@ export default {
   },
   methods: {
     getDetailById(id) {
-      console.log(id)
+      getBackup(id).then(resp => {
+        this.backupList = [resp.data]
+      })
     },
     submit() {
+      console.log(this.user)
       const data = {
-        ids: this.backupList.map((b) => b.id),
-        applyUser: this.user.username,
+        backupIds: this.backupList.map((b) => b.id),
+        appType: GRANT_BACKUP_PERMISSION,
         grantUser: this.grantUser,
         remark: this.reason,
-        expiration: this.expiration
+        expiration: this.expiration,
       }
       if (this.expiration === EXPIRATION_TEMPORARY) {
-        data['dateRange'] = this.dateRange
+        data['startTime'] = this.dateRange[0]
+        data['endTime'] = this.dateRange[1]
       }
-      console.log(data)
       applyPermission(data).then(() => {
         this.$message.success('申请提交成功!')
-        this.$route.push({ path: 'review' })
+        this.$router.push({ path: '/review' })
       })
 
     },

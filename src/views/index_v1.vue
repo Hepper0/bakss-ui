@@ -1,7 +1,12 @@
 <template>
   <div class="dashboard-editor-container">
 
-    <panel-group />
+    <panel-group
+      :applyCount="applyCount"
+      :pendingCount="pendingCount"
+      :clientCount="clientCount"
+      :taskCount="taskCount"
+    />
 
     <el-row :gutter="10">
       <!-- 最近申请 -->
@@ -13,9 +18,17 @@
           </div>
           <div>
             <div class="panel-table-wrapper">
-              <el-table :data="recentApplications">
-                <el-table-column prop="serviceType" label="服务类型"></el-table-column>
-                <el-table-column prop="status" label="审核状态"></el-table-column>
+              <el-table size="small" :data="recentApplications">
+                <el-table-column prop="serviceType" label="服务类型">
+                  <template  v-slot="{ row }">
+                    {{ APPLY_TYPE[row.appType] }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="reviewStatus" label="审核状态">
+                  <template  v-slot="{ row }">
+                    {{ REVIEW_STATUS_DICT[row.appType] }}
+                  </template>
+                </el-table-column>
                 <el-table-column prop="exeStatus" label="执行状态"></el-table-column>
                 <el-table-column prop="appTime" label="申请时间"></el-table-column>
               </el-table>
@@ -40,10 +53,18 @@
           </div>
           <div>
             <div class="panel-table-wrapper">
-              <el-table :data="recentTask">
+              <el-table size="small" :data="recentTask">
                 <el-table-column prop="appUser" label="申请人"></el-table-column>
-                <el-table-column prop="serviceType" label="服务类型"></el-table-column>
-                <el-table-column prop="taskName" label="任务名称"></el-table-column>
+                <el-table-column prop="appType" label="服务类型">
+                  <template  v-slot="{ row }">
+                    {{ APPLY_TYPE[row.appType] }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="taskName" label="任务名称">
+                  <template  v-slot="{ row }">
+                    {{ TASK_STATUS_DICT[row.flowStep] }}
+                  </template>
+                </el-table-column>
                 <el-table-column prop="appTime" label="申请时间"></el-table-column>
               </el-table>
             </div>
@@ -58,13 +79,17 @@
         </div>
       </el-col>
     </el-row>
-
-
   </div>
 </template>
 
 <script>
 import PanelGroup from './dashboard/PanelGroup'
+import { listApplication } from "@/api/review/application"
+import { getAllTaskList, getTodoTaskList } from "@/api/task"
+import { TASK_STATUS_DICT, APPLY_TYPE, REVIEW_STATUS_DICT } from "./common/config"
+
+const recordLimit = 10
+
 
 export default {
   name: 'Index',
@@ -73,17 +98,53 @@ export default {
   },
   data() {
     return {
+      TASK_STATUS_DICT,
+      APPLY_TYPE,
+      REVIEW_STATUS_DICT,
       recentApplications: [],
-      recentTask: []
+      recentTask: [],
+      applyCount: 100,
+      pendingCount: 100,
+      clientCount: 100,
+      taskCount: 100
     }
+  },
+  mounted() {
+    this.getApplicationList()
+    this.getTaskList()
+    this.getTodoTaskList()
+    this.getClientList()
   },
   methods: {
     handleSetLineChartData(type) {
-      this.lineChartData = lineChartData[type]
+      // this.lineChartData = lineChartData[type]
     },
     goto(fn) {
       this.$router.push({ path: '/' + fn })
+    },
+    getApplicationList() {
+      listApplication({ pageSize: recordLimit, pageNum: 1}).then(resp => {
+        this.applyCount = resp.total
+        this.recentApplications = resp.rows
+      })
+    },
+    getTaskList() {
+      getAllTaskList().then(resp => {
+        this.taskCount = resp.total
+      })
+    },
+    getTodoTaskList() {
+      getTodoTaskList().then(resp => {
+        this.pendingCount = resp.total
+        this.recentTask = resp.rows.slice(0, recordLimit)
+      })
+    },
+    getClientList() {
+      // listApplication().then(resp => {
+      //   this.applyCount = resp.total
+      // })
     }
+
   }
 }
 </script>

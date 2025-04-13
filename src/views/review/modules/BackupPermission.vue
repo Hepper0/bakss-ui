@@ -6,16 +6,20 @@
         <span>基本信息</span>
       </div>
       <el-row :gutter="24">
-        <el-col :span="6">ID
+        <el-col :span="6">
+          <div class="form-item">ID</div>
           <el-input size="small" disabled v-model="formData.id" class="form-item"></el-input>
         </el-col>
-        <el-col :span="6">申请类型
-          <el-input size="small" disabled v-model="formData.appType" class="form-item"></el-input>
+        <el-col :span="6">
+          <div class="form-item">申请类型</div>
+          <el-input size="small" disabled v-model="formData.appTypeZh" class="form-item"></el-input>
         </el-col>
-        <el-col :span="6">申请人
+        <el-col :span="6">
+          <div class="form-item">申请人</div>
           <el-input size="small" disabled v-model="formData.appUser" class="form-item"></el-input>
         </el-col>
-        <el-col :span="6">申请时间
+        <el-col :span="6">
+          <div class="form-item">申请时间</div>
           <el-input size="small" disabled v-model="formData.appTime" class="form-item"></el-input>
         </el-col>
       </el-row>
@@ -45,7 +49,7 @@
         </el-col>
       </el-row>
       <el-row>
-        备注
+        <div class="form-item">备注</div>
         <el-input disabled class="form-item" type="textarea" :rows="3" />
       </el-row>
     </el-card>
@@ -55,7 +59,7 @@
       </div>
       <el-collapse :value="1" style="border: 1px solid #f1f1f1; padding: 0 18px">
         <el-collapse-item :name="1">
-          <el-table v-loading="loading" size="small" :data="tableData" @selection-change="handleSelectionChange" stripe>
+          <el-table v-loading="loading" size="mini" :data="tableData" @selection-change="handleSelectionChange" stripe>
             <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
             <el-table-column prop="clientName" label="客户端名称"></el-table-column>
             <el-table-column prop="backupContent" label="备份内容"></el-table-column>
@@ -73,7 +77,7 @@
       </div>
       <el-collapse :value="1" style="border: 1px solid #f1f1f1; padding: 0 18px">
         <el-collapse-item :name="1">
-          <el-table v-loading="loading" size="small" :data="tableData" @selection-change="handleSelectionChange" stripe>
+          <el-table v-loading="loading" size="mini" :data="tableData" @selection-change="handleSelectionChange" stripe>
             <el-table-column prop="taskName" label="任务名称"></el-table-column>
             <el-table-column prop="reviewUser" label="执行人"></el-table-column>
             <el-table-column prop="startTime" label="开始时间"></el-table-column>
@@ -88,7 +92,8 @@
 </template>
 
 <script>
-
+import { getApplication } from '@/api/review/application'
+import { APPLY_TYPE } from '@/views/common/config'
 const BACKUP_TYPE_SCHEDULER = 1
 const BACKUP_TYPE_ONCE = 2
 
@@ -103,7 +108,8 @@ export default {
     return {
       formData: {
         id: 1,
-        appType: backupTypeMap[BACKUP_TYPE_ONCE],
+        appType: undefined,
+        appTypeZh: undefined,
         appUser: undefined,
         appTime: undefined,
         backupSoftware: undefined,
@@ -115,6 +121,18 @@ export default {
       },
       backupProgress: 0
     }
+  },
+  mounted() {
+    this.formData.id = this.$route.query.id
+    this.formData.appType = this.$route.query.taskType
+    this.formData.appTypeZh = APPLY_TYPE[this.$route.query.taskType]
+    console.log('apptype', this.formData.appTypeZh)
+    getApplication(this.formData.id).then(resp => {
+      const data = resp.data
+      this.formData.appUser = data.appUser
+      this.formData.appTime = data.appTime
+    })
+
   },
   methods: {
     back() {
@@ -132,7 +150,7 @@ export default {
 <style scoped>
 .form-item {
   width: 100%;
-  margin: 10px 0 15px 0;
+  margin: 0 0 10px 0;
 }
 
 .header {

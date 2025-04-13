@@ -62,13 +62,25 @@
 export default {
   data: function () {
     return {
-      applyCount: 100,
-      pendingCount: 100,
-      clientCount: 100,
-      taskCount: 100
     }
   },
-  components: {
+  props: {
+    applyCount: {
+      type: Number,
+      default: 100
+    },
+    pendingCount: {
+      type: Number,
+      default: 100
+    },
+    clientCount: {
+      type: Number,
+      default: 100
+    },
+    taskCount: {
+      type: Number,
+      default: 100
+    }
   },
   methods: {
     handleClick(type) {
@@ -88,6 +100,26 @@ export default {
     },
     goto(fn, query) {
       this.$router.push({ path: '/' + fn, query})
+    },
+    getApplicationList() {
+      listApplication().then(resp => {
+        this.applyCount = resp.total
+      })
+    },
+    getTaskList() {
+      getAllTaskList().then(resp => {
+        this.taskCount = resp.total
+      })
+    },
+    getTodoTaskList() {
+      getTodoTaskList().then(resp => {
+        this.pendingCount = resp.total
+      })
+    },
+    getClientList() {
+      // listApplication().then(resp => {
+      //   this.applyCount = resp.total
+      // })
     }
   }
 }
