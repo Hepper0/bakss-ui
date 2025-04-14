@@ -4,19 +4,19 @@
       <!-- 搜索栏 -->
       <el-row :gutter="10">
         <el-col :span="6">
-          <el-select size="mini" clearable v-model="backupSoftware" placeholder="备份文件">
+          <el-select size="mini" clearable v-model="queryParams.backupSoftware" placeholder="备份文件">
             <el-option label="NetBackup" value="NetBackup"></el-option>
             <el-option label="NetWorker" value="NetWorker"></el-option>
           </el-select>
         </el-col>
         <el-col :span="6">
-          <el-input size="mini" v-model="clientName" placeholder="请输入客户端名称" clearable></el-input>
+          <el-input size="mini" v-model="queryParams.clientName" placeholder="请输入客户端名称" clearable></el-input>
         </el-col>
         <el-col :span="12" class="search-buttons">
           <el-button size="mini" @click="getList" type="primary" icon="el-icon-search">搜索</el-button>
           <el-button size="mini" @click="reset" icon="el-icon-refresh">重置</el-button>
           <el-button size="mini" @click="createBackup" type="success">创建备份</el-button>
-          <el-button size="mini" @click="gotoApply">申请备份管理员权限</el-button>
+          <el-button size="mini" @click="gotoApply()">申请备份管理员权限</el-button>
         </el-col>
       </el-row>
     </div>
@@ -37,7 +37,7 @@
           <el-table-column prop="owner" label="负责人"></el-table-column>
           <el-table-column label="操作" width="120">
             <template v-slot="{ row }">
-              <el-button icon="el-icon-user-solid" size="mini" type="text" @click="goto('applyDetail', { id: row.id })"></el-button>
+              <el-button icon="el-icon-user-solid" size="mini" type="text" @click="gotoApply([row.id])"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -103,13 +103,13 @@ export default {
     handleSelectionChange (e) {
       this.selectedRows = e
     },
-    gotoApply() {
-      const ids = this.selectedRows.map((r) => r.id)
+    gotoApply(ids) {
+      ids = ids || this.selectedRows.map((r) => r.id)
       if (!ids.length) {
         this.$message.warning("未勾选内容，请先选择需要授权的内容！")
         return
       }
-      this.goto('applyDetail', { id: ids })
+      this.$router.push({ path: 'applyDetail', query: { ids: ids } })
     },
     goto(path, id) {
       this.$router.push({ path, query: { id } })

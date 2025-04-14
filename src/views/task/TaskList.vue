@@ -76,10 +76,12 @@ export default {
       conditionValue: undefined,
       pageNum: 0,
       pageSize: 10,
-      tableData: [
-        { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
-        { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
-      ]
+      total: 0,
+      taskList: [],
+      // tableData: [
+      //   { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
+      //   { backupFile: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
+      // ]
     }
   },
   computed: {
@@ -89,6 +91,9 @@ export default {
         pageNum: this.pageNum,
         pageSize: this.pageSize
       }
+    },
+    tableData: function () {
+      return this.taskList.slice((this.pageNum - 1) * this.pageSize, this.pageNum *this.pageSize)
     }
   },
   props: {
@@ -139,16 +144,21 @@ export default {
           return DONE_STATUS[3]
       }
     },
-    getTaskList() {
+    getTaskList(a,b,c,d) {
       if (this.taskType === 'todo') {
         getTodoTaskList(this.queryParams).then(resp => {
-          this.tableData = resp.rows
+          this.taskList = resp.rows
+          this.total = resp.total
         })
       } else {
         getDoneTaskList(this.queryParams).then(resp => {
-          this.tableData = resp.rows
+          this.taskList = resp.rows
+          this.total = resp.total
         })
       }
+    },
+    getPageData({page, limit}) {
+
     },
     reset() {
       this.conditionValue = undefined

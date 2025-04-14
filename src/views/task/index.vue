@@ -23,6 +23,9 @@ export default {
       activeName: 'todo',
     }
   },
+  mounted() {
+    this.activeName = this.$route.query.taskType || 'todo'
+  },
   components: {
     TaskList
   },

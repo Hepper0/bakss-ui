@@ -9,6 +9,13 @@ export function listBackup(query) {
   })
 }
 
+export function listBackupByIds(ids) {
+  return request({
+    url: '/service/backup?' + ids,
+    method: 'get',
+  })
+}
+
 export function myBackup(query) {
   return request({
     url: '/service/backup/my',

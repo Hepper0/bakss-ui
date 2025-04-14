@@ -9,7 +9,8 @@
         <div class="card-panel container" @click="gotoApply()">
           <el-row style="width: 100%; text-align: center">
             <el-row>
-              <span class="panel-num-font">{{ applyCount }}</span>
+              <count-to :start-val="0" :end-val="applyCount" :duration="1500" class="panel-num-font"/>
+<!--              <span class="panel-num-font">{{  }}</span>-->
             </el-row>
             <el-row>
               <span class="panel-title-font">我的申请</span>
@@ -21,7 +22,7 @@
         <div class="card-panel container" style="background-color: #bb0dbbc7" @click="gotoPending()">
           <el-row style="width: 100%; text-align: center;">
             <el-row>
-              <span class="panel-num-font">{{ pendingCount }}</span>
+              <count-to :start-val="0" :end-val="pendingCount" :duration="1500" class="panel-num-font"/>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的待审批的申请</span>
@@ -33,7 +34,7 @@
         <div class="card-panel container" style="background-color: #0b990bdb" @click="gotoClient()">
           <el-row style="width: 100%; text-align: center">
             <el-row>
-              <span class="panel-num-font">{{ clientCount }}</span>
+              <count-to :start-val="0" :end-val="clientCount" :duration="1500" class="panel-num-font"/>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的备份客户端</span>
@@ -45,7 +46,7 @@
         <div class="card-panel container" style="background-color: #e56001eb" @click="gotoTask()">
           <el-row style="width: 100%; text-align: center">
             <el-row>
-              <span class="panel-num-font">{{ taskCount }}</span>
+              <count-to :start-val="0" :end-val="taskCount" :duration="1500" class="panel-num-font"/>
             </el-row>
             <el-row>
               <span class="panel-title-font">我的任务</span>
@@ -58,11 +59,15 @@
 </template>
 
 <script>
+import CountTo from 'vue-count-to'
 
 export default {
   data: function () {
     return {
     }
+  },
+  components:{
+    CountTo
   },
   props: {
     applyCount: {
@@ -90,7 +95,7 @@ export default {
       this.goto('review')
     },
     gotoPending() {
-      this.goto('review', { status: 'pending' })
+      this.goto('task', { taskType: 'todo' })
     },
     gotoClient() {
       this.goto('service/backup')
@@ -100,26 +105,6 @@ export default {
     },
     goto(fn, query) {
       this.$router.push({ path: '/' + fn, query})
-    },
-    getApplicationList() {
-      listApplication().then(resp => {
-        this.applyCount = resp.total
-      })
-    },
-    getTaskList() {
-      getAllTaskList().then(resp => {
-        this.taskCount = resp.total
-      })
-    },
-    getTodoTaskList() {
-      getTodoTaskList().then(resp => {
-        this.pendingCount = resp.total
-      })
-    },
-    getClientList() {
-      // listApplication().then(resp => {
-      //   this.applyCount = resp.total
-      // })
     }
   }
 }

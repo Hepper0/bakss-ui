@@ -126,7 +126,6 @@ export default {
     this.formData.id = this.$route.query.id
     this.formData.appType = this.$route.query.taskType
     this.formData.appTypeZh = APPLY_TYPE[this.$route.query.taskType]
-    console.log('apptype', this.formData.appTypeZh)
     getApplication(this.formData.id).then(resp => {
       const data = resp.data
       this.formData.appUser = data.appUser

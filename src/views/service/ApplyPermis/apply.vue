@@ -16,7 +16,13 @@
         </el-table>
       </div>
       <!-- 分页 -->
-      <el-pagination class="pagination" background layout="prev, pager, next" :total="30"></el-pagination>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="pageNum"
+        :limit.sync="pageSize"
+        @pagination="getList"
+      />
     </el-card>
     <div class="panel-container" style="padding: 24px; margin-top: 10px">
       <el-row class="form-item">
@@ -25,8 +31,8 @@
         </el-col>
         <el-col :span="21">
           <el-radio-group size="mini" v-model="expiration">
-            <el-radio-button label="forever" :name="EXPIRATION_FOREVER">永久</el-radio-button>
-            <el-radio-button label="temporary" :name="EXPIRATION_TEMPORARY">非永久</el-radio-button>
+            <el-radio-button :label="EXPIRATION_FOREVER" name="forever">永久</el-radio-button>
+            <el-radio-button :label="EXPIRATION_TEMPORARY" name="temporary">非永久</el-radio-button>
           </el-radio-group>
         </el-col>
       </el-row>
@@ -64,8 +70,12 @@
 </template>
 
 <script>
-const EXPIRATION_FOREVER = 'forever'
-const EXPIRATION_TEMPORARY = 'temporary'
+
+import { listBackupByIds } from '@/api/service/backup'
+import { applyPermission } from '@/api/review/apply'
+import { APPLY_BACKUP_PERMISSION } from "@/views/common/config";
+const EXPIRATION_FOREVER = 1
+const EXPIRATION_TEMPORARY = 2
 
 export default {
   name: "apply",
@@ -76,53 +86,78 @@ export default {
       expiration: EXPIRATION_FOREVER,
       dateRange: undefined,
       reason: undefined,
-      backupList: [{
-        id: 1,
-        backupSoftware: 'NetBackup',
-        clientName: 'swtx9ltz7mq1',
-        backupContent: 'SQL Server',
-        appName: '--',
-        backupIP: '10.122.145.38',
-        platform: 'Linux',
-        owner: 'wangk7@lenovo.com'
-      }, {
-        id: 2,
-        backupSoftware: 'NetBackup',
-        clientName: 'swtx9ltz7mq2',
-        backupContent: 'SQL Server',
-        appName: '--',
-        backupIP: '10.122.145.39',
-        platform: 'Windows',
-        owner: 'wangk8@lenovo.com'
-      }]
+      backupList: [
+      //   {
+      //   id: 1,
+      //   backupSoftware: 'NetBackup',
+      //   clientName: 'swtx9ltz7mq1',
+      //   backupContent: 'SQL Server',
+      //   appName: '--',
+      //   backupIP: '10.122.145.38',
+      //   platform: 'Linux',
+      //   owner: 'wangk7@lenovo.com'
+      // }, {
+      //   id: 2,
+      //   backupSoftware: 'NetBackup',
+      //   clientName: 'swtx9ltz7mq2',
+      //   backupContent: 'SQL Server',
+      //   appName: '--',
+      //   backupIP: '10.122.145.39',
+      //   platform: 'Windows',
+      //   owner: 'wangk8@lenovo.com'
+      // }
+      ],
+      pageNum: 0,
+      pageSize: 1,
+      total: 0
     }
   },
   computed: {
-    loginUser: () => store.getters.user
+    user: function () {
+      return this.$store.getters.user
+    },
+    tableData: function () {
+      return this.backupList.slice((this.pageNum - 1) * this.pageSize, this.pageNum * this.pageSize)
+    }
   },
   mounted() {
-    const id = this.$route.query.id
-    this.getDetailById(id)
+    let ids = this.$route.query.ids
+    if (typeof ids === 'string') {
+      ids = [ids]
+    }
+    this.getDetailByIds(ids)
   },
   methods: {
     submit() {
       const data = {
-        ids: this.backupList.map((b) => b.id),
-        user: this.loginUser.id,  // 本人申请
-        reason: this.reason,
+        backupIds: this.backupList.map((b) => b.id),
+        appType: APPLY_BACKUP_PERMISSION,
+        grantUser: this.user.name,  // 本人申请
+        remark: this.reason,
         expiration: this.expiration
       }
       if (this.expiration === EXPIRATION_TEMPORARY) {
-        data['dateRange'] = this.dateRange
+        data['startTime'] = this.dateRange[0]
+        data['endTime'] = this.dateRange[1]
       }
-      console.log(data)
-      // todo call api
+      applyPermission(data).then(() => {
+        this.$message.success('申请提交成功!')
+        this.$router.push({ path: '/review' })
+      })
     },
-    getDetailById(id) {
-      console.log(id)
+    getDetailByIds(ids) {
+      let params = ids.map(id => 'ids='+id).join('&')
+      listBackupByIds(params).then(resp => {
+        this.backupList = resp.rows
+        this.total = resp.total
+        // this.pageSize = this.total
+      })
     },
     backup() {
       history.back()
+    },
+    getList() {
+
     }
   }
 }

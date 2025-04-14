@@ -131,7 +131,6 @@ export default {
       })
     },
     submit() {
-      console.log(this.user)
       const data = {
         backupIds: this.backupList.map((b) => b.id),
         appType: GRANT_BACKUP_PERMISSION,
@@ -147,7 +146,6 @@ export default {
         this.$message.success('申请提交成功!')
         this.$router.push({ path: '/review' })
       })
-
     },
     back() {
       history.back()

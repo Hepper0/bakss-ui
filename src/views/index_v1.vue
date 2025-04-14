@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard-editor-container">
-
     <panel-group
       :applyCount="applyCount"
       :pendingCount="pendingCount"
@@ -104,10 +103,10 @@ export default {
       REVIEW_STATUS_DICT,
       recentApplications: [],
       recentTask: [],
-      applyCount: 100,
-      pendingCount: 100,
-      clientCount: 100,
-      taskCount: 100
+      applyCount: 0,
+      pendingCount: 0,
+      clientCount: 0,
+      taskCount: 0
     }
   },
   mounted() {
