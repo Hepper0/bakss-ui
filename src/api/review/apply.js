@@ -41,9 +41,9 @@ export function applyStrategy(data) {
   })
 }
 
-export function applyModifyUser(data) {
+export function applyChangeUser(data) {
   return request({
-    url: '/service/apply/modifyUser',
+    url: '/service/apply/changeUser',
     method: 'post',
     data: data
   })
