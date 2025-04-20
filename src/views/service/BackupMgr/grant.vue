@@ -131,6 +131,14 @@ export default {
       })
     },
     submit() {
+      if (this.grantUser === undefined) {
+        this.$message.warning('请选择授权用户！')
+        return
+      }
+      if (this.reason === undefined || this.reason === '') {
+        this.$message.warning('请填写申请理由！')
+        return
+      }
       const data = {
         backupIds: this.backupList.map((b) => b.id),
         appType: GRANT_BACKUP_PERMISSION,
@@ -139,8 +147,13 @@ export default {
         expiration: this.expiration,
       }
       if (this.expiration === EXPIRATION_TEMPORARY) {
-        data['startTime'] = this.dateRange[0]
-        data['endTime'] = this.dateRange[1]
+        if (this.dateRange && this.dateRange.length === 2) {
+          data['startTime'] = this.dateRange[0]
+          data['endTime'] = this.dateRange[1]
+        } else {
+          this.$message.warning('未选择起止时间')
+          return
+        }
       }
       applyPermission(data).then(() => {
         this.$message.success('申请提交成功!')

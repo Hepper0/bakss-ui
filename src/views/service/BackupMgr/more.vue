@@ -11,10 +11,10 @@
             <b style="color: red">* </b>备份方式：
           </el-col>
           <el-col :span="20">
-            <el-button-group>
-              <el-button size="mini">立即备份</el-button>
-              <el-button size="mini">定时备份</el-button>
-            </el-button-group>
+            <el-radio-group size="mini" v-model="backupExecType">
+              <el-radio-button :label="BACKUP_RIGHT_NOW" name="rightNow">立即备份</el-radio-button>
+              <el-radio-button :label="BACKUP_AT_TIME" name="atTime">定时备份</el-radio-button>
+            </el-radio-group>
           </el-col>
         </el-row>
         <br />
@@ -23,7 +23,7 @@
             备注：
           </el-col>
           <el-col :span="20">
-            <el-input type="textarea" :rows="3"/>
+            <el-input v-mode="backupExecReason" type="textarea" :rows="3"/>
           </el-col>
         </el-row>
         <br/>
@@ -53,7 +53,7 @@
             申请理由：
           </el-col>
           <el-col :span="20">
-            <el-input type="textarea" :rows="3"/>
+            <el-input v-model="backupStrategyReason" type="textarea" :rows="3"/>
           </el-col>
         </el-row>
         <br/>
@@ -251,14 +251,25 @@
 </template>
 
 <script>
-import { applyStrategy } from '@/api/review/apply'
+import { applyStrategy, applyBackup } from '@/api/review/apply'
 import { backupHistory } from '@/api/service/backup'
+
+const BACKUP_EXEC_RIGHT_NOW = 1
+const BACKUP_EXEC_AT_TIME = 2
+export const BACKUP_RIGHT_NOW = 4
+export const BACKUP_AT_TIME = 5
+export const ENABLE_STRATEGY = 7
+export const DISABLE_STRATEGY = 8
+export const DELETE_STRATEGY = 9
 
 export default {
   name: "more",
   data() {
     return {
+      BACKUP_AT_TIME,
+      BACKUP_RIGHT_NOW,
       basicInfo: {
+        id: 1,
         backupIp: '10.122.145.38',
         masterIp: 'sltwfqm7huz',
         backupSoftware: 'NetBackup'
@@ -279,7 +290,10 @@ export default {
       backupDialogVisible: false,
       strategyDialogVisible: false,
       strategyDialogTitle: '禁用备份策略',
-      strategyOperation: 1
+      strategyOperation: 1,
+      backupExecType: BACKUP_RIGHT_NOW,
+      backupExecReason: undefined,
+      backupStrategyReason: undefined
     };
   },
   methods: {
@@ -302,25 +316,39 @@ export default {
       }
     },
     backupOnceSubmit() {
-      this.showBackupOnceDialog(false)
+      const data = {
+        backupId: this.basicInfo.id,
+        strategyId: this.backupStrategy.id,
+        appType: this.backupExecType,
+        remark: this.backupExecReason
+      }
+      applyBackup(data).then(() => {
+        this.$message.success('提交成功!')
+        this.showBackupOnceDialog(false)
+      })
     },
     strategySubmit() {
       const data = {
-        id: this.backupStrategy.id
+        backupId: this.basicInfo.id,
+        strategyId: this.backupStrategy.id,
+        remark: this.backupStrategyReason
       }
       // 禁用备份策略
       if (this.strategyOperation === 1) {
         if (this.backupStrategy.status === 1) {
           // this.strategyDialogTitle = '禁用备份策略'
           data.type = 2
+          data.appType = DISABLE_STRATEGY
         } else {
           // this.strategyDialogTitle = '启用备份策略'
           data.type = 1
+          data.appType = ENABLE_STRATEGY
         }
       } else {
         // 删除备份策略
         // this.strategyDialogTitle = '删除备份策略'
         data.type = 3
+        data.appType = DELETE_STRATEGY
       }
       applyStrategy(data).then(resp => {
         this.$message.success('提交成功!')
