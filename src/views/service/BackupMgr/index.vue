@@ -45,7 +45,7 @@
               </el-tooltip>
               <!--   todo 需求未说明   -->
               <el-tooltip class="item" effect="dark" content="申请" placement="top-start">
-                <el-button icon="el-icon-s-custom" size="mini" type="text" @click="goto('applyDetail', { id: row.id })"></el-button>
+                <el-button icon="el-icon-s-custom" size="mini" type="text" @click="gotoApplyDetail([row.id])"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="更多操作" placement="top-start">
                 <el-button icon="el-icon-more" size="mini" type="text" @click="goto('backup/more', row.id)"></el-button>
@@ -111,7 +111,7 @@ export default {
         return
       }
       if (!this.validate()) return
-      this.goto('applyDetail', { id: ids })
+      this.gotoApplyDetail(ids)
     },
     validate() {
       const softSet = new Set(this.selectedRows.map(s => s.backupSoftware))
@@ -133,6 +133,9 @@ export default {
     },
     goto(path, id) {
       this.$router.push({ path, query: { id } })
+    },
+    gotoApplyDetail(ids) {
+      this.$router.push({ path: 'applyDetail', query: { ids } })
     },
     handleSelectionChange (e) {
       this.selectedRows = e

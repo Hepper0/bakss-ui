@@ -43,7 +43,7 @@ export default {
   },
   mounted() {
     // this.type = this.$route.query
-    this.taskType = parseInt(this.$route.query.taskType) || 2
+    this.taskType = parseInt(this.$route.query.taskType)
   },
   methods: {
     back() {

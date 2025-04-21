@@ -5,7 +5,7 @@
     <create-backup v-else-if="taskType === TYPE_CREATE_BACKUP" />
     <backup-once v-else-if="taskType === TYPE_BACKUP_ONCE" />
     <modify-directory v-else-if="taskType === TYPE_MODIFY_DIRECTORY" />
-    <stratagy v-else-if="taskType === TYPE_STRATEGY" />
+    <strategy v-else-if="taskType === TYPE_STRATEGY" />
     <el-card>
       <div slot="header" class="clearfix">
         <span>操作区</span>

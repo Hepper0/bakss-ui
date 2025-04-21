@@ -49,6 +49,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             style="width: 500px"
+            :picker-options="dateOptions"
           >
           </el-date-picker>
         </el-col>
@@ -109,7 +110,12 @@ export default {
       ],
       pageNum: 0,
       pageSize: 1,
-      total: 0
+      total: 0,
+      dateOptions: {
+        disabledDate(time) {
+          return time.getTime() < new Date().getTime();
+        }
+      }
     }
   },
   computed: {

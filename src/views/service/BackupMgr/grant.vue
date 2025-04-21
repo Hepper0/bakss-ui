@@ -53,6 +53,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             style="width: 500px"
+            :picker-options="dateOptions"
           >
           </el-date-picker>
         </el-col>
@@ -93,26 +94,12 @@ export default {
       reason: undefined,
       grantUser: undefined,
       userList: [{ name: 'Aaa', id: 1},{ name: 'Baa', id: 2}],
-      backupList: [{
-        id: 1,
-        backupSoftware: 'Veeam',
-        clientName: 'swtx9ltz7mq',
-        backupContent: 'SQL Server',
-        appName: '--',
-        backupIP: '10.122.145.38',
-        platform: 'Linux',
-        owner: 'wangk7@lenovo.com'
-      },
-        {
-          id: 2,
-          backupSoftware: 'Veeam',
-          clientName: 'swtx9ltz7mq',
-          backupContent: 'MySQL',
-          appName: '--',
-          backupIP: '10.122.145.39',
-          platform: 'Linux',
-          owner: 'wangk7@lenovo.com'
-        }]
+      backupList: [],
+      dateOptions: {
+        disabledDate(time) {
+          return time.getTime() < new Date().getTime();
+        }
+      }
     }
   },
   computed: {

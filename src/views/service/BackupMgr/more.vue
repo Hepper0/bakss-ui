@@ -17,13 +17,29 @@
             </el-radio-group>
           </el-col>
         </el-row>
+        <el-row v-show="backupExecType === BACKUP_AT_TIME">
+          <br />
+          <el-col :span="4" style="text-align: right; padding: 3px">
+            <b style="color: red">* </b>备份时间：
+          </el-col>
+          <el-col :span="20">
+            <el-date-picker
+              size="mini"
+              v-model="backupExecTime"
+              type="datetime"
+              placeholder="请选择日期时间"
+              :picker-options="dateOptions"
+              value-format="yyyy-MM-dd HH:mm:ss"
+            />
+          </el-col>
+        </el-row>
         <br />
         <el-row :gutter="5">
           <el-col :span="4" style="text-align: right">
             备注：
           </el-col>
           <el-col :span="20">
-            <el-input v-mode="backupExecReason" type="textarea" :rows="3"/>
+            <el-input v-model="backupExecReason" type="textarea" :rows="3"/>
           </el-col>
         </el-row>
         <br/>
@@ -292,8 +308,14 @@ export default {
       strategyDialogTitle: '禁用备份策略',
       strategyOperation: 1,
       backupExecType: BACKUP_RIGHT_NOW,
+      backupExecTime: undefined,
       backupExecReason: undefined,
-      backupStrategyReason: undefined
+      backupStrategyReason: undefined,
+      dateOptions: {
+        disabledDate(time) {
+          return time.getTime() < new Date().getTime();
+        }
+      }
     };
   },
   methods: {
@@ -321,6 +343,9 @@ export default {
         strategyId: this.backupStrategy.id,
         appType: this.backupExecType,
         remark: this.backupExecReason
+      }
+      if (this.backupExecType === BACKUP_AT_TIME) {
+        data['backupTime'] = this.backupExecTime
       }
       applyBackup(data).then(() => {
         this.$message.success('提交成功!')
@@ -362,6 +387,9 @@ export default {
     },
     resetBackupQuery() {
       this.searchQuery = { dataRange: [], strategy: undefined, clientName: undefined, status: undefined }
+    },
+    onChangeDate (e) {
+      console.log(e)
     }
   }
 };

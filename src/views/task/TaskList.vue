@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { APPLY_TYPE, TASK_STATUS_DICT } from '@/views/common/config'
+import { APPLY_TYPE, TASK_STATUS_DICT, getComponentType } from '@/views/common/config'
 import { getDoneTaskList, getTodoTaskList } from "@/api/task"
 
 // 代办状态 0 指派人/owner  1 dba/管理员 2 管理员
@@ -117,7 +117,7 @@ export default {
       }
     },
     gotoDetail(row) {
-      this.$router.push({ path: '/task/detail', query: { id: row.id } })
+      this.$router.push({ path: '/task/detail', query: { id: row.id, taskType: getComponentType(row.appType) } })
     },
     getWaitingBackupStatus (row) {
       switch (row.reviewStatus) {
