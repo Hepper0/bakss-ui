@@ -33,7 +33,7 @@
               </el-table>
             </div>
             <div style="height: 60px; padding: 20px 10px">
-              <div style="float: right" @click="goto('review')">
+              <div style="float: right" @click="goto('application')">
                 <b class="font-body" style="color: #558bea; font-size: 15px">
                   >>更多
                 </b>
@@ -83,7 +83,7 @@
 
 <script>
 import PanelGroup from './dashboard/PanelGroup'
-import { listApplication } from "@/api/review/application"
+import { listApplication } from "@/api/application/application"
 import { getAllTaskList, getTodoTaskList } from "@/api/task"
 import { myBackup } from "@/api/service/backup"
 import { TASK_STATUS_DICT, APPLY_TYPE, REVIEW_STATUS_DICT } from "./common/config"

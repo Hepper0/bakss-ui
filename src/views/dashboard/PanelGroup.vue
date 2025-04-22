@@ -92,7 +92,7 @@ export default {
       this.$emit('clickPanel', type)
     },
     gotoApply() {
-      this.goto('review')
+      this.goto('application')
     },
     gotoPending() {
       this.goto('task', { taskType: 'todo' })

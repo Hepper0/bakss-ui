@@ -1,74 +1,4 @@
 <template>
-<!--  <div>-->
-<!--    modify directory-->
-<!--    <el-card>-->
-<!--      <div slot="header" class="clearfix">-->
-<!--        <span>基本信息</span>-->
-<!--      </div>-->
-<!--      <el-row :gutter="24">-->
-<!--        <el-col :span="6">ID-->
-<!--          <el-input size="small" disabled v-model="formData.id" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--        <el-col :span="6">申请类型-->
-<!--          <el-input size="small" disabled v-model="formData.appType" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--        <el-col :span="6">申请人-->
-<!--          <el-input size="small" disabled v-model="formData.appUser" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--        <el-col :span="6">申请时间-->
-<!--          <el-input size="small" disabled v-model="formData.appTime" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
-<!--      <el-row :gutter="24">-->
-<!--        <el-col :span="6">备份软件-->
-<!--          <el-input size="small" disabled v-model="formData.backupSoftware" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--        <el-col :span="6">客户端名称-->
-<!--          <el-input size="small" disabled v-model="formData.client" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--        <el-col :span="6">备份策略-->
-<!--          <el-input size="small" disabled v-model="formData.strategy" class="form-item"></el-input>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
-<!--      <el-row>-->
-<!--        备注-->
-<!--        <el-input disabled class="form-item" type="textarea" :rows="3" />-->
-<!--      </el-row>-->
-<!--    </el-card>-->
-<!--    <el-card>-->
-<!--      <div slot="header" class="clearfix">-->
-<!--        <span>备份信息</span>-->
-<!--      </div>-->
-<!--      <el-collapse :value="1" style="border: 1px solid #f1f1f1; padding: 0 18px">-->
-<!--        <el-collapse-item :name="1">-->
-<!--          <el-row>-->
-<!--            <el-col :span="11">-->
-<!--              <div class="panel-table-wrapper">-->
-<!--                <div class="dire-panel">-->
-<!--                  <el-row class="panel-title"><b class="text">原备份文件或目录</b></el-row>-->
-<!--                  <el-row class="panel-item"><span class="text">/tmp</span></el-row>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </el-col>-->
-<!--            <el-col :span="2" style="height: 100%">-->
-<!--              <b style="min-height: 115px" class="opt">-->
-<!--                >>-->
-<!--              </b>-->
-<!--            </el-col>-->
-<!--            <el-col :span="11">-->
-<!--              <div class="panel-table-wrapper">-->
-<!--                <div class="dire-panel">-->
-<!--                  <el-row class="panel-title"><b class="text">变更后备份文件或目录</b></el-row>-->
-<!--                  <el-row class="panel-item"><span class="text">/tmp</span></el-row>-->
-<!--                  <el-row class="panel-item"><span class="text">/var</span></el-row>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </el-col>-->
-<!--          </el-row>-->
-<!--        </el-collapse-item>-->
-<!--      </el-collapse>-->
-<!--    </el-card>-->
-<!--  </div>-->
   <ApplyDetailTemplate :form-data="formData">
     <template #default>
       <el-row :gutter="24">
@@ -124,7 +54,7 @@
 <script>
 import ApplyDetailTemplate from "./ApplyDetail"
 import { APPLY_TYPE } from '@/views/common/config'
-import { getApplication } from '@/api/review/application'
+import { getApplication } from '@/api/application/application'
 
 export default {
   name: "ModifyDirectory",

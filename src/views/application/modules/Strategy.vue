@@ -6,7 +6,7 @@
 <script>
 import ApplyDetailTemplate from "./ApplyDetail"
 import { APPLY_TYPE } from '@/views/common/config'
-import { getApplication } from '@/api/review/application'
+import { getApplication } from '@/api/application/application'
 
 export default {
   name: "Strategy",

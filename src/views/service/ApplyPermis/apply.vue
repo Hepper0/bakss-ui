@@ -73,7 +73,7 @@
 <script>
 
 import { listBackupByIds } from '@/api/service/backup'
-import { applyPermission } from '@/api/review/apply'
+import { applyPermission } from '@/api/application/apply'
 import { APPLY_BACKUP_PERMISSION } from "@/views/common/config";
 const EXPIRATION_FOREVER = 1
 const EXPIRATION_TEMPORARY = 2
@@ -157,7 +157,7 @@ export default {
       }
       applyPermission(data).then(() => {
         this.$message.success('申请提交成功!')
-        this.$router.push({ path: '/review' })
+        this.$router.push({ path: '/application' })
       })
     },
     getDetailByIds(ids) {

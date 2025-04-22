@@ -267,7 +267,7 @@
 </template>
 
 <script>
-import { applyStrategy, applyBackup } from '@/api/review/apply'
+import { applyStrategy, applyBackup } from '@/api/application/apply'
 import { backupHistory } from '@/api/service/backup'
 
 const BACKUP_EXEC_RIGHT_NOW = 1

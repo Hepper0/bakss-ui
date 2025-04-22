@@ -19,12 +19,12 @@
 </template>
 
 <script>
-import Strategy from '@/views/review/modules/Strategy'
-import BackupOnce from '@/views/review/modules/BackupOnce'
-import BackupPermission from '@/views/review/modules/BackupPermission'
-import CreateBackup from '@/views/review/modules/CreateBackup'
-import CreateRestore from '@/views/review/modules/CreateRestore'
-import ModifyDirectory from '@/views/review/modules/ModifyDirectory'
+import Strategy from '@/views/application/modules/Strategy'
+import BackupOnce from '@/views/application/modules/BackupOnce'
+import BackupPermission from '@/views/application/modules/BackupPermission'
+import CreateBackup from '@/views/application/modules/CreateBackup'
+import CreateRestore from '@/views/application/modules/CreateRestore'
+import ModifyDirectory from '@/views/application/modules/ModifyDirectory'
 import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY } from '@/views/common/config'
 
 export default {

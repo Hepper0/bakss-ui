@@ -89,18 +89,18 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/review',
+    path: '/application',
     component: Layout,
     hidden: true,
     meta: { title: '申请查看' },
     children: [
       {
         path: '',
-        component: () => import('@/views/review/index'),
+        component: () => import('@/views/application/index'),
       },
       {
         path: 'detail',
-        component: () => import('@/views/review/detail'),
+        component: () => import('@/views/application/detail'),
         meta: { title: '详情' },
       }
     ]

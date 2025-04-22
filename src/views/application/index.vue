@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { listApplication } from '@/api/review/application'
+import { listApplication } from '@/api/application/application'
 import { APPLY_TYPE, getComponentType } from '@/views/common/config'
 
 const reviewStatus = ['待审批', '审批同意', '审批不同意']
@@ -73,7 +73,7 @@ const backupStatus = ['待执行', '执行中', '执行成功', '执行失败']
 const backupColor = ['rgb(205 197 195)', '#ffba00', '#42d885', '#ff4949']
 
 export default {
-  name: 'review',
+  name: 'application',
   data: function() {
     return {
       reviewStatus,
@@ -115,7 +115,7 @@ export default {
       }
     },
     gotoDetail(row) {
-      this.$router.push({ path: '/review/detail', query: { id: row.id, taskType: getComponentType(row.appType) } })
+      this.$router.push({ path: '/application/detail', query: { id: row.id, taskType: getComponentType(row.appType) } })
     },
     reset() {
       this.data = undefined

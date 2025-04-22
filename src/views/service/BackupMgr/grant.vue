@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { applyPermission } from '@/api/review/apply'
+import { applyPermission } from '@/api/application/apply'
 import { getBackup } from "@/api/service/backup"
 import { GRANT_BACKUP_PERMISSION } from '@/views/common/config'
 
@@ -144,7 +144,7 @@ export default {
       }
       applyPermission(data).then(() => {
         this.$message.success('申请提交成功!')
-        this.$router.push({ path: '/review' })
+        this.$router.push({ path: '/application' })
       })
     },
     back() {
