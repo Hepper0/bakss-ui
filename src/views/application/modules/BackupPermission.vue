@@ -64,6 +64,7 @@ export default {
       this.formData.appTypeZh = APPLY_TYPE[data.appType]
       this.formData.appUser = data.appUser
       this.formData.appTime = data.appTime
+      this.formData.remark = data.remark
     })
   },
   methods: {

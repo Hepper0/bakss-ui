@@ -30,7 +30,8 @@ export default {
           id: undefined,
           appTypeZh: undefined,
           appUser: undefined,
-          appTime: undefined
+          appTime: undefined,
+          remark: undefined
         }
       }
     },

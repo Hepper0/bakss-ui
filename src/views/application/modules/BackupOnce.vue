@@ -10,7 +10,7 @@
           <el-input disabled v-model="formData.id" class="form-item"></el-input>
         </el-col>
         <el-col :span="6">申请类型
-          <el-input size="small" disabled v-model="formData.appType" class="form-item"></el-input></el-col>
+          <el-input size="small" disabled v-model="formData.appTypeZh" class="form-item"></el-input></el-col>
         <el-col :span="6">申请人
           <el-input size="small" disabled v-model="formData.appUser" class="form-item"></el-input></el-col>
         <el-col :span="6">申请时间
@@ -41,13 +41,15 @@
       </el-row>
       <el-row>
         备注
-        <el-input disabled class="form-item" type="textarea" :rows="3" />
+        <el-input v-model="formData.remark" disabled class="form-item" type="textarea" :rows="3" />
       </el-row>
     </el-card>
   </div>
 </template>
 
 <script>
+import { getApplication } from '@/api/application/application'
+import { APPLY_TYPE } from '@/views/common/config'
 
 const BACKUP_TYPE_SCHEDULER = 1
 const BACKUP_TYPE_ONCE = 2
@@ -63,7 +65,7 @@ export default {
     return {
       formData: {
         id: 1,
-        appType: backupTypeMap[BACKUP_TYPE_ONCE],
+        appType: undefined,
         appUser: undefined,
         appTime: undefined,
         backupSoftware: undefined,
@@ -75,6 +77,17 @@ export default {
       },
       backupProgress: 0
     }
+  },
+  mounted() {
+    this.formData.id = this.$route.query.id
+    getApplication(this.formData.id).then(resp => {
+      const data = resp.data
+      this.formData.appType = data.appType
+      this.formData.appTypeZh = APPLY_TYPE[data.appType]
+      this.formData.appUser = data.appUser
+      this.formData.appTime = data.appTime
+      this.formData.remark = data.remark
+    })
   },
   methods: {
 

@@ -25,7 +25,7 @@
     </slot>
     <el-row>
       <div class="form-item">备注</div>
-      <el-input disabled class="form-item" type="textarea" :rows="3" />
+      <el-input disabled v-model="formData.remark" class="form-item" type="textarea" :rows="3" />
     </el-row>
   </el-card>
 </template>
@@ -41,7 +41,8 @@ export default {
           id: undefined,
           appTypeZh: undefined,
           appUser: undefined,
-          appTime: undefined
+          appTime: undefined,
+          remark: undefined
         }
       }
     },

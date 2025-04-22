@@ -57,3 +57,10 @@ export function applyBackup(data) {
   })
 }
 
+export function cancelApplication(appId) {
+  return request({
+    url: '/service/apply/cancel/' + appId,
+    method: 'delete'
+  })
+}
+
