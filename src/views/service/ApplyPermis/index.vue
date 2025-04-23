@@ -3,14 +3,12 @@
     <div class="panel-container">
       <!-- 搜索栏 -->
       <el-row :gutter="10">
-        <el-col :span="6">
-          <el-select size="mini" clearable v-model="queryParams.backupSoftware" placeholder="备份文件">
-            <el-option label="NetBackup" value="NetBackup"></el-option>
+        <el-col :span="10">
+          <el-select style="width: 30%;margin-right: 15px" size="mini" clearable v-model="queryParams.backupSoftware" placeholder="请选择">
+            <el-option label="ID" value="ID"></el-option>
             <el-option label="NetWorker" value="NetWorker"></el-option>
           </el-select>
-        </el-col>
-        <el-col :span="6">
-          <el-input size="mini" v-model="queryParams.clientName" placeholder="请输入客户端名称" clearable></el-input>
+          <el-input style="width: 60%" size="mini" v-model="queryParams.clientName" placeholder="请输入" clearable></el-input>
         </el-col>
         <el-col :span="12" class="search-buttons">
           <el-button size="mini" @click="getList" type="primary" icon="el-icon-search">搜索</el-button>

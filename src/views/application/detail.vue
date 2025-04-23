@@ -52,7 +52,6 @@ export default {
     },
     cancel() {
       const appId = this.$refs.detail.formData.id
-      console.log(appId)
       this.$confirm('确定取消备份申请吗？', '提示', { type: 'warning' }).then(() => {
         cancelApplication(appId).then(() => {
           this.$message.success('取消成功！')

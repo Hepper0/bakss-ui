@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="tips">创建备份前，请仔细阅读以下须知</div>
+    <div class="tips">创建恢复前，请仔细阅读以下须知</div>
     <el-collapse>
       <el-collapse-item :name="1" title="环境配置">
         <div class="item-panel">

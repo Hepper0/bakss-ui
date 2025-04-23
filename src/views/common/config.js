@@ -43,6 +43,9 @@ export const REVIEW_STATUS_DICT = {
   1: '审批同意',
   2: '审批不同意'
 }
+
+export const CANCEL_APPLICATION = 2;
+
 export const APPROVAL_STATUS_WAIT_LEADER = 0;
 export const APPROVAL_STATUS_WAIT_DBA = 1;
 export const APPROVAL_STATUS_WAIT_MANAGER = 2;

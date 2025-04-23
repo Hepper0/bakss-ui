@@ -20,12 +20,33 @@
 </template>
 
 <script>
+import { listBackupByIds } from '@/api/service/backup'
+
 export default {
   name: "ClientInfo",
   data: function () {
     return {
       loading: false,
       tableData: []
+    }
+  },
+  props: {
+    backupId: ''
+  },
+  watch: {
+    backupId: function() {
+      this.getBackupClientInfo()
+    }
+  },
+  methods: {
+    getBackupClientInfo() {
+      if (!this.backupId) return
+      this.loading = true
+      let params = this.backupId.split(",").map(id => 'ids='+id).join('&')
+      listBackupByIds(params).then(resp => {
+        this.loading = false
+        this.tableData = resp.rows
+      })
     }
   }
 }

@@ -4,8 +4,8 @@
       <slot></slot>
     </apply-info>
     <slot name="additional"></slot>
-    <client-info v-show="showClient" />
-    <flow-steps v-show="showFlow" />
+    <client-info v-show="showClient && backupId" :backupId="backupId" />
+    <flow-steps v-show="showFlow && appId" :app-id="appId"/>
   </div>
 </template>
 
@@ -27,11 +27,11 @@ export default {
       type: Object,
       default: function () {
         return {
-          id: undefined,
-          appTypeZh: undefined,
-          appUser: undefined,
-          appTime: undefined,
-          remark: undefined
+          // id: undefined,
+          // appTypeZh: undefined,
+          // appUser: undefined,
+          // appTime: undefined,
+          // remark: undefined
         }
       }
     },
@@ -48,6 +48,14 @@ export default {
     ApplyInfo,
     ClientInfo,
     FlowSteps
+  },
+  computed: {
+    backupId: function () {
+      return this.formData.backupId
+    },
+    appId: function () {
+      return this.formData.id
+    }
   },
   methods: {
     back() {

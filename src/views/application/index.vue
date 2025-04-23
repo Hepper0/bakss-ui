@@ -34,7 +34,8 @@
           <el-table-column prop="appUser" label="申请人"></el-table-column>
           <el-table-column prop="reviewStatus" label="审批状态">
             <template v-slot="{ row }">
-              <span :style="{ color: reviewColor[row.reviewStatus] }">{{ reviewStatus[row.reviewStatus] }}</span>
+              <span v-if="row.status === CANCEL_APPLICATION" style="color: rgb(205 197 195)">撤销申请</span>
+              <span v-else :style="{ color: reviewColor[row.reviewStatus] }">{{ reviewStatus[row.reviewStatus] }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="backupStatus" label="执行状态">
@@ -65,7 +66,7 @@
 
 <script>
 import { listApplication } from '@/api/application/application'
-import { APPLY_TYPE, getComponentType } from '@/views/common/config'
+import { APPLY_TYPE, CANCEL_APPLICATION, getComponentType } from '@/views/common/config'
 
 const reviewStatus = ['待审批', '审批同意', '审批不同意']
 const reviewColor = ['#ffba00', '#42d885', '#ff4949']
@@ -78,12 +79,14 @@ export default {
     return {
       reviewStatus,
       reviewColor,
+      CANCEL_APPLICATION,
       APPLY_TYPE,
       backupStatus,
       backupColor,
       column: undefined,
       data: undefined,
       queryParams: {
+        appUser: undefined,
         pageNum: 0,
         pageSize: 10
       },
@@ -94,11 +97,17 @@ export default {
       total: 0,
     };
   },
+  computed: {
+    user: function () {
+      return this.$store.getters.user
+    },
+  },
   mounted() {
     this.getList()
   },
   methods: {
     getList() {
+      this.queryParams.appUser = this.user.name
       listApplication(this.queryParams).then(resp => {
         this.tableData = resp.rows
         this.total = resp.total

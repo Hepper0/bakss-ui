@@ -18,6 +18,7 @@ export default {
         appTypeZh: undefined,
         appUser: undefined,
         appTime: undefined,
+        backupId: undefined,
         backupSoftware: undefined,
         backupType: undefined,
         backupDate: undefined,
@@ -35,11 +36,12 @@ export default {
     this.formData.id = this.$route.query.id
     getApplication(this.formData.id).then(resp => {
       const data = resp.data
-      this.formData.appType = data.appType
+      // this.formData.appType = data.appType
       this.formData.appTypeZh = APPLY_TYPE[data.appType]
-      this.formData.appUser = data.appUser
-      this.formData.appTime = data.appTime
-      this.formData.remark = data.remark
+      // this.formData.appUser = data.appUser
+      // this.formData.appTime = data.appTime
+      // this.formData.remark = data.remark
+      Object.assign(this.formData, data)
     })
   },
   methods: {
