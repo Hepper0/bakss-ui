@@ -10,9 +10,10 @@
       <div slot="header" class="clearfix">
         <span>操作区</span>
       </div>
-      <div>
-        <el-button @click="cancel" style="color: orangered">取消备份申请</el-button>
-        <el-button @click="back">返回</el-button>
+      <el-input v-model="remark" type="textarea" :rows="3"/>
+      <div style="margin-top: 15px">
+        <el-button @click="approval(true)" type="primary">审批同意</el-button>
+        <el-button @click="approval(false)" style="color: orangered">审批不同意</el-button>
       </div>
     </el-card>
   </div>
@@ -38,7 +39,8 @@ export default {
       TYPE_CREATE_BACKUP,
       TYPE_CREATE_RESTORE,
       TYPE_MODIFY_DIRECTORY,
-      taskType: TYPE_MODIFY_DIRECTORY
+      taskType: TYPE_MODIFY_DIRECTORY,
+      remark: undefined
     }
   },
   mounted() {
@@ -49,8 +51,12 @@ export default {
     back() {
       window.history.back()
     },
-    cancel() {
-      this.$confirm('确定取消备份申请吗？', '提示', { type: 'warning' }).then(() => {
+    approval(flag) {
+      const msg = flag ? '同意' : '不同意'
+      if (this.remark === undefined || this.remark === '审批【同意】' || this.remark === '审批【不同意】') {
+        this.remark = '审批【' + msg +'】'
+      }
+      this.$confirm('确定审批【' + msg +'】吗？', '提示', { type: 'warning' }).then(() => {
         // todo api
       })
     }
