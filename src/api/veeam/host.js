@@ -8,11 +8,14 @@ export function listHost(query) {
   })
 }
 
-export function getHostEntity(query) {
+export function getHostEntity(serverName, viewMode='HostAndVms') {
   return request({
     url: '/veeam/host/entity',
     method: 'get',
-    params: query
+    params: {
+      serverName,
+      viewMode
+    }
   })
 }
 
