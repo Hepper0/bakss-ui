@@ -1,60 +1,84 @@
 import request from '@/utils/request'
 
-export function listHost(query) {
+export function listHost(page, pageSize, server) {
   return request({
     url: '/veeam/host/list',
     method: 'get',
-    params: query
+    params: {
+      page,
+      pageSize
+    },
+    headers: {
+      server
+    }
   })
 }
 
-export function getHostEntity(serverName, viewMode='HostAndVms') {
+export function getHostEntity(serverName, viewMode='HostAndVms', server) {
   return request({
     url: '/veeam/host/entity',
     method: 'get',
     params: {
       serverName,
       viewMode
+    },
+    headers: {
+      server
     }
   })
 }
 
-export function getHostDatastore(query) {
+export function getHostDatastore(serverName, server) {
   return request({
     url: '/veeam/host/datastore',
     method: 'get',
-    params: query
+    params: { serverName },
+    headers: {
+      server
+    }
   })
 }
 
-export function getHostResourcePool(query) {
+export function getHostResourcePool(serverName, server) {
   return request({
     url: '/veeam/host/resourcePool',
     method: 'get',
-    params: query
+    params: { serverName },
+    headers: {
+      server
+    }
   })
 }
 
-export function getHostSwitch(query) {
+export function getHostSwitch(serverName, server) {
   return request({
     url: '/veeam/host/switch',
     method: 'get',
-    params: query
+    params: { serverName },
+    headers: {
+      server
+    }
   })
 }
 
-export function getHostNetwork(query) {
+export function getHostNetwork(serverName, server) {
   return request({
     url: '/veeam/host/network',
     method: 'get',
-    params: query
+    params: { serverName },
+    headers: {
+      server
+    }
   })
 }
 
-export function getHostFolder(query) {
+export function getHostFolder(serverName, server) {
   return request({
     url: '/veeam/host/folder',
     method: 'get',
-    params: query
+    params: { serverName },
+    headers: {
+      server
+    }
   })
 }

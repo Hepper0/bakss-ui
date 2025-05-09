@@ -1,49 +1,77 @@
 import request from '@/utils/request'
 
-export function listBackup(query) {
+export function listBackup(page, pageSize, server) {
   return request({
     url: '/veeam/backup/list',
     method: 'get',
-    params: query
+    params: {
+      page,
+      pageSize
+    },
+    headers: {
+      server
+    }
   })
 }
 
-export function getBackupChild(query) {
+export function getBackupChild(parentId, server) {
   return request({
     url: '/veeam/backup/child',
     method: 'get',
-    params: query
+    params: {
+      parentId
+    },
+    headers: {
+      server
+    }
   })
 }
 
-export function getBackupApplication(query) {
+export function getBackupApplication(Names, server) {
   return request({
     url: '/veeam/backup/application',
     method: 'get',
-    params: query
+    params: {
+      Names
+    },
+    headers: {
+      server
+    }
   })
 }
 
-export function getBackupDetail(query) {
+export function getBackupDetail(ID, server) {
   return request({
     url: '/veeam/backup/detail',
     method: 'get',
-    params: query
+    params: { ID },
+    headers: {
+      server
+    }
   })
 }
 
-export function getBackupPointDetail(query) {
+export function getBackupPointDetail(ID, backupId, server) {
   return request({
     url: '/veeam/backup/pointDetail',
     method: 'get',
-    params: query
+    params: {
+      ID,
+      backupId
+    },
+    headers: {
+      server
+    }
   })
 }
 
-export function getBackupPoint(query) {
+export function getBackupPoint(ID, server) {
   return request({
     url: '/veeam/backup/point',
     method: 'get',
-    params: query
+    params: { ID },
+    headers: {
+      server
+    }
   })
 }

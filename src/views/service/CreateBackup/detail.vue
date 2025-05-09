@@ -76,15 +76,25 @@
       </div>
       <div class="card-panel-content">
         <el-form ref="backupForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px">
-          <el-col :span="8">
-            <el-form-item label="应用名称" prop="appName">
-              <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '100%'}">
-              </el-input>
-            </el-form-item>
-          </el-col>
+          <el-row>
+            <el-col :span="8">
+              <el-form-item label="应用名称" prop="appName">
+                <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '100%'}">
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="Veeam Server" prop="veeamServer">
+                <el-select v-model="backupFormData.vs" placeholder="请选择" :style="{width: '100%'}">
+                  <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <el-col :span="8">
             <el-form-item label="VC名称" prop="vc">
-              <el-select v-model="backupFormData.vc" placeholder="请选择" @change="onVCChange"
+              <el-select v-model="veeamServer" placeholder="请选择" @change="onVCChange"
                          :style="{width: '100%'}">
                 <el-option v-for="(item, index) in vcOptions" :key="index" :label="item.label"
                            :value="item.value"></el-option>
@@ -157,7 +167,7 @@
 
 <script>
 import { getHostEntity, listHost } from '@/api/veeam/host'
-import { listRepository } from '@/api/veeam/repository'
+import { listRepository } from '@/api/veeam/repo'
 import { createJob } from '@/api/veeam/job'
 import { applyCreateBackup } from '@/api/application/apply'
 import { CREATE_BACKUP } from '@/views/common/config'
@@ -268,6 +278,8 @@ const envOptions = [{label: '生产', value: 'prod'}, {label: '非生产', value
 const backupSoftwareOptions = [{label: 'Veeam', value: 'veeam'}]
 const machineTypeOptions = [{label: '虚拟机', value: 'vm'}, {label: '物理机', value: 'physical'},]
 
+const veeamServerOptions = [{ label: 'VeeamServer1', value: 'vs1' }, { label: 'VeeamServer2', value: 'vs2'}]
+
 const cascadeRule = { mysql: {}, vm: {machineType: 'vm', platform: 'windows'}}
 
 export default {
@@ -284,6 +296,7 @@ export default {
       envOptions,
       backupSoftwareOptions,
       machineTypeOptions,
+      veeamServerOptions,
       reason: undefined,
       formData: {
         backupContent: undefined,
@@ -323,6 +336,7 @@ export default {
         costNumber: undefined,
         reason: undefined
       },
+      veeamServer: undefined,
       vmObjectDataList: [],
       repositoryDataList: [],
       vcOptions: [{ label: 'vc1', value:'vc1' }],
@@ -382,7 +396,7 @@ export default {
       this.getVMList(e)
     },
     getVCList() {
-      listHost().then(resp => {
+      listHost(undefined, undefined, this.veeamServer).then(resp => {
         this.vcOptions = resp.rows.filter(r => r.type === 1).map(r => {
           return { label: r.name, value: r.name }
         })
@@ -390,7 +404,7 @@ export default {
     },
     getVMList(name) {
       if (this.vmCache[name]) return this.vmCache[name]
-      getHostEntity(name, 'HostAndVms').then(resp => {
+      getHostEntity(name, 'HostAndVms', this.veeamServer).then(resp => {
         this.vmObjectsOptions = resp.rows.filter(r => r.type === 'Vm').map(r => {
           return { label: r.name, value: r.path }
         })

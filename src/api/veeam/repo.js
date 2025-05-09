@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function listProxy(page, pageSize, server) {
+export function listRepository(page, pageSize, server) {
   return request({
-    url: '/veeam/proxy/list',
+    url: '/veeam/repository/list',
     method: 'get',
     params: {
       page,
@@ -14,9 +14,9 @@ export function listProxy(page, pageSize, server) {
   })
 }
 
-export function getProxyDetail(ID, server) {
+export function getRepositoryDetail(ID, server) {
   return request({
-    url: '/veeam/proxy/detail',
+    url: '/veeam/repository/detail',
     method: 'get',
     params: { ID },
     headers: {
@@ -25,9 +25,9 @@ export function getProxyDetail(ID, server) {
   })
 }
 
-export function deleteProxy(name, server) {
+export function deleteRepository(name, server) {
   return request({
-    url: '/veeam/proxy',
+    url: '/veeam/repository',
     method: 'delete',
     params: { name },
     headers: {

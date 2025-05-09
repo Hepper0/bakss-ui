@@ -101,7 +101,7 @@
     <el-row style="width: 100%; display: flex; justify-content: center">
       <div v-show="false" class="circle">{{ count }}</div>
       <el-checkbox v-model="checked" style="margin: 3px 3px" :disabled="count !== 0">
-        <el-text>我已仔细阅读并接受以上条件</el-text>
+        <span>我已仔细阅读并接受以上条件</span>
       </el-checkbox>
     </el-row>
   </div>
@@ -112,7 +112,7 @@ export default {
   name: "index",
   data: function () {
     return {
-      count: 10,
+      count: 1,
       checked: false
     }
   },
