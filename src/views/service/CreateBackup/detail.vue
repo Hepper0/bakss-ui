@@ -79,13 +79,13 @@
           <el-row>
             <el-col :span="8">
               <el-form-item label="应用名称" prop="appName">
-                <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '100%'}">
+                <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '80%'}">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="Veeam Server" prop="veeamServer">
-                <el-select v-model="backupFormData.vs" placeholder="请选择" :style="{width: '100%'}">
+              <el-form-item label="Veeam Server" prop="backupServer">
+                <el-select v-model="backupFormData.backupServer" placeholder="请选择" :style="{width: '80%'}">
                   <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label"
                              :value="item.value"></el-option>
                 </el-select>
@@ -93,9 +93,9 @@
             </el-col>
           </el-row>
           <el-col :span="8">
-            <el-form-item label="VC名称" prop="vc">
-              <el-select v-model="veeamServer" placeholder="请选择" @change="onVCChange"
-                         :style="{width: '100%'}">
+            <el-form-item label="VC名称" prop="vCenter">
+              <el-select v-model="backupFormData.vCenter" placeholder="请选择" @change="onVCChange"
+                         :style="{width: '80%'}">
                 <el-option v-for="(item, index) in vcOptions" :key="index" :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
@@ -104,7 +104,7 @@
           <el-col :span="8">
             <el-form-item label="VM名称" prop="vmObjects">
               <el-select v-model="backupFormData.vmObjects" placeholder="请选择" multiple clearable
-                         :style="{width: '100%'}" :loading="true">
+                         :style="{width: '80%'}" :loading="false">
                 <el-option v-for="(item, index) in vmObjectsOptions" :key="index" :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
@@ -112,16 +112,16 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="仓库" prop="repository">
-              <el-select v-model="backupFormData.repository" placeholder="请选择仓库" :style="{width: '100%'}">
+              <el-select v-model="backupFormData.repository" placeholder="请选择仓库" :style="{width: '80%'}">
                 <el-option v-for="(item, index) in repositoryOptions" :key="index" :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="24">
+          <el-col :span="16">
             <el-form-item label="任务描述" prop="description">
-              <el-input v-model="formData.description" type="textarea" placeholder="请输入多行文本"
-                        :autosize="{minRows: 4, maxRows: 4}" :style="{width: '100%'}"></el-input>
+              <el-input v-model="backupFormData.description" type="textarea" placeholder="请输入多行文本"
+                        :autosize="{minRows: 3, maxRows: 4}" :style="{width: '90%'}"></el-input>
             </el-form-item>
           </el-col>
         </el-form>
@@ -149,9 +149,9 @@
             </el-form-item>
           </el-col>
           <el-col :span="16">
-            <el-form-item label="申请理由" prop="reason">
-              <el-input v-model="otherFormData.reason" type="textarea" placeholder="请输入申请理由"
-                        :autosize="{minRows: 4, maxRows: 4}" :style="{width: '90%'}"></el-input>
+            <el-form-item label="申请理由" prop="remark">
+              <el-input v-model="otherFormData.remark" type="textarea" placeholder="请输入申请理由"
+                        :autosize="{minRows: 3, maxRows: 4}" :style="{width: '90%'}"></el-input>
             </el-form-item>
           </el-col>
         </el-form>
@@ -171,6 +171,7 @@ import { listRepository } from '@/api/veeam/repo'
 import { createJob } from '@/api/veeam/job'
 import { applyCreateBackup } from '@/api/application/apply'
 import { CREATE_BACKUP } from '@/views/common/config'
+import {deepClone} from "../../../utils";
 
 const rules = {
   backupContent: [{
@@ -222,23 +223,28 @@ const backupRules = {
     message: '请选择',
     trigger: 'blur'
   }],
-    vc: [{
+  vCenter: [{
     required: true,
     message: '请选择',
     trigger: 'blur'
   }],
-    vmObjects: [{
+  vmObjects: [{
     required: true,
     type: 'array',
     message: '请至少选择一个VC',
     trigger: 'change'
   }],
-    repository: [{
+  repository: [{
     required: true,
     message: '请选择仓库',
     trigger: 'blur'
   }],
-    description: [{
+  backupServer: [{
+    required: true,
+    message: '请选择',
+    trigger: 'blur'
+  }],
+  description: [{
     required: true,
     message: '请输入任务描述',
     trigger: 'blur'
@@ -247,16 +253,15 @@ const backupRules = {
 const otherRules = {
   costType: [{
     required: true,
-    type: 'array',
     message: '请选择成本方式',
     trigger: 'blur'
   }],
-    costNumber: [{
+  costNumber: [{
     required: true,
     message: '请输入成本编号',
     trigger: 'blur'
   }],
-    reason: [{
+  remark: [{
     required: true,
     message: '请输入申请理由',
     trigger: 'blur'
@@ -297,7 +302,7 @@ export default {
       backupSoftwareOptions,
       machineTypeOptions,
       veeamServerOptions,
-      reason: undefined,
+      remark: undefined,
       formData: {
         backupContent: undefined,
         machineType: undefined,
@@ -310,7 +315,7 @@ export default {
         description: undefined,
         costType: undefined,
         costNumber: undefined,
-        reason: undefined
+        remark: undefined
       },
       basicFormData: {
         backupContent: undefined,
@@ -326,7 +331,8 @@ export default {
       },
       backupFormData: {
         appName: undefined,
-        vc: undefined,
+        backupServer: undefined,
+        vCenter: undefined,
         vmObjects: [],
         repository: undefined,
         description: undefined
@@ -334,12 +340,12 @@ export default {
       otherFormData: {
         costType: undefined,
         costNumber: undefined,
-        reason: undefined
+        remark: undefined
       },
-      veeamServer: undefined,
+      backupServer: undefined,
       vmObjectDataList: [],
       repositoryDataList: [],
-      vcOptions: [{ label: 'vc1', value:'vc1' }],
+      vcOptions: [{ label: 'vc1', value:'vc1' }, { label: 'vc2', value:'vc2' }],
       vmObjectsOptions: [{ label: '虚机1', value: 'vm1'}, { label: '虚机2', value: 'vm2'}, { label: '虚机3', value: 'vm3'},],
       repositoryOptions: [{ label: '仓库1', value: 'repository1'}, { label: '仓库2', value: 'repository2'},],
       costTypeOptions: [{label: '收费方式1', value: 'costType1'}, {label: '收费方式2', value: 'costType2'}],
@@ -361,10 +367,21 @@ export default {
   methods: {
     submitForm() {
       const validateList = [this.$refs['basicForm'].validate(), this.$refs['platformForm'].validate(), this.$refs['backupForm'].validate(), this.$refs['otherForm'].validate()]
-      Promise.all(validateList).then(valid => {
-        if (!valid) return
-        this.formData['appType'] = CREATE_BACKUP
-        applyCreateBackup(this.formData).then((resp) => {
+      Promise.all(validateList).then(validates => {
+        for (const v of validates) {
+          if (!v) return
+        }
+        const data = {
+          appType: CREATE_BACKUP
+        }
+        Object.assign(data, this.basicFormData)
+        Object.assign(data, this.platformFormData)
+        Object.assign(data, this.backupFormData)
+        Object.assign(data, this.otherFormData)
+        const backupInfo = deepClone(this.backupFormData)
+        backupInfo.vmObjects = backupInfo.vmObjects.toString()
+        data['backupInfo'] = backupInfo
+        applyCreateBackup(data).then((resp) => {
           this.$message.success("提交成功！")
         })
       })
@@ -393,10 +410,10 @@ export default {
     },
     onVCChange(e) {
       this.backupFormData.vmObjects = []
-      this.getVMList(e)
+      // this.getVMList(e)
     },
     getVCList() {
-      listHost(undefined, undefined, this.veeamServer).then(resp => {
+      listHost(undefined, undefined, this.backupServer).then(resp => {
         this.vcOptions = resp.rows.filter(r => r.type === 1).map(r => {
           return { label: r.name, value: r.name }
         })
@@ -404,7 +421,7 @@ export default {
     },
     getVMList(name) {
       if (this.vmCache[name]) return this.vmCache[name]
-      getHostEntity(name, 'HostAndVms', this.veeamServer).then(resp => {
+      getHostEntity(name, 'HostAndVms', this.backupServer).then(resp => {
         this.vmObjectsOptions = resp.rows.filter(r => r.type === 'Vm').map(r => {
           return { label: r.name, value: r.path }
         })
