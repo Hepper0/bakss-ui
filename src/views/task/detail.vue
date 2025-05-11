@@ -6,7 +6,7 @@
     <create-backup v-else-if="taskType === TYPE_CREATE_BACKUP" />
     <create-restore v-else-if="taskType === TYPE_CREATE_RESTORE" />
     <modify-directory v-else-if="taskType === TYPE_MODIFY_DIRECTORY" />
-    <el-card>
+    <el-card v-show="appBasicInfo && appBasicInfo.status === 1">
       <div slot="header" class="clearfix">
         <span>操作区</span>
       </div>
@@ -27,6 +27,7 @@ import CreateBackup from '@/views/application/modules/CreateBackup'
 import CreateRestore from '@/views/application/modules/CreateRestore'
 import ModifyDirectory from '@/views/application/modules/ModifyDirectory'
 import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY } from '@/views/common/config'
+import { getApplication, approve, reject } from '@/api/application/application'
 
 export default {
   name: 'detail',
@@ -40,12 +41,25 @@ export default {
       TYPE_CREATE_RESTORE,
       TYPE_MODIFY_DIRECTORY,
       taskType: TYPE_MODIFY_DIRECTORY,
-      remark: undefined
+      remark: undefined,
+      appId: undefined,
+      appBasicInfo: undefined
+    }
+  },
+  computed: {
+    user: function () {
+      return this.$store.getters.user
     }
   },
   mounted() {
     // this.type = this.$route.query
     this.taskType = parseInt(this.$route.query.taskType)
+    this.appId = this.$route.query.id
+  },
+  provide() {
+    return {
+      getAppBasicInfo: this.getApplicationBasicInfo
+    }
   },
   methods: {
     back() {
@@ -53,12 +67,26 @@ export default {
     },
     approval(flag) {
       const msg = flag ? '同意' : '不同意'
-      if (this.remark === undefined || this.remark === '审批【同意】' || this.remark === '审批【不同意】') {
-        this.remark = '审批【' + msg +'】'
+      if (this.remark === undefined || this.remark === '【同意】' || this.remark === '【不同意】') {
+        this.remark = '【' + msg +'】'
       }
       this.$confirm('确定审批【' + msg +'】吗？', '提示', { type: 'warning' }).then(() => {
-        // todo api
+        const req = flag ? approve : reject
+        const reqData = { id: this.appBasicInfo.id, flowId: this.appBasicInfo.flowId, appType: this.appBasicInfo.appType }
+        req(reqData).then(resp => {
+          this.$message.success('提交成功！')
+          this.back()
+        })
       })
+    },
+    getApplicationBasicInfo() {
+      return new Promise((resolve, reject) => {
+          getApplication(this.appId).then(resp => {
+            this.appBasicInfo = resp.data
+            resolve(resp)
+          }).catch(e => reject(e))
+        }
+      )
     }
   }
 }

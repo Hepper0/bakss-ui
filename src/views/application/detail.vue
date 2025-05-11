@@ -11,7 +11,7 @@
         <span>操作区</span>
       </div>
       <div>
-        <el-button @click="cancel" style="color: orangered">取消备份申请</el-button>
+        <el-button v-show="user.name === appBasicInfo && appBasicInfo.appUser" @click="cancel" style="color: orangered">取消申请</el-button>
         <el-button @click="back">返回</el-button>
       </div>
     </el-card>
@@ -25,8 +25,9 @@ import BackupPermission from './modules/BackupPermission'
 import CreateBackup from './modules/CreateBackup'
 import CreateRestore from './modules/CreateRestore'
 import ModifyDirectory from './modules/ModifyDirectory'
-import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY } from '@/views/common/config'
+import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY, APPLY_TYPE } from '@/views/common/config'
 import { cancelApplication } from '@/api/application/apply'
+import { getApplication } from '@/api/application/application'
 
 
 export default {
@@ -40,24 +41,45 @@ export default {
       TYPE_CREATE_BACKUP,
       TYPE_CREATE_RESTORE,
       TYPE_MODIFY_DIRECTORY,
-      taskType: TYPE_MODIFY_DIRECTORY
+      taskType: TYPE_MODIFY_DIRECTORY,
+      appId: undefined,
+      appBasicInfo: undefined
+    }
+  },
+  computed: {
+    user: function () {
+      return this.$store.getters.user
     }
   },
   mounted() {
     this.taskType = parseInt(this.$route.query.taskType)
+    this.appId = this.$route.query.id
+  },
+  provide() {
+    return {
+      getAppBasicInfo: this.getApplicationBasicInfo
+    }
   },
   methods: {
     back() {
       window.history.back()
     },
     cancel() {
-      const appId = this.$refs.detail.formData.id
       this.$confirm('确定取消备份申请吗？', '提示', { type: 'warning' }).then(() => {
-        cancelApplication(appId).then(() => {
+        cancelApplication(this.appId).then(() => {
           this.$message.success('取消成功！')
           this.back()
         })
       })
+    },
+    getApplicationBasicInfo() {
+      return new Promise((resolve, reject) => {
+          getApplication(this.appId).then(resp => {
+            this.appBasicInfo = resp.data
+            resolve(resp)
+          }).catch(e => reject(e))
+        }
+      )
     }
   }
 }

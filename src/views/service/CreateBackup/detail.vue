@@ -251,16 +251,16 @@ const backupRules = {
   }]
 }
 const otherRules = {
-  costType: [{
-    required: true,
-    message: '请选择成本方式',
-    trigger: 'blur'
-  }],
-  costNumber: [{
-    required: true,
-    message: '请输入成本编号',
-    trigger: 'blur'
-  }],
+  // costType: [{
+  //   required: true,
+  //   message: '请选择成本方式',
+  //   trigger: 'blur'
+  // }],
+  // costNumber: [{
+  //   required: true,
+  //   message: '请输入成本编号',
+  //   trigger: 'blur'
+  // }],
   remark: [{
     required: true,
     message: '请输入申请理由',
@@ -269,23 +269,23 @@ const otherRules = {
 }
 
 const backupContentOptions = [
-  {label: 'VMware', value: 'vm'},
-  {label: 'MySQL', value: 'mysql'},
-  {label: 'SQL Server', value: 'sqlserver'},
-  {label: 'PostgreSQL', value: 'postgresql'},
-  {label: 'Oracle', value: 'oracle'},
-  {label: 'FileSystem', value: 'filesystem'},
+  {label: 'VMware', value: 'VMware'},
+  {label: 'MySQL', value: 'MySQL'},
+  {label: 'SQL Server', value: 'SQL Server'},
+  {label: 'PostgreSQL', value: 'PostgreSQL'},
+  {label: 'Oracle', value: 'Oracle'},
+  {label: 'FileSystem', value: 'FileSystem'},
 ]
 
 const dataCenterOptions = [{label: 'CATL/宁德时代', value: 'catl'}]
-const platformOptions = [{label: 'Windows', value: 'windows'}, {label: 'Linux', value: 'linux'}]
+const platformOptions = [{label: 'Windows', value: 'Windows'}, {label: 'Linux', value: 'Linux'}]
 const envOptions = [{label: '生产', value: 'prod'}, {label: '非生产', value: 'dev'},]
-const backupSoftwareOptions = [{label: 'Veeam', value: 'veeam'}]
+const backupSoftwareOptions = [{label: 'Veeam', value: 'Veeam'}]
 const machineTypeOptions = [{label: '虚拟机', value: 'vm'}, {label: '物理机', value: 'physical'},]
 
 const veeamServerOptions = [{ label: 'VeeamServer1', value: 'vs1' }, { label: 'VeeamServer2', value: 'vs2'}]
 
-const cascadeRule = { mysql: {}, vm: {machineType: 'vm', platform: 'windows'}}
+const cascadeRule = { MySQL: {}, VMware: {machineType: 'vm', platform: 'Windows'}}
 
 export default {
   name: "detail",

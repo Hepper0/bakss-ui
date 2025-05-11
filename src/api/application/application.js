@@ -50,3 +50,26 @@ export function applyPermission() {
   })
 }
 
+export function approve(data) {
+  return request({
+    url: '/service/application/approve',
+    method: 'post',
+    data
+  })
+}
+
+export function reject(data) {
+  return request({
+    url: '/service/application/approve',
+    method: 'post',
+    data
+  })
+}
+
+export function getCreateBackupApplication(appId) {
+  return request({
+    url: '/application/createBackup/' + appId,
+    method: 'get',
+  })
+}
+
