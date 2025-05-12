@@ -85,7 +85,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="Veeam Server" prop="backupServer">
-                <el-select v-model="backupFormData.backupServer" placeholder="请选择" :style="{width: '80%'}">
+                <el-select v-model="backupFormData.backupServer" placeholder="请选择" :style="{width: '80%'}" @change="onServerChange">
                   <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label"
                              :value="item.value"></el-option>
                 </el-select>
@@ -278,13 +278,13 @@ const backupContentOptions = [
   {label: 'FileSystem', value: 'FileSystem'},
 ]
 
-const dataCenterOptions = [{label: 'CATL/宁德时代', value: 'catl'}]
+const dataCenterOptions = [{label: 'CATL/宁德时代', value: 'CATL'}]
 const platformOptions = [{label: 'Windows', value: 'Windows'}, {label: 'Linux', value: 'Linux'}]
 const envOptions = [{label: '生产', value: 'prod'}, {label: '非生产', value: 'dev'},]
 const backupSoftwareOptions = [{label: 'Veeam', value: 'Veeam'}]
 const machineTypeOptions = [{label: '虚拟机', value: 'vm'}, {label: '物理机', value: 'physical'},]
 
-const veeamServerOptions = [{ label: 'VeeamServer1', value: 'vs1' }, { label: 'VeeamServer2', value: 'vs2'}]
+const veeamServerOptions = [{ label: '192.168.1.104:8888', value: '192.168.1.104:8888' }, { label: '192.168.1.101:8888', value: '192.168.1.101:8888'}]
 
 const cascadeRule = { MySQL: {}, VMware: {machineType: 'vm', platform: 'Windows'}}
 
@@ -416,19 +416,27 @@ export default {
     },
     onVCChange(e) {
       this.backupFormData.vmObjects = []
-      // this.getVMList(e)
+      this.getVMList(e)
+    },
+    onServerChange() {
+      this.backupFormData.vCenter = undefined
+      this.backupFormData.repository = undefined
+      this.getVCList()
+      listRepository(1, 100, this.backupFormData.backupServer).then(resp => {
+        this.repositoryDataList = resp.rows
+      })
     },
     getVCList() {
-      listHost(undefined, undefined, this.backupServer).then(resp => {
-        this.vcOptions = resp.rows.filter(r => r.type === 1).map(r => {
+      listHost(1, 100, this.backupFormData.backupServer).then(resp => {
+        this.vcOptions = resp.data.filter(r => r.type === 1).map(r => {
           return { label: r.name, value: r.name }
         })
       })
     },
     getVMList(name) {
       if (this.vmCache[name]) return this.vmCache[name]
-      getHostEntity(name, 'HostAndVms', this.backupServer).then(resp => {
-        this.vmObjectsOptions = resp.rows.filter(r => r.type === 'Vm').map(r => {
+      getHostEntity(name, 'HostAndVms', this.backupFormData.backupServer).then(resp => {
+        this.vmObjectsOptions = resp.data.filter(r => r.type === 'Vm').map(r => {
           return { label: r.name, value: r.path }
         })
         if (this.vmCache[name] === undefined) {
