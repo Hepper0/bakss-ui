@@ -171,7 +171,8 @@ import { listRepository } from '@/api/veeam/repo'
 import { createJob } from '@/api/veeam/job'
 import { applyCreateBackup } from '@/api/application/apply'
 import { CREATE_BACKUP } from '@/views/common/config'
-import {deepClone} from "../../../utils";
+import { deepClone } from "@/utils";
+import { parseTime } from "@/utils/ruoyi"
 
 const rules = {
   backupContent: [{
@@ -356,6 +357,9 @@ export default {
   computed: {
     cascadeRule: function () {
       return cascadeRule[this.basicFormData.backupContent]
+    },
+    user: function () {
+      return this.$store.getters.user
     }
   },
   mounted() {
@@ -363,6 +367,8 @@ export default {
     // listRepository().then(resp => {
     //   this.repositoryDataList = resp.rows
     // })
+    // name要拼接appId, 放在后端处理
+    this.backupFormData.description = "Created by Bakss\\" + this.user.name + " at " + parseTime(new Date().getTime(), '{y}-{m}-{d} {h}:{i}')
   },
   methods: {
     submitForm() {
