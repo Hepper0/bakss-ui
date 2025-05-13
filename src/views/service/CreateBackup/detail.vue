@@ -428,7 +428,8 @@ export default {
     },
     getVCList() {
       listHost(1, 100, this.backupFormData.backupServer).then(resp => {
-        this.vcOptions = resp.data.filter(r => r.type === 1).map(r => {
+        //  .filter(r => r.type === 1)
+        this.vcOptions = resp.data.map(r => {
           return { label: r.name, value: r.name }
         })
       })
@@ -437,7 +438,7 @@ export default {
       if (this.vmCache[name]) return this.vmCache[name]
       getHostEntity(name, 'HostAndVms', this.backupFormData.backupServer).then(resp => {
         this.vmObjectsOptions = resp.data.filter(r => r.type === 'Vm').map(r => {
-          return { label: r.name, value: r.path }
+          return { label: r.name, value: r.id }
         })
         if (this.vmCache[name] === undefined) {
           this.vmCache[name] = this.vmObjectsOptions
