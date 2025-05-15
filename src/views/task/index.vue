@@ -24,14 +24,14 @@ export default {
     }
   },
   mounted() {
-    this.activeName = this.$route.query.taskType || 'todo'
+    this.activeName = this.$route.query.taskType || this.$cache.local.get('taskTab') || 'todo'
   },
   components: {
     TaskList
   },
   methods: {
     handleClick(e) {
-
+      this.$cache.local.set('taskTab', e.name)
     },
   }
 }

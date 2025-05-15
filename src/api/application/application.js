@@ -68,7 +68,7 @@ export function reject(data) {
 
 export function getCreateBackupApplication(appId) {
   return request({
-    url: '/application/createBackup/' + appId,
+    url: '/application/createBackupApplication/' + appId,
     method: 'get',
   })
 }

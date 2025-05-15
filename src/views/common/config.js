@@ -1,3 +1,4 @@
+// 申请类型
 export const APPLY_BACKUP_PERMISSION = 0
 export const GRANT_BACKUP_PERMISSION = 1
 export const CREATE_RESTORE = 2
@@ -12,6 +13,7 @@ export const MODIFY_OWNER = 10
 export const MODIFY_MANAGER = 11
 export const APPLY_TYPE = ['申请备份管理权', '授权备份管理权','恢复创建','备份创建','立即备份','定时备份','修改备份目录','启用备份','策略禁用','策略删除', '修改owner', '修改管理员']
 
+// 申请类型对应的组件类型
 export const TYPE_BACKUP_PERMISSION = 0
 export const TYPE_CREATE_RESTORE = 1
 export const TYPE_CREATE_BACKUP = 2
@@ -29,6 +31,7 @@ export const APPLY_MAP = [
   [MODIFY_OWNER, MODIFY_MANAGER]
 ]
 
+// 申请单流程
 export const TASK_STATUS = ['指派人审批', '客户端owner审批', 'dba审批', '备份管理员审批']
 export const TASK_STATUS_DICT = {
   'assign': '指派人审批',
@@ -44,6 +47,7 @@ export const REVIEW_STATUS_DICT = {
   2: '审批不同意'
 }
 
+// 申请单状态
 export const CANCEL_APPLICATION = 2;
 
 export const APPROVAL_STATUS_WAIT_LEADER = 0;
@@ -57,3 +61,9 @@ export const getComponentType = (appType) => {
     }
   }
 }
+
+// 通用配置
+export const MACHINE_TYPE = { vm: '虚拟机' , physical: '物理机' }
+export const DATA_CENTER = {catl: '宁德时代/CATL'}
+export const COST_TYPE = {costCenter: '成本中心'}
+export const ENV = { prod: '生产', dev: '非生产' }

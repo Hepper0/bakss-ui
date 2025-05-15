@@ -14,8 +14,13 @@
           <el-table-column prop="reviewUser" label="执行人"></el-table-column>
           <el-table-column prop="createTime" label="开始时间"></el-table-column>
           <el-table-column prop="reviewTime" label="结束时间"></el-table-column>
-          <el-table-column prop="reviewStatus" label="处理意见"></el-table-column>
-          <el-table-column prop="duration" label="处理时间"></el-table-column>
+          <el-table-column prop="reviewStatus" label="处理意见">
+            <template slot-scope="{ row }">
+              <el-tag v-if="row.reviewStatus === 1" type="success">审批同意</el-tag>
+              <el-tag v-else-if="row.reviewStatus === 2" type="danger">审批不同意</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="duration" label="处理时长"></el-table-column>
         </el-table>
       </el-collapse-item>
     </el-collapse>
@@ -47,7 +52,22 @@ export default {
       getFlowByAppId({ appId: this.appId }).then((resp) => {
         this.loading = false
         this.tableData = resp.rows
+        this.tableData.forEach(r => {
+          if (r.reviewStatus && r.reviewTime !== undefined) {
+            r.duration = this.prettyDate(parseInt((new Date(r.reviewTime).getTime() - new Date(r.createTime).getTime()) / 1000))
+          }
+        })
       })
+    },
+    prettyDate(t) {
+      const minute = 60
+      const hour = 60 * minute
+      const day = 24 * hour
+      const d = parseInt(t / day)
+      const h = parseInt(t % day / hour)
+      const m = parseInt(t % hour / minute)
+      const s = parseInt( t % minute)
+      return t > minute ? (d ? d + '天' : '') + (h? h + '小时': '') + (m? m+'分钟': '') + (s? s + '秒': '') : t + '秒'
     }
   }
 }

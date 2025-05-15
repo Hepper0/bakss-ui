@@ -58,6 +58,17 @@ export function formatTime(time, option) {
   }
 }
 
+export function prettyDate(t) {
+  const minute = 60
+  const hour = 60 * minute
+  const day = 24 * hour
+  const d = parseInt(t / day)
+  const h = parseInt(t % day / hour)
+  const m = parseInt(t % hour / minute)
+  const s = parseInt( t % minute)
+  return t > minute ? (d ? d + '天' : '') + (h? h + '小时': '') + (m? m+'分钟': '') + (s? s + '秒': '') : t + '秒'
+}
+
 /**
  * @param {string} url
  * @returns {Object}

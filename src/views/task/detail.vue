@@ -1,6 +1,6 @@
 <template>
   <div style="padding: 10px">
-    <stratagy v-if="taskType === TYPE_STRATEGY" />
+    <strategy v-if="taskType === TYPE_STRATEGY" />
     <backup-once v-else-if="taskType === TYPE_BACKUP_ONCE" />
     <backup-permission v-else-if="taskType === TYPE_BACKUP_PERMISSION" />
     <create-backup v-else-if="taskType === TYPE_CREATE_BACKUP" />
@@ -11,7 +11,7 @@
         <span>操作区</span>
       </div>
       <el-input v-model="remark" type="textarea" :rows="3"/>
-      <div style="margin-top: 15px">
+      <div style="margin-top: 15px" v-show="appBasicInfo && appBasicInfo.status === 1">
         <el-button @click="approval(true)" type="primary">审批同意</el-button>
         <el-button @click="approval(false)" style="color: orangered">审批不同意</el-button>
       </div>
