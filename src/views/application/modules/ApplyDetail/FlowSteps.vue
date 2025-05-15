@@ -8,7 +8,8 @@
         <el-table v-loading="loading" size="mini" :data="tableData" stripe>
           <el-table-column prop="flowStep" label="任务名称">
             <template slot-scope="{ row }">
-              {{ row.flowStep }}
+              {{ TASK_STATUS_DICT[row.flowStep] || '提交' }}
+
             </template>
           </el-table-column>
           <el-table-column prop="reviewUser" label="执行人"></el-table-column>
@@ -29,11 +30,13 @@
 
 <script>
 import { getFlowByAppId } from '@/api/application/flow'
+import { TASK_STATUS_DICT } from '@/views/common/config'
 
 export default {
   name: "FlowSteps",
   data: function () {
     return {
+      TASK_STATUS_DICT,
       loading: false,
       tableData: []
     }
@@ -41,6 +44,7 @@ export default {
   props: {
     appId: undefined
   },
+  inject: ['getAppBasicInfo'],
   watch: {
     appId: function () {
       this.getFlowByAppId()
@@ -49,13 +53,18 @@ export default {
   methods: {
     getFlowByAppId() {
       this.loading = true
-      getFlowByAppId({ appId: this.appId }).then((resp) => {
-        this.loading = false
-        this.tableData = resp.rows
-        this.tableData.forEach(r => {
-          if (r.reviewStatus && r.reviewTime !== undefined) {
-            r.duration = this.prettyDate(parseInt((new Date(r.reviewTime).getTime() - new Date(r.createTime).getTime()) / 1000))
-          }
+      this.getAppBasicInfo().then(resp => {
+        const appInfo = resp.data
+        getFlowByAppId({ appId: this.appId }).then((resp) => {
+          this.loading = false
+          const tableData = resp.rows
+          const submitStep = { flowStep: '提交', flowOrder: -1, reviewUser: appInfo.appUser, createTime: appInfo.createTime, reviewTime: appInfo.createTime }
+          this.tableData = [submitStep, ...tableData]
+          this.tableData.forEach(r => {
+            if (r.reviewStatus && r.reviewTime !== undefined) {
+              r.duration = this.prettyDate(parseInt((new Date(r.reviewTime).getTime() - new Date(r.createTime).getTime()) / 1000))
+            }
+          })
         })
       })
     },

@@ -25,8 +25,16 @@
         <el-input size="small" disabled v-model="data.appName" class="form-item"></el-input>
       </el-col>
       <el-col :span="6">
-        <div class="form-item">备份时间段</div>
-        <el-input size="small" disabled v-model="data.schedule" class="form-item"></el-input>
+        <div class="form-item">备份时间</div>
+        <el-input size="small" disabled v-model="data.scheduleTime" class="form-item"></el-input>
+      </el-col>
+      <el-col :span="6">
+        <div class="form-item">备份日期类型</div>
+        <el-input size="small" disabled v-model="data.scheduleDateType" class="form-item"></el-input>
+      </el-col>
+      <el-col :span="6" v-show="data.scheduleDateType === 'On these days'">
+        <div class="form-item">备份日期</div>
+        <el-input size="small" disabled v-model="data.scheduleDay" class="form-item"></el-input>
       </el-col>
       <el-col :span="6">
         <div class="form-item">收费方式</div>
@@ -50,8 +58,15 @@
 import { MACHINE_TYPE, COST_TYPE, DATA_CENTER } from '@/views/common/config'
 import {deepClone} from "../../../../utils";
 
+const scheduleDateTypeOptions = {'everyday': 'EveryDay', 'weekdays': 'On Weekdays', 'selectedDays': 'On these days'}
+
 export default {
   name: "VMInfo",
+  data: function () {
+    return {
+      scheduleDateTypeOptions
+    }
+  },
   props: {
     formData: {
       type: Object,
@@ -79,6 +94,7 @@ export default {
       data.machineType = MACHINE_TYPE[data.machineType]
       data.dataCenter = DATA_CENTER[data.dataCenter]
       data.costType = COST_TYPE[data.costType]
+      data.scheduleDateType = scheduleDateTypeOptions[data.scheduleDateType]
       return data
     }
   }

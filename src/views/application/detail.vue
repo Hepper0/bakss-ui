@@ -11,7 +11,7 @@
         <span>操作区</span>
       </div>
       <div>
-        <el-button v-show="user.name === appBasicInfo && appBasicInfo.appUser" @click="cancel" style="color: orangered">取消申请</el-button>
+        <el-button v-show="appBasicInfo && (user.name === appBasicInfo.appUser) && appBasicInfo.status === 1" @click="cancel" style="color: orangered">取消申请</el-button>
         <el-button @click="back">返回</el-button>
       </div>
     </el-card>

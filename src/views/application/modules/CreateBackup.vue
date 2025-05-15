@@ -43,6 +43,7 @@ export default {
       getCreateBackupApplication(appId).then(resp => {
         const backupInfo = resp.data
         backupInfo && delete backupInfo.remark
+        backupInfo && delete backupInfo.id
         Object.assign(this.formData, backupInfo)
       })
     },

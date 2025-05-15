@@ -342,7 +342,7 @@ const scheduleDayOptions = [
   {label: 'Thursday', value: 'Thursday'},
   {label: 'Friday', value: 'Friday'},
   {label: 'Saturday', value: 'Saturday'},
-  {label: 'Sunday', value: 'Sunday'},]
+  {label: 'Sunday', value: 'Sunday'}]
 
 // const veeamServerOptions = [{ label: '192.168.1.104:8888', value: '192.168.1.104:8888' }, { label: '192.168.1.101:8888', value: '192.168.1.101:8888'}]
 
