@@ -43,7 +43,7 @@
                 <el-button icon="el-icon-key" size="mini" type="text" @click="goto('backup/grant', row.id)"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="管理授权用户" placement="top-start">
-                <el-button :disabled icon="el-icon-s-custom" size="mini" type="text" @click="gotoApplyDetail([row.id])"></el-button>
+                <el-button disabled icon="el-icon-s-custom" size="mini" type="text" @click="gotoApplyDetail([row.id])"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="更多操作" placement="top-start">
                 <el-button icon="el-icon-more" size="mini" type="text" @click="goto('backup/more', row.id)"></el-button>
@@ -63,23 +63,60 @@
       />
     </div>
     <!-- 添加或修改Veeam服务器对话框 -->
-    <el-dialog title="编辑备份" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog title="编辑备份" :visible.sync="open" width="1000px">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px" style="padding: 0 30px">
-        <el-form-item label="HostName" prop="hostname">
-          <el-input v-model="form.backupSoftware" placeholder="请输入域名" />
-        </el-form-item>
-        <el-form-item label="IP" prop="ip">
-          <el-input v-model="form.backupContent" placeholder="请输入IP" />
-        </el-form-item>
-        <el-form-item label="端口" prop="port">
-          <el-input v-model="form.backupIP" placeholder="请输入$端口" />
-        </el-form-item>
-        <el-form-item label="平台" prop="port">
-          <el-input v-model="form.backupIP" placeholder="请输入$端口" />
-        </el-form-item>
-        <el-form-item label="启用" prop="status">
-          <el-switch v-model="form.status" />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="备份软件" prop="backupSoftware">
+              <el-input disabled v-model="form.backupSoftware" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备份内容" prop="backupContent">
+              <el-input disabled v-model="form.backupContent"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备份类型" prop="jobType">
+              <el-input disabled v-model="form.backType" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备份IP" prop="backupIP">
+              <el-input disabled v-model="form.backupIP" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Master IP" prop="MasterIp">
+              <el-input disabled v-model="form.backupIP" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="任务名称" prop="taskName">
+              <el-input v-model="form.appName" placeholder="请输入$端口" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="环境" prop="env">
+              <el-select style="width: 100%" v-model="form.env"></el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="操作系统" prop="platform">
+              <el-select style="width: 100%" v-model="form.platform"></el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="管理员" prop="manager">
+              <el-select style="width: 100%" v-model="form.manager"></el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="负责人" prop="principal">
+              <el-select style="width: 100%" v-model="form.principal"></el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -98,6 +135,7 @@ export default {
   name: 'BackupMgr',
   data() {
     return {
+      open: false,
       loading: false,
       total: 0,
       queryParams: {
@@ -110,7 +148,9 @@ export default {
         // { id: 1, backupSoftware: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtx9ltz7mq', backupContent: 'SQL Server', backupIP: '10.122.145.38', appName: '--', platform: 'Linux', owner: 'wangk7@lenovo.com' },
         // { id: 2, backupSoftware: 'NetBackup', softwareVersion: '9.1.0.1', clientName: 'swtkvb5quvc', backupContent: 'SQL Server', backupIP: '10.122.145.53', appName: '--', platform: 'Linux', owner: 'zhangxy90@lenovo.com' }
       ],
-      selectedRows: []
+      selectedRows: [],
+      form: {},
+      rules: {}
     };
   },
   components: {
@@ -122,6 +162,8 @@ export default {
   methods: {
     editRow(row) {
       this.$message.info(`编辑 ${row.clientName}`);
+      this.open = true
+      this.form = row
     },
     handleCommand(command) {
       if (command === 'delete') {
@@ -184,6 +226,12 @@ export default {
     },
     createBackup() {
       this.goto('create')
+    },
+    submitForm() {
+
+    },
+    cancel() {
+      this.open = false
     }
   }
 };

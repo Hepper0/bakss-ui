@@ -87,15 +87,14 @@
       <el-form label-width="100px">
         <el-row :gutter="20">
           <el-col :span="6">
-            <el-form-item label="备份IP">
-              <el-input v-model="basicInfo.backupIp" disabled></el-input>
+            <el-form-item label="任务名称">
+              <el-input v-model="jobName" disabled></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="备份软件">
-              <el-select v-model="basicInfo.backupSoftwaree" disabled style="width: 100%">
-                <el-option label="NetBackup" value="NetBackup"></el-option>
-                <el-option label="NetWorker" value="NetWorker"></el-option>
+              <el-select v-model="basicInfo.backupSoftware" disabled style="width: 100%">
+                <el-option label="Veeam" value="Veeam"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -105,8 +104,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="客户端名称">
-              <el-input v-model="basicInfo.client" disabled></el-input>
+            <el-form-item label="备份IP">
+              <el-input v-model="basicInfo.backupIp" disabled></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -117,8 +116,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="备份应用">
-              <el-input v-model="basicInfo.backupApp" disabled></el-input>
+            <el-form-item label="备份内容">
+              <el-input v-model="basicInfo.backupContent" disabled></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
@@ -173,18 +172,22 @@
                       </div>
                     </template>
                     <div class="collapse-panel">
-                      <div style="background-color: #f1f1f1; border-radius: 8px; padding: 15px">
+                      <div style="background-color: #f1f1f1; border-radius: 8px; padding: 15px 30px">
                         <el-row style="padding: 0 10px">
                           <el-button size="mini" type="primary" style="float: right" @click="showBackupOnceDialog(true)">一次性备份</el-button>
                         </el-row>
                         <el-row style="margin-bottom: 15px">
-                          <el-col :span="8">备份策略: {{ backupStrategy.name }}</el-col>
-                          <el-col :span="8">数据保留时间: {{ backupStrategy.retention }}</el-col>
-                          <el-col :span="8">调度名称: {{ backupStrategy.dispatch }}</el-col>
+                          <el-col :span="8">备份服务器: {{ backupStrategy.backupServer }}</el-col>
+                        </el-row>
+                        <el-row style="margin-bottom: 15px">
+                          <el-col :span="8">VCenter: {{ backupStrategy.VCenter }}</el-col>
+                          <el-col :span="8">虚拟机: {{ backupStrategy.vmObjects }}</el-col>
+                          <el-col :span="8">仓库: {{ backupStrategy.repository }}</el-col>
                         </el-row>
                         <el-row>
-                          <el-col :span="8">备份目录: {{ backupStrategy.directory }}</el-col>
-                          <el-col :span="8">备份频率: {{ backupStrategy.schedule }}</el-col>
+                          <el-col :span="8">备份时间: {{ backupStrategy.scheduleTime }}</el-col>
+                          <el-col :span="8">备份计划类型: {{ backupStrategy.scheduleDateType }}</el-col>
+                          <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'On these days') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
                         </el-row>
                       </div>
                     </div>
@@ -247,11 +250,14 @@
 
           <div class="panel-table-wrapper">
             <el-table :data="backupHistory" size="small">
-              <el-table-column prop="jobType" label="策略名"></el-table-column>
-              <el-table-column prop="state" label="客户端名称"></el-table-column>
-              <el-table-column prop="result" label="开始时间"></el-table-column>
-              <el-table-column prop="description" label="结束时间"></el-table-column>
-              <el-table-column prop="size" label="原始大小"></el-table-column>
+              <el-table-column prop="jobName" label="任务名"></el-table-column>
+              <el-table-column prop="jobType" label="任务类型"></el-table-column>
+              <el-table-column prop="state" label="状态">
+              </el-table-column>
+              <el-table-column prop="result" label="结果">
+              </el-table-column>
+              <el-table-column prop="creationTime" label="开始时间"></el-table-column>
+              <el-table-column prop="endTime" label="结束时间"></el-table-column>
               <el-table-column prop="status" label="备份状态">
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.status === '成功'" type="success">成功</el-tag>
@@ -268,8 +274,9 @@
 
 <script>
 import { applyStrategy, applyBackup } from '@/api/application/apply'
-import { backupHistory } from '@/api/service/backup'
+import { getBackup } from '@/api/service/backup'
 import { listSession, getSessionDetail } from '@/api/veeam/session'
+import { getJobDetail } from '@/api/veeam/job'
 
 const BACKUP_EXEC_RIGHT_NOW = 1
 const BACKUP_EXEC_AT_TIME = 2
@@ -289,19 +296,19 @@ export default {
         id: 1,
         backupIp: '10.122.145.38',
         masterIp: 'sltwfqm7huz',
-        backupSoftware: 'NetBackup'
+        backupSoftware: 'Veeam'
       },
       backupStrategy: {
-        id: '123',
-        name: '10.122.145.38_SQL_Alvayson_FULL',
-        directory: 'WHOLE_DATABASE',
-        retention: '1 month',
-        schedule: 'Every week on Monday at 15:00',
-        status: 1
+        // id: '123',
+        // name: '10.122.145.38_SQL_Alvayson_FULL',
+        // directory: 'WHOLE_DATABASE',
+        // retention: '1 month',
+        // schedule: 'Every week on Monday at 15:00',
+        // status: 1
       },
       backupHistory: [
-        { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'sltwfqm7huz', startTime: '2022-08-31 16:43:01', endTime: '2022-08-31 16:45:28', size: '2.08GB', status: '成功' },
-        { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
+        // { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'sltwfqm7huz', startTime: '2022-08-31 16:43:01', endTime: '2022-08-31 16:45:28', size: '2.08GB', status: '成功' },
+        // { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
       ],
       searchQuery: { dataRange: [], strategy: undefined, clientName: undefined, status: undefined },
       backupDialogVisible: false,
@@ -318,6 +325,17 @@ export default {
         }
       }
     };
+  },
+  mounted() {
+    const backupId = this.$route.query.id
+    getBackup(backupId).then(resp => {
+      this.basicInfo = resp.data
+    })
+  },
+  computed: {
+    jobName: function () {
+      return this.basicInfo.appName
+    }
   },
   methods: {
     showBackupOnceDialog(flag) {
@@ -382,7 +400,7 @@ export default {
       })
     },
     getBackupHistory() {
-      backupHistory({ id: this.backupStrategy.id}).then(resp => {
+      listSession(this.jobName, 1, 10).then(resp => {
         this.backupHistory = resp.rows
       })
     },
@@ -395,6 +413,40 @@ export default {
     getSessionDetail(id) {
       getSessionDetail(id).then(resp => {
 
+      })
+    },
+    getJobDetail() {
+      getJobDetail(this.jobName).then(resp => {
+        const jobInfo = resp.data && resp.data.jobInfo
+        jobInfo.repository = jobInfo['backupRepositoryName']
+        const vmObjects = jobInfo['selectedVmObjects']
+        if (vmObjects[0]) {
+          const path = vmObjects[0].path
+          jobInfo.Vcenter = path.split('\\')[0]
+        }
+        const schedule = jobInfo['schedule']
+        if (schedule) {
+          const policy = schedule['policy']
+          jobInfo.policy = policy
+          const options = schedule['options' + policy]
+          switch (policy) {
+            case 'Daily':
+              jobInfo.scheduleTime = options['startDateTimeLocal']
+              jobInfo.scheduleDateType = options['dayNumberInMonth']
+              jobInfo.scheduleDay = options['dayOfWeek']
+              break
+            case 'Monthly':
+              const dayInMonth = options['dayInMonth']
+              jobInfo.scheduleTime = options['time']
+              jobInfo.scheduleDateType = dayInMonth['dayNumberInMonth'] + ',' + dayInMonth['dayOfWeek']
+              jobInfo.scheduleDay = options['months']
+              break
+            case 'Periodically':
+              break
+            case 'Continuous':
+              break
+          }
+        }
       })
     }
   }

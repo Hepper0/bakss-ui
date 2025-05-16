@@ -78,7 +78,7 @@
         <el-form ref="backupForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px" :loading="true">
           <el-row>
             <el-col :span="8">
-              <el-form-item label="应用名称" prop="appName">
+              <el-form-item label="任务名称" prop="appName">
                 <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '80%'}">
                 </el-input>
               </el-form-item>
@@ -256,7 +256,7 @@ const platformRules = {
 const backupRules = {
   appName: [{
     required: true,
-    message: '请选择',
+    message: '请输入',
     trigger: 'blur'
   }],
   vCenter: [{
