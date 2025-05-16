@@ -247,10 +247,10 @@
 
           <div class="panel-table-wrapper">
             <el-table :data="backupHistory" size="small">
-              <el-table-column prop="name" label="策略名"></el-table-column>
-              <el-table-column prop="client" label="客户端名称"></el-table-column>
-              <el-table-column prop="startTime" label="开始时间"></el-table-column>
-              <el-table-column prop="endTime" label="结束时间"></el-table-column>
+              <el-table-column prop="jobType" label="策略名"></el-table-column>
+              <el-table-column prop="state" label="客户端名称"></el-table-column>
+              <el-table-column prop="result" label="开始时间"></el-table-column>
+              <el-table-column prop="description" label="结束时间"></el-table-column>
               <el-table-column prop="size" label="原始大小"></el-table-column>
               <el-table-column prop="status" label="备份状态">
                 <template slot-scope="scope">
@@ -269,6 +269,7 @@
 <script>
 import { applyStrategy, applyBackup } from '@/api/application/apply'
 import { backupHistory } from '@/api/service/backup'
+import { listSession, getSessionDetail } from '@/api/veeam/session'
 
 const BACKUP_EXEC_RIGHT_NOW = 1
 const BACKUP_EXEC_AT_TIME = 2
@@ -390,6 +391,11 @@ export default {
     },
     onChangeDate (e) {
       console.log(e)
+    },
+    getSessionDetail(id) {
+      getSessionDetail(id).then(resp => {
+
+      })
     }
   }
 };

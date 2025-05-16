@@ -42,9 +42,8 @@
               <el-tooltip class="item" effect="dark" content="授权" placement="top-start">
                 <el-button icon="el-icon-key" size="mini" type="text" @click="goto('backup/grant', row.id)"></el-button>
               </el-tooltip>
-              <!--   todo 需求未说明   -->
-              <el-tooltip class="item" effect="dark" content="申请" placement="top-start">
-                <el-button icon="el-icon-s-custom" size="mini" type="text" @click="gotoApplyDetail([row.id])"></el-button>
+              <el-tooltip class="item" effect="dark" content="管理授权用户" placement="top-start">
+                <el-button :disabled icon="el-icon-s-custom" size="mini" type="text" @click="gotoApplyDetail([row.id])"></el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="更多操作" placement="top-start">
                 <el-button icon="el-icon-more" size="mini" type="text" @click="goto('backup/more', row.id)"></el-button>
@@ -63,6 +62,30 @@
         @pagination="getList"
       />
     </div>
+    <!-- 添加或修改Veeam服务器对话框 -->
+    <el-dialog title="编辑备份" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px" style="padding: 0 30px">
+        <el-form-item label="HostName" prop="hostname">
+          <el-input v-model="form.backupSoftware" placeholder="请输入域名" />
+        </el-form-item>
+        <el-form-item label="IP" prop="ip">
+          <el-input v-model="form.backupContent" placeholder="请输入IP" />
+        </el-form-item>
+        <el-form-item label="端口" prop="port">
+          <el-input v-model="form.backupIP" placeholder="请输入$端口" />
+        </el-form-item>
+        <el-form-item label="平台" prop="port">
+          <el-input v-model="form.backupIP" placeholder="请输入$端口" />
+        </el-form-item>
+        <el-form-item label="启用" prop="status">
+          <el-switch v-model="form.status" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
