@@ -67,3 +67,19 @@ export const MACHINE_TYPE = { vm: '虚拟机' , physical: '物理机' }
 export const DATA_CENTER = {catl: '宁德时代/CATL'}
 export const COST_TYPE = {costCenter: '成本中心'}
 export const ENV = { prod: '生产', dev: '非生产' }
+
+export const JOB_TYPE = {
+  0: '虚机备份',
+  1: '复制',
+  3: '备份验证',
+  12: '即时恢复',
+  63: '备份拷贝',
+  65: '备份拷贝',
+  4020: 'SQL日志备份',
+  4021: 'Oracle备份',
+  4022: 'Postgre日志备份',
+  12002: 'Agent客户端备份',
+  12003: 'Agent服务端备份',
+  12100: 'OracleRMAN备份',
+  13000: '非结构化数据备份',
+}

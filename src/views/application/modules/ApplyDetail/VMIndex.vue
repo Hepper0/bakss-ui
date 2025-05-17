@@ -4,18 +4,26 @@
       <slot></slot>
     </WMInfo>
     <flow-steps v-show="appId" :app-id="appId"/>
+    <el-card>
+      <div slot="header" class="clearfix">
+        <span>执行情况</span>
+      </div>
+      <session />
+    </el-card>
   </div>
 </template>
 
 <script>
 import WMInfo from "./VMInfo"
 import FlowSteps from "./FlowSteps"
+import Session from "@/views/application/modules/job/session"
 
 export default {
   name: "VMIndex",
   components: {
     WMInfo,
-    FlowSteps
+    FlowSteps,
+    Session
   },
   props: {
     formData: {

@@ -14,7 +14,6 @@ import FlowSteps from "./FlowSteps"
 import ClientInfo from "./ClientInfo"
 import ApplyInfo from "./ApplyInfo"
 
-
 export default {
   name: "ApplyDetailTemplate",
   data: function () {

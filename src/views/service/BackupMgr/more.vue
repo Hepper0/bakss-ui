@@ -79,6 +79,13 @@
         </span>
       </div>
     </el-dialog>
+    <el-dialog
+      title="任务详情"
+      :visible="sessionDetailVisible"
+      show-close
+    >
+      <Session style="border-top: 1px solid #e3e3e3; margin-top: -20px"/>
+    </el-dialog>
     <!-- 基本信息 -->
     <el-card class="box-card panel-container-raw">
       <div slot="header" class="clearfix">
@@ -143,8 +150,6 @@
 
     <!-- 备份策略 -->
     <div class="panel-container">
-      <el-tabs value="first">
-        <el-tab-pane label="数据库全备" name="first">
           <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
             <el-collapse-item :name="1">
               <template slot="title">
@@ -160,10 +165,10 @@
                   <el-collapse-item :name="1">
                     <template slot="title">
                       <div style="width: 100%">
-                        <span style="font-size: 14px;">
-                        <span style="font-family: 'Microsoft YaHei', sans-serif;">
-                          {{ backupStrategy.name }}
-                        </span>
+                        <span style="font-size: 14px; margin-left: 20px">
+                          <span style="font-family: 'Microsoft YaHei', sans-serif;">
+                            {{ backupStrategy.jobName }}
+                          </span>
                         </span>
                         <span style="float: right; margin-right: 15px">
                           <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">{{ backupStrategy.status ? '禁用' : '启用' }}备份</el-button>
@@ -176,19 +181,45 @@
                         <el-row style="padding: 0 10px">
                           <el-button size="mini" type="primary" style="float: right" @click="showBackupOnceDialog(true)">一次性备份</el-button>
                         </el-row>
-                        <el-row style="margin-bottom: 15px">
-                          <el-col :span="8">备份服务器: {{ backupStrategy.backupServer }}</el-col>
-                        </el-row>
-                        <el-row style="margin-bottom: 15px">
-                          <el-col :span="8">VCenter: {{ backupStrategy.VCenter }}</el-col>
-                          <el-col :span="8">虚拟机: {{ backupStrategy.vmObjects }}</el-col>
-                          <el-col :span="8">仓库: {{ backupStrategy.repository }}</el-col>
-                        </el-row>
-                        <el-row>
-                          <el-col :span="8">备份时间: {{ backupStrategy.scheduleTime }}</el-col>
-                          <el-col :span="8">备份计划类型: {{ backupStrategy.scheduleDateType }}</el-col>
-                          <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'On these days') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
-                        </el-row>
+                        <el-form label-width="120px">
+                          <el-row>
+                            <el-col :span="8">
+                              <el-form-item label="备份服务器: ">
+                                {{ backupStrategy.backupServer }}
+                              </el-form-item>
+                            </el-col>
+                          </el-row>
+                          <el-row>
+                            <el-col :span="8">
+                              <el-form-item label="VCenter: ">
+                                {{ backupStrategy.vCenter }}
+                              </el-form-item>
+                            </el-col>
+                            <el-col :span="8">
+                              <el-form-item label="虚拟机: ">
+                                {{ backupStrategy.vCenter }}
+                              </el-form-item>
+                            </el-col>
+                            <el-col :span="8">
+                              <el-form-item label="仓库: ">
+                                {{ backupStrategy.repository }}
+                              </el-form-item>
+                            </el-col>
+                          </el-row>
+                          <el-row>
+                            <el-col :span="8">
+                              <el-form-item label="备份时间: ">
+                                {{ backupStrategy.scheduleTime }}
+                              </el-form-item>
+                            </el-col>
+                            <el-col :span="8">
+                              <el-form-item label="备份计划类型: ">
+                                {{ backupStrategy.scheduleDateType }}
+                              </el-form-item>
+                            </el-col>
+                            <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'On these days') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
+                          </el-row>
+                        </el-form>
                       </div>
                     </div>
                   </el-collapse-item>
@@ -196,9 +227,7 @@
               </div>
             </el-collapse-item>
           </el-collapse>
-        </el-tab-pane>
-        <el-tab-pane label="数据库日志备份" name="second">数据库日志备份</el-tab-pane>
-      </el-tabs>
+
     </div>
 
     <!-- 备份历史 -->
@@ -230,13 +259,18 @@
                 </el-date-picker>
               </el-col>
               <el-col :span="4" style="display: flex">
-                策略名：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery.strategy" placeholder="请输入策略名称" clearable></el-input>
+                任务名称：
+                <el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery.jobName" clearable></el-input>
               </el-col>
               <el-col :span="4">
-                客户端名称：<el-input style="width: calc(100% - 100px)" size="mini" v-model="searchQuery.clientName" placeholder="请输入客户端名称" clearable></el-input>
+                任务类型：
+                <el-select style="width: calc(100% - 100px)" size="mini" v-model="searchQuery.jobType" clearable>
+                  <el-option v-for="(item, index) in jobTypeOptions" :key="index" :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
               </el-col>
               <el-col :span="3">
-                <el-select size="mini" clearable v-model="searchQuery.status" placeholder="状态">
+                <el-select size="mini" clearable v-model="searchQuery.result" placeholder="状态">
                   <el-option label="备份成功" value="success"></el-option>
                   <el-option label="备份失败" value="failure"></el-option>
                 </el-select>
@@ -251,17 +285,24 @@
           <div class="panel-table-wrapper">
             <el-table :data="backupHistory" size="small">
               <el-table-column prop="jobName" label="任务名"></el-table-column>
-              <el-table-column prop="jobType" label="任务类型"></el-table-column>
-              <el-table-column prop="state" label="状态">
+              <el-table-column prop="jobType" label="任务类型">
+                <template slot-scope="{ row }">
+                  {{ JOB_TYPE[row.jobType] }}
+                </template>
               </el-table-column>
-              <el-table-column prop="result" label="结果">
+              <el-table-column prop="state" label="状态">
               </el-table-column>
               <el-table-column prop="creationTime" label="开始时间"></el-table-column>
               <el-table-column prop="endTime" label="结束时间"></el-table-column>
               <el-table-column prop="status" label="备份状态">
                 <template slot-scope="scope">
-                  <el-tag v-if="scope.row.status === '成功'" type="success">成功</el-tag>
+                  <el-tag v-if="scope.row.result === 0" type="success">成功</el-tag>
                   <el-tag v-else type="danger">失败</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="{ row }">
+                  <i class="header-icon el-icon-document session-detail" @click="showSessionDetail(row)" />
                 </template>
               </el-table-column>
             </el-table>
@@ -277,6 +318,8 @@ import { applyStrategy, applyBackup } from '@/api/application/apply'
 import { getBackup } from '@/api/service/backup'
 import { listSession, getSessionDetail } from '@/api/veeam/session'
 import { getJobDetail } from '@/api/veeam/job'
+import { JOB_TYPE } from "../../common/config";
+import Session from "@/views/application/modules/job/session";
 
 const BACKUP_EXEC_RIGHT_NOW = 1
 const BACKUP_EXEC_AT_TIME = 2
@@ -288,8 +331,10 @@ export const DELETE_STRATEGY = 9
 
 export default {
   name: "more",
+  components: {Session},
   data() {
     return {
+      JOB_TYPE,
       BACKUP_AT_TIME,
       BACKUP_RIGHT_NOW,
       basicInfo: {
@@ -299,15 +344,30 @@ export default {
         backupSoftware: 'Veeam'
       },
       backupStrategy: {
-        // id: '123',
-        // name: '10.122.145.38_SQL_Alvayson_FULL',
-        // directory: 'WHOLE_DATABASE',
-        // retention: '1 month',
-        // schedule: 'Every week on Monday at 15:00',
-        // status: 1
+        jobName: "vmJob1",
+        backupServer: 'BackupServer1',
+        vCenter: 'Vcenter',
+        vmObjects: '',
+        repository: 'Base Repository',
+        scheduleTime: '22:00',
+        scheduleDateType: 'On weekDays'
       },
       backupHistory: [
-        // { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'sltwfqm7huz', startTime: '2022-08-31 16:43:01', endTime: '2022-08-31 16:45:28', size: '2.08GB', status: '成功' },
+        {
+          "creationTime": "2025-04-03 14:56:16",
+          "endTime": "2025-04-03 14:57:25",
+          "ID": "56620a04-10c9-4e5f-80fa-a26fc3172d71",
+          "jobId": "51a4756c-8eda-44f5-ad52-cc738ccc77d0",
+          "jobType": 3,
+          "state": -1,
+          "result": 2,
+          "progress": 100,
+          "runManually": true,
+          "jobName": "surebackupJob",
+          "description": "",
+          "operation": "",
+          "reason": ""
+        }
         // { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
       ],
       searchQuery: { dataRange: [], strategy: undefined, clientName: undefined, status: undefined },
@@ -323,7 +383,8 @@ export default {
         disabledDate(time) {
           return time.getTime() < new Date().getTime();
         }
-      }
+      },
+      sessionDetailVisible: false
     };
   },
   mounted() {
@@ -335,6 +396,14 @@ export default {
   computed: {
     jobName: function () {
       return this.basicInfo.appName
+    },
+    jobTypeOptions: function () {
+      const jobTypeList = []
+      for(const k in JOB_TYPE) {
+        const jobType = { label: JOB_TYPE[k], value: k }
+        jobTypeList.push(jobType)
+      }
+      return jobTypeList
     }
   },
   methods: {
@@ -448,6 +517,9 @@ export default {
           }
         }
       })
+    },
+    showSessionDetail() {
+      this.sessionDetailVisible = true
     }
   }
 };
@@ -464,5 +536,14 @@ export default {
 .collapse-panel {
   padding: 10px;
   border-top: 1px solid #f1f1f1;
+}
+
+.session-detail {
+  color: #1890ff;
+  font-size: 16px
+}
+
+.session-detail:hover {
+  cursor: pointer;
 }
 </style>
