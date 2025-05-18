@@ -2,7 +2,7 @@
   <div class="backup-management">
     <el-dialog
       title="一次性备份"
-      :visible="backupDialogVisible"
+      :visible.sync="backupDialogVisible"
       show-close
     >
       <div style="padding: 0 40px">
@@ -51,7 +51,7 @@
     </el-dialog>
     <el-dialog
       :title="strategyDialogTitle"
-      :visible="strategyDialogVisible"
+      :visible.sync="strategyDialogVisible"
       show-close
     >
       <div style="padding: 0 40px">
@@ -81,8 +81,7 @@
     </el-dialog>
     <el-dialog
       title="任务详情"
-      :visible="sessionDetailVisible"
-      show-close
+      :visible.sync="sessionDetailVisible"
     >
       <Session :session-id="sessionDetailSessionId" style="border-top: 1px solid #e3e3e3; margin-top: -20px"/>
     </el-dialog>

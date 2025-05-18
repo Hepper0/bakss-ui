@@ -5,16 +5,16 @@
         权限类型
       </el-col>
       <el-col class="form-item">
-        <el-radio disabled v-model="formData.expiration" label="forever">永久</el-radio>
-        <el-radio disabled v-model="formData.expiration" label="temporary">非永久</el-radio>
+        <el-radio disabled v-model="expiration" :label="1">永久</el-radio>
+        <el-radio disabled v-model="expiration" :label="2">非永久</el-radio>
       </el-col>
-      <el-col class="form-item">
+      <el-col class="form-item" v-if="expiration !== 1">
         <b style="color: red">* </b><b>起止时间：</b>
       </el-col>
-      <el-col class="form-item" v-show="formData.expiration !== 'forever'">
+      <el-col class="form-item" v-if="expiration !== 1">
         <el-date-picker
           disabled
-          v-model="formData.dateRange"
+          v-model="dateRange"
           size="mini"
           type="datetimerange"
           range-separator="-"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { getApplication } from '@/api/application/application'
+import { getPermissionApplication } from '@/api/application/application'
 import { APPLY_TYPE } from '@/views/common/config'
 import ApplyDetailTemplate from "./ApplyDetail"
 
@@ -51,7 +51,9 @@ export default {
         client: undefined,
         strategy: undefined
       },
-      backupProgress: 0
+      backupProgress: 0,
+      expiration: undefined,
+      dateRange: []
     }
   },
   components: {
@@ -63,6 +65,12 @@ export default {
       const data = resp.data
       this.formData.appTypeZh = APPLY_TYPE[data.appType]
       Object.assign(this.formData, data)
+      getPermissionApplication(this.formData.id).then(resp => {
+        this.expiration = resp.data.expiration
+        if (this.expiration === 2) {
+          this.dateRange = [resp.data.startTime, resp.data.endTime]
+        }
+      })
     })
     // this.formData.id = this.$route.query.id
     // getApplication(this.formData.id).then(resp => {

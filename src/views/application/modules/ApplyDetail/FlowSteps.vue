@@ -57,7 +57,19 @@ export default {
         const appInfo = resp.data
         getFlowByAppId({ appId: this.appId }).then((resp) => {
           this.loading = false
-          const tableData = resp.rows
+          let tableData = resp.rows
+          // 找到当前步骤
+          let curOrder = 0
+          for(const r of tableData) {
+            if (r.reviewStatus === 1) {
+              curOrder = r.flowOrder + 1
+            } else if(r.reviewStatus === 2){
+              curOrder = r.flowOrder
+            }
+          }
+          // 未到的步骤不予显示
+          tableData = tableData.filter(r => r.flowOrder <= curOrder)
+
           const submitStep = { flowStep: '提交', flowOrder: -1, reviewUser: appInfo.appUser, createTime: appInfo.createTime, reviewTime: appInfo.createTime }
           this.tableData = [submitStep, ...tableData]
           this.tableData.forEach(r => {

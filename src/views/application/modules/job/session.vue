@@ -293,7 +293,7 @@ export default {
   name: "session",
   data: function () {
     return {
-      jobSession: this.parseSessionInfo(jobSession),
+      jobSession: undefined, //this.parseSessionInfo(jobSession),
       selectedTask: undefined
     }
   },

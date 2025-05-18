@@ -26,12 +26,12 @@
         <el-table v-loading="loading" size="small" :data="tableData" @selection-change="handleSelectionChange" stripe>
           <el-table-column type="selection" width="45"></el-table-column>
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
-          <el-table-column prop="softwareVersion" label="软件版本"></el-table-column>
-          <el-table-column prop="clientName" label="客户端名称"></el-table-column>
+<!--          <el-table-column prop="softwareVersion" label="软件版本"></el-table-column>-->
+          <el-table-column prop="appName" label="任务名"></el-table-column>
           <el-table-column prop="backupContent" label="备份内容"></el-table-column>
           <el-table-column prop="vCenter" label="VCenter主机名"></el-table-column>
           <el-table-column prop="backupIP" label="备份IP"></el-table-column>
-          <el-table-column prop="appName" label="应用名称"></el-table-column>
+<!--          <el-table-column prop="appName" label="应用名称"></el-table-column>-->
           <el-table-column prop="platform" label="操作系统类型"></el-table-column>
           <el-table-column prop="owner" label="负责人"></el-table-column>
           <el-table-column label="操作" width="150">
@@ -132,6 +132,7 @@
 <script>
 
 import { myBackup } from "@/api/service/backup"
+import { listJob } from "@/api/veeam/job"
 import QueryCondition from "@/components/QueryCondition"
 
 export default {

@@ -43,13 +43,6 @@ export function delApplication(id) {
   })
 }
 
-export function applyPermission() {
-  return request({
-    url: '/service/application/' + id,
-    method: 'post'
-  })
-}
-
 export function approve(data) {
   return request({
     url: '/service/application/approve',
@@ -73,3 +66,9 @@ export function getCreateBackupApplication(appId) {
   })
 }
 
+export function getPermissionApplication(id) {
+  return request({
+    url: '/service/application/permis/' + id,
+    method: 'get'
+  })
+}
