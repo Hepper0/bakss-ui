@@ -5,6 +5,10 @@
     </div>
     <el-row :gutter="24">
       <el-col :span="6">
+        <div class="form-item">申请类型</div>
+        <el-input size="small" disabled v-model="data.appType" class="form-item"></el-input>
+      </el-col>
+      <el-col :span="6">
         <div class="form-item">备份内容</div>
         <el-input size="small" disabled v-model="data.backupContent" class="form-item"></el-input>
       </el-col>
@@ -55,8 +59,8 @@
 </template>
 
 <script>
-import { MACHINE_TYPE, COST_TYPE, DATA_CENTER } from '@/views/common/config'
-import {deepClone} from "../../../../utils";
+import { MACHINE_TYPE, COST_TYPE, DATA_CENTER, APPLY_TYPE } from '@/views/common/config'
+import { deepClone } from "../../../../utils";
 
 const scheduleDateTypeOptions = {'everyday': 'EveryDay', 'weekdays': 'On Weekdays', 'selectedDays': 'On these days'}
 
@@ -95,6 +99,7 @@ export default {
       data.dataCenter = DATA_CENTER[data.dataCenter]
       data.costType = COST_TYPE[data.costType]
       data.scheduleDateType = scheduleDateTypeOptions[data.scheduleDateType]
+      data.appType = APPLY_TYPE[data.appType]
       return data
     }
   }

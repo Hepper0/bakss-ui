@@ -64,16 +64,6 @@
           v-hasPermi="['system:config:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['system:config:export']"
-        >导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -141,7 +131,7 @@
 </template>
 
 <script>
-import { listConfig, getConfig, delConfig, addConfig, updateConfig } from "@/api/veeam/config";
+import { listConfig, getConfig, delConfig, addConfig, updateConfig } from "@/api/veeam/basic";
 
 export default {
   name: "Config",

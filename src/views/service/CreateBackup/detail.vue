@@ -199,7 +199,7 @@
 </template>
 
 <script>
-import { listConfig } from "@/api/veeam/config"
+import { listConfig } from "@/api/veeam/basic"
 import { getHostEntity, listHost } from '@/api/veeam/host'
 import { listRepository } from '@/api/veeam/repo'
 import { applyCreateBackup } from '@/api/application/apply'
@@ -438,7 +438,7 @@ export default {
     // name要拼接appId, 放在后端处理
     this.backupFormData.description = "Created by Bakss\\" + this.user.name + " at " + parseTime(new Date().getTime(), '{y}-{m}-{d} {h}:{i}')
     listConfig().then(resp => {
-      this.veeamServerOptions = resp.rows.map(r => {
+      this.veeamServerOptions = resp.rows.filter(r => r.status).map(r => {
         return { label: r.hostname, value: `http://${r.ip}:${r.port}` }
       })
     })

@@ -93,12 +93,15 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务名称" prop="taskName">
-              <el-input v-model="form.appName" placeholder="请输入$端口" />
+              <el-input disabled v-model="form.appName" placeholder="请输入" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="环境" prop="env">
-              <el-select style="width: 100%" v-model="form.env"></el-select>
+              <el-select style="width: 100%" v-model="form.env">
+                <el-option label="Linux" value="Linux"></el-option>
+                <el-option label="Windows" value="Windows"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">

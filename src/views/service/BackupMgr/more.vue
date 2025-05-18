@@ -84,7 +84,7 @@
       :visible="sessionDetailVisible"
       show-close
     >
-      <Session style="border-top: 1px solid #e3e3e3; margin-top: -20px"/>
+      <Session :session-id="sessionDetailSessionId" style="border-top: 1px solid #e3e3e3; margin-top: -20px"/>
     </el-dialog>
     <!-- 基本信息 -->
     <el-card class="box-card panel-container-raw">
@@ -302,7 +302,7 @@
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="{ row }">
-                  <i class="header-icon el-icon-document session-detail" @click="showSessionDetail(row)" />
+                  <i class="header-icon el-icon-document session-detail" @click="showSessionDetail(row.id)" />
                 </template>
               </el-table-column>
             </el-table>
@@ -384,7 +384,8 @@ export default {
           return time.getTime() < new Date().getTime();
         }
       },
-      sessionDetailVisible: false
+      sessionDetailVisible: false,
+      sessionDetailSessionId: undefined
     };
   },
   mounted() {
@@ -518,7 +519,8 @@ export default {
         }
       })
     },
-    showSessionDetail() {
+    showSessionDetail(sessionId) {
+      this.sessionDetailSessionId = sessionId
       this.sessionDetailVisible = true
     }
   }

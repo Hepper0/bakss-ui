@@ -4,11 +4,11 @@
       <slot></slot>
     </WMInfo>
     <flow-steps v-show="appId" :app-id="appId"/>
-    <el-card>
+    <el-card v-show="sessionDetailVisible">
       <div slot="header" class="clearfix">
         <span>执行情况</span>
       </div>
-      <session />
+      <session ref="sessionDetail" @loaded="onSessionLoad"/>
     </el-card>
   </div>
 </template>
@@ -20,6 +20,11 @@ import Session from "@/views/application/modules/job/session"
 
 export default {
   name: "VMIndex",
+  data: function () {
+    return {
+      sessionDetailVisible: false
+    }
+  },
   components: {
     WMInfo,
     FlowSteps,
@@ -42,8 +47,16 @@ export default {
   computed: {
     appId: function () {
       return this.formData.id
+    },
+    sessionId: function () {
+      // todo jobSessionId怎么绑定
     }
   },
+  methods: {
+    onSessionLoad() {
+      this.sessionDetailVisible = true
+    }
+  }
 }
 </script>
 

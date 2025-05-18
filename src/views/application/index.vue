@@ -24,7 +24,7 @@
       <div class="panel-table-wrapper" style="background-color: #f1f1f1">
         <el-table :data="tableData" stripe>
           <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="id" label="ID"></el-table-column>
+          <el-table-column prop="id" label="ID" :show-overflow-tooltip="true"></el-table-column>
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
           <el-table-column prop="appType" label="申请类型">
             <template v-slot="{ row }">
