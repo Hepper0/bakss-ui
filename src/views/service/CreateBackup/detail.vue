@@ -505,7 +505,8 @@ export default {
     getRepositoryList() {
       this.repositoryLoading = true
       listRepository(1, 100, this.backupFormData.backupServer).then(resp => {
-        this.repositoryDataList = resp.data.map(r => {
+        this.repositoryDataList = resp.data
+        this.repositoryOptions = this.repositoryDataList.map(r => {
           this.repositoryLoading = false
           return { label: r.name, value: r.name }
         })

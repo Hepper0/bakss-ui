@@ -3,8 +3,9 @@
     <el-dialog
       title="备份任务同步"
       :visible.sync="syncBackupJobVisible"
+      width="1200"
     >
-      <div>
+      <div v-show="selectedJob === undefined">
         <el-table>
           <el-table-column prop="name" label="任务名称"></el-table-column>
           <el-table-column prop="type" label="任务类型"></el-table-column>
@@ -12,12 +13,19 @@
           <el-table-column prop="repositoryName" label="仓库名称"></el-table-column>
           <el-table-column prop="scheduleEnabled" label="是否启用"></el-table-column>
           <el-table-column prop="creationDateUtc" label="创建时间"></el-table-column>
+          <el-table-column label="操作">
+            <template v-slot="{ row }">
+              <el-tooltip class="item" effect="dark" content="关联" placement="top-start">
+                <el-button icon="el-icon-edit" size="mini" type="text" @click="associate(row)"></el-button>
+              </el-tooltip>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
-      <div>
+      <div v-if="selectedJob">
         <el-card class="card-panel">
           <div slot="header" class="clearfix">
-            <span>基本信息</span>
+            <span>基本信息 - {{ selectedJob.name }}</span>
           </div>
           <div class="card-panel-content">
             <el-form ref="basicForm" :model="basicFormData" :rules="basicRules" size="medium" label-width="120px">
@@ -86,6 +94,10 @@
           </div>
         </el-card>
       </div>
+      <span slot="footer" class="dialog-footer" style="display: flex; justify-content: right; border-top: 1px solid #f1f1f1; padding-top: 10px">
+          <el-button @click="() => this.syncBackupJobVisible = false" size="small">取 消</el-button>
+          <el-button type="primary" @click.stop="submitBackupJob" size="small">确 定</el-button>
+        </span>
     </el-dialog>
     <div class="panel-container">
       <!-- 搜索栏 -->
@@ -219,7 +231,7 @@
 
 <script>
 
-import { myBackup } from "@/api/service/backup"
+import { myBackup, addBackup } from "@/api/service/backup"
 import { listJob } from "@/api/veeam/job"
 import QueryCondition from "@/components/QueryCondition"
 
@@ -324,6 +336,8 @@ export default {
         backupIP: undefined,
         backupPort: 22
       },
+      remoteJobList: [],
+      selectedJob: undefined
     };
   },
   components: {
@@ -408,6 +422,28 @@ export default {
     },
     syncBackupJob() {
       this.syncBackupJobVisible = true
+      listJob(null, 1, 0, '192.168.1.104:8888').then(resp => {
+        this.remoteJobList = resp.rows
+      })
+    },
+    submitBackupJob() {
+      const validateList = [this.$refs['basicForm'].validate(), this.$refs['platformForm'].validate()]
+      Promise.all(validateList).then(validates => {
+        for (const v of validates) {
+          if (!v) return
+        }
+        let data = deepClone(this.basicFormData)
+        data = Object.assign(data, this.platformFormData)
+        data.appName = this.selectedJob.name
+        data.backupJobKey = this.selectedJob.name
+        addBackup(data).then(resp => {
+          this.$message.success("提交成功！")
+          this.getList()
+        })
+      })
+    },
+    associate(row) {
+      this.selectedJob = row
     }
   }
 };

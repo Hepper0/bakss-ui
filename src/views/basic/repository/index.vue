@@ -133,9 +133,6 @@
         <el-form-item disabled label="hostId" prop="hostId">
           <el-input v-model="form.hostId" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="选项" prop="options">
-          <el-input v-model="form.options" placeholder="请输入" />
-        </el-form-item>
         <el-form-item label="空闲空间" prop="freeSpace">
           <el-input v-model="form.freeSpace" placeholder="请输入" />
         </el-form-item>
@@ -358,7 +355,7 @@ export default {
       Promise.all(reqList).then((resp) => {
         this.loading = false
         resp.forEach(r => {
-          repositoryList.push(...r.rows)
+          repositoryList.push(...r.data)
         })
         this.repositoryList = repositoryList
         this.total = repositoryList.length
