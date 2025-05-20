@@ -170,7 +170,7 @@
                           </span>
                         </span>
                         <span style="float: right; margin-right: 15px">
-                          <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">{{ backupStrategy.status ? '禁用' : '启用' }}备份</el-button>
+                          <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">{{ backupStrategy.isScheduleEnabled ? '禁用' : '启用' }}备份</el-button>
                           <el-button @click.stop="showStrategyDialog(true, 2)" type="danger" size="mini">删除</el-button>
                         </span>
                       </div>
@@ -293,7 +293,7 @@
               </el-table-column>
               <el-table-column prop="creationTime" label="开始时间"></el-table-column>
               <el-table-column prop="endTime" label="结束时间"></el-table-column>
-              <el-table-column prop="status" label="备份状态">
+              <el-table-column prop="result" label="备份状态">
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.result === 0" type="success">成功</el-tag>
                   <el-tag v-else type="danger">失败</el-tag>
@@ -336,20 +336,16 @@ export default {
       JOB_TYPE,
       BACKUP_AT_TIME,
       BACKUP_RIGHT_NOW,
-      basicInfo: {
-        id: 1,
-        backupIp: '10.122.145.38',
-        masterIp: 'sltwfqm7huz',
-        backupSoftware: 'Veeam'
-      },
+      basicInfo: {},
       backupStrategy: {
-        jobName: "vmJob1",
-        backupServer: 'BackupServer1',
-        vCenter: 'Vcenter',
-        vmObjects: '',
-        repository: 'Base Repository',
-        scheduleTime: '22:00',
-        scheduleDateType: 'On weekDays'
+        jobName: undefined,
+        backupServer: undefined,
+        vCenter: undefined,
+        vmObjects: undefined,
+        repository: undefined,
+        scheduleTime: undefined,
+        scheduleDateType: undefined,
+        isScheduleEnabled: undefined
       },
       backupHistory: [
         {
@@ -367,9 +363,8 @@ export default {
           "operation": "",
           "reason": ""
         }
-        // { name: '10.122.145.38_SQL_Alvayson_FULL', client: 'swt9zltzmq', startTime: '2022-08-31 16:44:11', endTime: '2022-08-31 16:44:46', size: '28.78MB', status: '成功' }
       ],
-      searchQuery: { dataRange: [], strategy: undefined, clientName: undefined, status: undefined },
+      searchQuery: { dataRange: [], jobType: undefined, jobName: undefined, result: undefined },
       backupDialogVisible: false,
       strategyDialogVisible: false,
       strategyDialogTitle: '禁用备份策略',
@@ -406,6 +401,14 @@ export default {
       return jobTypeList
     }
   },
+  watch: {
+    jobName: function (val) {
+      if (val !== undefined) {
+        this.getJobDetail()
+        this.getBackupHistory()
+      }
+    }
+  },
   methods: {
     showBackupOnceDialog(flag) {
       this.backupDialogVisible = flag
@@ -415,7 +418,7 @@ export default {
       this.strategyDialogVisible = flag
       // 禁用备份策略
       if (this.strategyOperation === 1) {
-        if (this.backupStrategy.status === 1) {
+        if (this.backupStrategy.isScheduleEnabled) {
           this.strategyDialogTitle = '禁用备份策略'
         } else {
           this.strategyDialogTitle = '启用备份策略'
@@ -448,7 +451,7 @@ export default {
       }
       // 禁用备份策略
       if (this.strategyOperation === 1) {
-        if (this.backupStrategy.status === 1) {
+        if (this.backupStrategy.isScheduleEnabled === 1) {
           // this.strategyDialogTitle = '禁用备份策略'
           data.type = 2
           data.appType = DISABLE_STRATEGY
@@ -474,7 +477,7 @@ export default {
       })
     },
     resetBackupQuery() {
-      this.searchQuery = { dataRange: [], strategy: undefined, clientName: undefined, status: undefined }
+      this.searchQuery = { dataRange: [], jobType: undefined, jobName: undefined, result: undefined }
     },
     onChangeDate (e) {
       console.log(e)
@@ -495,6 +498,7 @@ export default {
         }
         const schedule = jobInfo['schedule']
         if (schedule) {
+          jobInfo.isScheduleEnabled = schedule.isScheduleEnabled
           const policy = schedule['policy']
           jobInfo.policy = policy
           const options = schedule['options' + policy]
@@ -516,6 +520,7 @@ export default {
               break
           }
         }
+        this.backupStrategy = jobInfo
       })
     },
     showSessionDetail(sessionId) {
