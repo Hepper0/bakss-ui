@@ -84,7 +84,6 @@
       <el-table-column label="名称" align="center" prop="name" />
       <el-table-column label="类型" align="center" prop="type" />
       <el-table-column label="HostId" align="center" prop="hostId" />
-      <el-table-column label="选项" align="center" prop="options" />
       <el-table-column label="空闲空间" align="center" prop="freeSpace" />
       <el-table-column label="总空间" align="center" prop="totalSpace" />
       <el-table-column label="扩展类型" align="center" prop="extentType" />

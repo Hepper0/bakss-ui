@@ -345,6 +345,7 @@ export default {
   },
   watch: {
     sessionId: function (val) {
+      this.jobSession = undefined
       this.refresh(val)
     }
   },
@@ -383,9 +384,12 @@ export default {
       return parseInt(dataSize) + unit
     },
     refresh(sessionId) {
+      const loading = this.$loading({
+        lock: true
+      })
       getSessionDetail(sessionId, this.server).then(resp => {
-        const data = resp.data
-        this.jobSession = data.jobSession
+        loading.close()
+        this.jobSession = resp.data
         this.parseSessionInfo(this.jobSession)
         this.$emit('loaded', this.jobSession)
         this.loaded(this.jobSession)

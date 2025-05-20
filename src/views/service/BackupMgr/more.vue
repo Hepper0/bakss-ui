@@ -381,21 +381,21 @@ export default {
         isScheduleEnabled: undefined
       },
       backupHistory: [
-        {
-          "creationTime": "2025-04-03 14:56:16",
-          "endTime": "2025-04-03 14:57:25",
-          "id": "56620a04-10c9-4e5f-80fa-a26fc3172d71",
-          "jobId": "51a4756c-8eda-44f5-ad52-cc738ccc77d0",
-          "jobType": 3,
-          "state": -1,
-          "result": 2,
-          "progress": 100,
-          "runManually": true,
-          "jobName": "surebackupJob",
-          "description": "",
-          "operation": "",
-          "reason": ""
-        }
+        // {
+        //   "creationTime": "2025-04-03 14:56:16",
+        //   "endTime": "2025-04-03 14:57:25",
+        //   "id": "56620a04-10c9-4e5f-80fa-a26fc3172d71",
+        //   "jobId": "51a4756c-8eda-44f5-ad52-cc738ccc77d0",
+        //   "jobType": 3,
+        //   "state": -1,
+        //   "result": 2,
+        //   "progress": 100,
+        //   "runManually": true,
+        //   "jobName": "surebackupJob",
+        //   "description": "",
+        //   "operation": "",
+        //   "reason": ""
+        // }
       ],
       searchQuery: { dataRange: [], jobType: undefined, jobName: undefined, result: undefined },
       backupDialogVisible: false,
