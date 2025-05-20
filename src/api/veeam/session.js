@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 
-export function listSession(page, pageSize, server) {
+export function listSession(jobName, page, pageSize, server) {
   return request({
     url: '/veeam/jobSession/list',
     method: 'get',
     params: {
+      jobName,
       page,
       pageSize
     },

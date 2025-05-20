@@ -82,8 +82,9 @@
     <el-dialog
       title="任务详情"
       :visible.sync="sessionDetailVisible"
+      custom-class="dialog-border"
     >
-      <Session :session-id="sessionDetailSessionId" style="border-top: 1px solid #e3e3e3; margin-top: -20px"/>
+      <Session :sessionId="sessionDetailSessionId" :server="server" style="border-top: 1px solid #e3e3e3; margin-top: -20px"/>
     </el-dialog>
     <!-- 基本信息 -->
     <el-card class="box-card panel-container-raw">
@@ -166,7 +167,7 @@
                       <div style="width: 100%">
                         <span style="font-size: 14px; margin-left: 20px">
                           <span style="font-family: 'Microsoft YaHei', sans-serif;">
-                            {{ backupStrategy.jobName }}
+                            {{ jobName }}
                           </span>
                         </span>
                         <span style="float: right; margin-right: 15px">
@@ -184,19 +185,21 @@
                           <el-row>
                             <el-col :span="8">
                               <el-form-item label="备份服务器: ">
-                                {{ backupStrategy.backupServer }}
+                                {{ basicInfo.backupServer }}
                               </el-form-item>
                             </el-col>
                           </el-row>
                           <el-row>
                             <el-col :span="8">
                               <el-form-item label="VCenter: ">
-                                {{ backupStrategy.vCenter }}
+                                {{ basicInfo.vCenter }}
                               </el-form-item>
                             </el-col>
                             <el-col :span="8">
                               <el-form-item label="虚拟机: ">
-                                {{ backupStrategy.vCenter }}
+                                <span v-if="backupStrategy.selectedVmObjects">
+                                  <el-tag :key="idx" v-for="(v, idx) in backupStrategy.selectedVmObjects.map(v => v.name)"> {{ v }}</el-tag>
+                                </span>
                               </el-form-item>
                             </el-col>
                             <el-col :span="8">
@@ -283,6 +286,7 @@
 
           <div class="panel-table-wrapper">
             <el-table :data="backupHistory" size="small">
+              <el-table-column prop="id" label="ID" :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="jobName" label="任务名"></el-table-column>
               <el-table-column prop="jobType" label="任务类型">
                 <template slot-scope="{ row }">
@@ -290,12 +294,16 @@
                 </template>
               </el-table-column>
               <el-table-column prop="state" label="状态">
+                <template slot-scope="{ row }">
+                  {{ JOB_STATE[row.state] }}
+                </template>
               </el-table-column>
               <el-table-column prop="creationTime" label="开始时间"></el-table-column>
               <el-table-column prop="endTime" label="结束时间"></el-table-column>
               <el-table-column prop="result" label="备份状态">
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.result === 0" type="success">成功</el-tag>
+                  <el-tag v-else-if="scope.row.result === 1" type="warning">告警</el-tag>
                   <el-tag v-else type="danger">失败</el-tag>
                 </template>
               </el-table-column>
@@ -322,11 +330,34 @@ import Session from "@/views/application/modules/job/session";
 
 const BACKUP_EXEC_RIGHT_NOW = 1
 const BACKUP_EXEC_AT_TIME = 2
-export const BACKUP_RIGHT_NOW = 4
-export const BACKUP_AT_TIME = 5
-export const ENABLE_STRATEGY = 7
-export const DISABLE_STRATEGY = 8
-export const DELETE_STRATEGY = 9
+const BACKUP_RIGHT_NOW = 4
+const BACKUP_AT_TIME = 5
+const ENABLE_STRATEGY = 7
+const DISABLE_STRATEGY = 8
+const DELETE_STRATEGY = 9
+
+const JOB_STATE = {
+  [-1]: '已停止',
+  [3]: '启动中',
+  [4]: '停止中',
+  [5]: '执行中',
+  [6]: '暂停',
+  [7]: '恢复中',
+  [8]: '等待磁带',
+  [9]: '空闲',
+  [10]: '后处理',
+  [11]: '等待仓库',
+  [12]: '等待插槽',
+  [13]: '脏块',
+  [14]: '需要动作'
+}
+
+const JOB_RESULT = {
+  [-1]: '无',
+  [0]: '成功',
+  [1]: '告警',
+  [2]: '失败'
+}
 
 export default {
   name: "more",
@@ -334,6 +365,8 @@ export default {
   data() {
     return {
       JOB_TYPE,
+      JOB_STATE,
+      JOB_RESULT,
       BACKUP_AT_TIME,
       BACKUP_RIGHT_NOW,
       basicInfo: {},
@@ -351,7 +384,7 @@ export default {
         {
           "creationTime": "2025-04-03 14:56:16",
           "endTime": "2025-04-03 14:57:25",
-          "ID": "56620a04-10c9-4e5f-80fa-a26fc3172d71",
+          "id": "56620a04-10c9-4e5f-80fa-a26fc3172d71",
           "jobId": "51a4756c-8eda-44f5-ad52-cc738ccc77d0",
           "jobType": 3,
           "state": -1,
@@ -391,6 +424,9 @@ export default {
   computed: {
     jobName: function () {
       return this.basicInfo.appName
+    },
+    server: function () {
+      return this.basicInfo.backupServer
     },
     jobTypeOptions: function () {
       const jobTypeList = []
@@ -472,8 +508,8 @@ export default {
       })
     },
     getBackupHistory() {
-      listSession(this.jobName, 1, 10).then(resp => {
-        this.backupHistory = resp.rows
+      listSession(this.jobName, 1, 10, this.basicInfo.backupServer).then(resp => {
+        this.backupHistory = resp.data
       })
     },
     resetBackupQuery() {
@@ -483,13 +519,13 @@ export default {
       console.log(e)
     },
     getSessionDetail(id) {
-      getSessionDetail(id).then(resp => {
+      getSessionDetail(id, this.basicInfo.backupServer).then(resp => {
 
       })
     },
     getJobDetail() {
-      getJobDetail(this.jobName).then(resp => {
-        const jobInfo = resp.data && resp.data.jobInfo
+      getJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
+        const jobInfo = resp.data
         jobInfo.repository = jobInfo['backupRepositoryName']
         const vmObjects = jobInfo['selectedVmObjects']
         if (vmObjects[0]) {
@@ -524,8 +560,10 @@ export default {
       })
     },
     showSessionDetail(sessionId) {
-      this.sessionDetailSessionId = sessionId
       this.sessionDetailVisible = true
+      this.$nextTick(() => {
+        this.sessionDetailSessionId = sessionId
+      })
     }
   }
 };
@@ -551,5 +589,10 @@ export default {
 
 .session-detail:hover {
   cursor: pointer;
+}
+
+.el-dialog {
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="jobSession">
+  <div v-if="jobSession" style="padding: 10px 30px">
     <el-form>
       <el-row>
         <el-col :span="8">
@@ -9,7 +9,12 @@
         </el-col>
         <el-col :span="8">
           <el-form-item label="状态: ">
-            {{ jobSession.result }}
+            {{ JOB_STATE[jobSession.state] }}
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="结果: ">
+            {{ JOB_RESULT[jobSession.result] }}
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -85,7 +90,7 @@
         </el-table>
       </el-col>
       <el-col :span="18">
-        <el-table size="mini" :data="logTableData">
+        <el-table size="mini" :data="logTableData" stripe>
           <el-table-column prop="title" label="消息"></el-table-column>
           <el-table-column prop="jobType" label="耗时" width="100">
             <template slot-scope="{ row }">
@@ -289,16 +294,48 @@ const jobSession = {
   ]
 }
 
+const JOB_STATE = {
+  [-1]: '已停止',
+  [3]: '启动中',
+  [4]: '停止中',
+  [5]: '执行中',
+  [6]: '暂停',
+  [7]: '恢复中',
+  [8]: '等待磁带',
+  [9]: '空闲',
+  [10]: '后处理',
+  [11]: '等待仓库',
+  [12]: '等待插槽',
+  [13]: '脏块',
+  [14]: '需要动作'
+}
+
+const JOB_RESULT = {
+  [-1]: '无',
+  [0]: '成功',
+  [1]: '告警',
+  [2]: '失败'
+}
+
 export default {
   name: "session",
   data: function () {
     return {
-      jobSession: undefined, //this.parseSessionInfo(jobSession),
+      JOB_STATE,
+      JOB_RESULT,
+      jobSession: undefined, // this.parseSessionInfo(jobSession),
       selectedTask: undefined
     }
   },
   props: {
-    sessionId: undefined,
+    sessionId: {
+      type: String,
+      default: undefined
+    },
+    server: {
+      type: String,
+      default: undefined
+    },
     loaded: {
       type: Function,
       default: function () {
@@ -346,7 +383,7 @@ export default {
       return parseInt(dataSize) + unit
     },
     refresh(sessionId) {
-      getSessionDetail(sessionId).then(resp => {
+      getSessionDetail(sessionId, this.server).then(resp => {
         const data = resp.data
         this.jobSession = data.jobSession
         this.parseSessionInfo(this.jobSession)
@@ -359,5 +396,8 @@ export default {
 </script>
 
 <style scoped>
+.el-form-item{
+  margin-bottom: 8px;
+}
 
 </style>
