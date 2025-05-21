@@ -6,6 +6,9 @@
       width="1200px"
     >
       <div v-show="selectedJob === undefined">
+        <el-select style="width: 300px" v-model="selectedServer" @change="onBackupServerChange" placeholder="请选择Veeam服务器">
+          <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label" :value="item.value" />
+        </el-select>
         <el-table :data="remoteJobList">
           <el-table-column prop="name" label="任务名称"></el-table-column>
           <el-table-column prop="type" label="任务类型"></el-table-column>
@@ -95,9 +98,11 @@
         </el-card>
       </div>
       <span slot="footer" class="dialog-footer" style="display: flex; justify-content: right; border-top: 1px solid #f1f1f1; padding-top: 10px">
-          <el-button v-if="selectedJob" @click="() => this.selectedJob = undefined" size="small">返 回</el-button>
-          <el-button v-else @click="() => this.syncBackupJobVisible = false" size="small">取 消</el-button>
+        <span v-if="selectedJob">
+          <el-button @click="() => this.selectedJob = undefined" size="small">返 回</el-button>
           <el-button type="primary" @click.stop="submitBackupJob" size="small">确 定</el-button>
+        </span>
+        <el-button v-else @click="() => this.syncBackupJobVisible = false" size="small">取 消</el-button>
         </span>
     </el-dialog>
     <div class="panel-container">
@@ -116,7 +121,7 @@
           <el-button size="mini" @click="reset" icon="el-icon-refresh">重置</el-button>
           <el-button size="mini" @click="createBackup" type="success">创建备份</el-button>
           <el-button size="mini" @click="gotoApply">申请备份管理员权限</el-button>
-          <el-button size="mini" @click="syncBackupJob">同步备份任务</el-button>
+          <el-button size="mini" @click="showBackupSyncWindow">同步备份任务</el-button>
         </el-col>
       </el-row>
     </div>
@@ -234,6 +239,7 @@
 
 import { myBackup, addBackup } from "@/api/service/backup"
 import { listJob } from "@/api/veeam/job"
+import { listConfig } from "@/api/veeam/basic"
 import QueryCondition from "@/components/QueryCondition"
 
 const basicRules = {
@@ -340,7 +346,10 @@ export default {
         backupPort: 22
       },
       remoteJobList: [],
-      selectedJob: undefined
+      selectedJob: undefined,
+      backupServer: undefined,
+      veeamServerOptions: [],
+      selectedServer: undefined
     };
   },
   components: {
@@ -423,11 +432,17 @@ export default {
     cancel() {
       this.open = false
     },
-    syncBackupJob() {
+    showBackupSyncWindow() {
       this.syncBackupJobVisible = true
-      listJob(null, 1, 0, '192.168.1.104:8888').then(resp => {
+      this.selectedServer = undefined
+    },
+    syncBackupJob() {
+      listJob(null, 1, 0, this.selectedServer).then(resp => {
         this.remoteJobList = resp.data
       })
+    },
+    onBackupServerChange() {
+      this.syncBackupJob()
     },
     submitBackupJob() {
       const validateList = [this.$refs['basicForm'].validate(), this.$refs['platformForm'].validate()]
@@ -460,6 +475,13 @@ export default {
         }
       }
     },
+    getBackupServerConfig() {
+      listConfig().then(resp => {
+        this.veeamServerOptions = resp.rows.filter(r => r.status).map(r => {
+          return { label: r.hostname, value: `http://${r.ip}:${r.port}` }
+        })
+      })
+    }
   }
 };
 </script>
