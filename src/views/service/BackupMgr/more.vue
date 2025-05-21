@@ -1,5 +1,6 @@
 <template>
   <div class="backup-management">
+    <!--  一次性备份  -->
     <el-dialog
       title="一次性备份"
       :visible.sync="backupDialogVisible"
@@ -49,6 +50,7 @@
         </span>
       </div>
     </el-dialog>
+    <!-- 启停备份   -->
     <el-dialog
       :title="strategyDialogTitle"
       :visible.sync="strategyDialogVisible"
@@ -57,10 +59,10 @@
       <div style="padding: 0 40px">
         <el-row :gutter="5">
           <el-col :span="4" style="text-align: right; padding: 3px">
-            <b style="color: red">* </b>备份策略：
+            <b style="color: red">* </b>任务名称：
           </el-col>
           <el-col :span="20">
-            <el-input disabled size="mini" />
+            <el-input v-model="jobName" disabled size="mini" />
           </el-col>
         </el-row>
         <br />
@@ -469,8 +471,9 @@ export default {
     backupOnceSubmit() {
       const data = {
         backupId: this.basicInfo.id,
-        strategyId: this.backupStrategy.id,
+        jobKey: this.jobName,
         appType: this.backupExecType,
+        backupServer: this.basicInfo.backupServer,
         remark: this.backupExecReason
       }
       if (this.backupExecType === BACKUP_AT_TIME) {
@@ -484,8 +487,9 @@ export default {
     strategySubmit() {
       const data = {
         backupId: this.basicInfo.id,
-        strategyId: this.backupStrategy.id,
-        remark: this.backupStrategyReason
+        jobKey: this.jobName,
+        remark: this.backupStrategyReason,
+        backupServer: this.basicInfo.backupServer,
       }
       // 禁用备份策略
       if (this.strategyOperation === 1) {

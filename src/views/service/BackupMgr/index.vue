@@ -4,26 +4,29 @@
       title="备份任务同步"
       :visible.sync="syncBackupJobVisible"
       width="1200px"
+      @close="cancelSync"
     >
       <div v-show="selectedJob === undefined">
-        <el-select style="width: 300px" v-model="selectedServer" @change="onBackupServerChange" placeholder="请选择Veeam服务器">
+        <el-select style="width: 300px; margin-bottom: 5px" v-model="selectedServer" @change="onBackupServerChange" placeholder="请选择Veeam服务器">
           <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label" :value="item.value" />
         </el-select>
-        <el-table :data="remoteJobList">
-          <el-table-column prop="name" label="任务名称"></el-table-column>
-          <el-table-column prop="type" label="任务类型"></el-table-column>
-          <el-table-column prop="description" label="任务描述"></el-table-column>
-          <el-table-column prop="repositoryName" label="仓库名称"></el-table-column>
-          <el-table-column prop="scheduleEnabled" label="是否启用"></el-table-column>
-          <el-table-column prop="creationDateUtc" label="创建时间"></el-table-column>
-          <el-table-column label="操作">
-            <template v-slot="{ row }">
-              <el-tooltip class="item" effect="dark" content="关联" placement="top-start">
-                <el-button icon="el-icon-edit" size="mini" type="text" @click="associate(row)"></el-button>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="panel-table-wrapper" style="background-color: #f1f1f1">
+          <el-table :data="remoteJobList">
+            <el-table-column prop="name" label="任务名称"></el-table-column>
+            <el-table-column prop="type" label="任务类型"></el-table-column>
+            <el-table-column prop="description" label="任务描述"></el-table-column>
+            <el-table-column prop="repositoryName" label="仓库名称"></el-table-column>
+            <el-table-column prop="scheduleEnabled" label="是否启用"></el-table-column>
+            <el-table-column prop="creationDateUtc" label="创建时间"></el-table-column>
+            <el-table-column label="操作">
+              <template v-slot="{ row }">
+                <el-tooltip class="item" effect="dark" content="关联" placement="top-start">
+                  <el-button icon="el-icon-edit" size="mini" type="text" @click="associate(row)"></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
       <div v-if="selectedJob">
         <el-card class="card-panel">
@@ -102,7 +105,7 @@
           <el-button @click="() => this.selectedJob = undefined" size="small">返 回</el-button>
           <el-button type="primary" @click.stop="submitBackupJob" size="small">确 定</el-button>
         </span>
-        <el-button v-else @click="() => this.syncBackupJobVisible = false" size="small">取 消</el-button>
+        <el-button v-else @click="cancelSync" size="small">取 消</el-button>
         </span>
     </el-dialog>
     <div class="panel-container">
@@ -205,14 +208,17 @@
           <el-col :span="12">
             <el-form-item label="环境" prop="env">
               <el-select style="width: 100%" v-model="form.env">
-                <el-option label="Linux" value="Linux"></el-option>
-                <el-option label="Windows" value="Windows"></el-option>
+                <el-option label="生产" value="prod"></el-option>
+                <el-option label="非生产" value="dev"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="操作系统" prop="platform">
-              <el-select style="width: 100%" v-model="form.platform"></el-select>
+              <el-select style="width: 100%" v-model="form.platform" :disabled="form.backupContent === 'VMware'">
+                <el-option label="Linux" value="Linux"></el-option>
+                <el-option label="Windows" value="Windows"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -237,10 +243,31 @@
 
 <script>
 
+import { deepClone } from "@/utils"
 import { myBackup, addBackup } from "@/api/service/backup"
 import { listJob } from "@/api/veeam/job"
 import { listConfig } from "@/api/veeam/basic"
 import QueryCondition from "@/components/QueryCondition"
+
+const remoteBackupList = [{
+  "type": "0",
+  "name": "pgsql-vm_clone1",
+  "jobSourceType": 2,
+  "latestResult": 0,
+  "description": "Created by WIN-LDB9MMJE03P\\Administrator at 2025/4/21 18:37.",
+  "scheduleEnabled": true,
+  "creationDateUtc": "2025-05-13T16:19:20.138233Z",
+  "sessionId": "4e872825-83d9-4918-8b36-e736661125a7",
+  "sessionCreationTime": "2025-05-14T00:27:20.359729Z",
+  "sessionEndTime": "2025-05-14T00:29:03.486028Z",
+  "sessionState": -1,
+  "sessionResult": 0,
+  "sessionRunManually": true,
+  "sessionProgress": 100,
+  "sessionAvgSpeed": 203528601,
+  "repositoryName": "Backup Repository",
+  "id": "bf823b77-fbdd-4166-a6d0-b4f52ffd5686"
+}]
 
 const basicRules = {
   backupContent: [{
@@ -309,7 +336,6 @@ export default {
     return {
       basicRules,
       platformRules,
-      cascadeRule,
       backupContentOptions,
       dataCenterOptions,
       platformOptions,
@@ -345,7 +371,7 @@ export default {
         backupIP: undefined,
         backupPort: 22
       },
-      remoteJobList: [],
+      remoteJobList: remoteBackupList,
       selectedJob: undefined,
       backupServer: undefined,
       veeamServerOptions: [],
@@ -355,8 +381,14 @@ export default {
   components: {
     QueryCondition
   },
+  computed: {
+    cascadeRule: function () {
+      return cascadeRule[this.basicFormData.backupContent]
+    },
+  },
   mounted() {
     this.getList()
+    this.getBackupServerConfig()
   },
   methods: {
     editRow(row) {
@@ -441,6 +473,11 @@ export default {
         this.remoteJobList = resp.data
       })
     },
+    cancelSync() {
+      this.syncBackupJobVisible = false
+      this.remoteJobList = []
+      this.selectedJob = undefined
+    },
     onBackupServerChange() {
       this.syncBackupJob()
     },
@@ -454,7 +491,13 @@ export default {
         data = Object.assign(data, this.platformFormData)
         data.appName = this.selectedJob.name
         data.backupJobKey = this.selectedJob.name
+        data.backupServer = this.selectedServer
+        if (this.selectedServer === undefined) {
+          this.$message.error('VeeamServer为空，请联系管理员！')
+          return
+        }
         addBackup(data).then(resp => {
+          this.syncBackupJobVisible = false
           this.$message.success("提交成功！")
           this.getList()
         })
