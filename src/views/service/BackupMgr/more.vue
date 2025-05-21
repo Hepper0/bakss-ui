@@ -160,7 +160,7 @@
                   </span>
                 </div>
               </template>
-              <div class="collapse-panel">
+              <div class="collapse-panel" id="jobDetail" v-loading="jobDetailLoading">
                 <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
                   <el-collapse-item :name="1">
                     <template slot="title">
@@ -285,7 +285,7 @@
           </div>
 
           <div class="panel-table-wrapper">
-            <el-table :data="backupHistory" size="small">
+            <el-table :data="backupHistory" size="small" v-loading="historyLoading">
               <el-table-column prop="id" label="ID" :show-overflow-tooltip="true"></el-table-column>
               <el-table-column prop="jobName" label="任务名"></el-table-column>
               <el-table-column prop="jobType" label="任务类型">
@@ -412,7 +412,9 @@ export default {
         }
       },
       sessionDetailVisible: false,
-      sessionDetailSessionId: undefined
+      sessionDetailSessionId: undefined,
+      historyLoading: false,
+      jobDetailLoading: false
     };
   },
   mounted() {
@@ -508,9 +510,11 @@ export default {
       })
     },
     getBackupHistory() {
+      this.historyLoading = true
       listSession(this.jobName, 1, 10, this.basicInfo.backupServer).then(resp => {
         this.backupHistory = resp.data
-      })
+        this.historyLoading = false
+      }).catch(e => this.historyLoading = false)
     },
     resetBackupQuery() {
       this.searchQuery = { dataRange: [], jobType: undefined, jobName: undefined, result: undefined }
@@ -524,7 +528,9 @@ export default {
       })
     },
     getJobDetail() {
+      this.jobDetailLoading = true
       getJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
+        this.jobDetailLoading = false
         const jobInfo = resp.data
         jobInfo.repository = jobInfo['backupRepositoryName']
         const vmObjects = jobInfo['selectedVmObjects']
@@ -557,7 +563,7 @@ export default {
           }
         }
         this.backupStrategy = jobInfo
-      })
+      }).catch(e => this.jobDetailLoading = false)
     },
     showSessionDetail(sessionId) {
       this.sessionDetailVisible = true

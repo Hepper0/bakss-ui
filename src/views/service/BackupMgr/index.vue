@@ -3,10 +3,10 @@
     <el-dialog
       title="备份任务同步"
       :visible.sync="syncBackupJobVisible"
-      width="1200"
+      width="1200px"
     >
       <div v-show="selectedJob === undefined">
-        <el-table>
+        <el-table :data="remoteJobList">
           <el-table-column prop="name" label="任务名称"></el-table-column>
           <el-table-column prop="type" label="任务类型"></el-table-column>
           <el-table-column prop="description" label="任务描述"></el-table-column>
@@ -65,7 +65,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="备份软件" prop="backupSoftware" :disabled="cascadeRule && cascadeRule['backupSoftware'] !== undefined">
+                <el-form-item label="备份软件" prop="backupSoftware" >
                   <el-select v-model="basicFormData.backupSoftware" :style="{width: '80%'}">
                     <el-option v-for="(item, index) in backupSoftwareOptions" :key="index" :label="item.label" :value="item.value" />
                   </el-select>
@@ -95,7 +95,8 @@
         </el-card>
       </div>
       <span slot="footer" class="dialog-footer" style="display: flex; justify-content: right; border-top: 1px solid #f1f1f1; padding-top: 10px">
-          <el-button @click="() => this.syncBackupJobVisible = false" size="small">取 消</el-button>
+          <el-button v-if="selectedJob" @click="() => this.selectedJob = undefined" size="small">返 回</el-button>
+          <el-button v-else @click="() => this.syncBackupJobVisible = false" size="small">取 消</el-button>
           <el-button type="primary" @click.stop="submitBackupJob" size="small">确 定</el-button>
         </span>
     </el-dialog>
@@ -279,6 +280,7 @@ const platformRules = {
     trigger: 'blur'
   }],
 }
+const cascadeRule = { MySQL: {}, VMware: {machineType: 'vm', platform: 'Windows'}}
 
 const backupContentOptions = [
   {label: 'VMware', value: 'VMware'},
@@ -301,6 +303,7 @@ export default {
     return {
       basicRules,
       platformRules,
+      cascadeRule,
       backupContentOptions,
       dataCenterOptions,
       platformOptions,
@@ -423,7 +426,7 @@ export default {
     syncBackupJob() {
       this.syncBackupJobVisible = true
       listJob(null, 1, 0, '192.168.1.104:8888').then(resp => {
-        this.remoteJobList = resp.rows
+        this.remoteJobList = resp.data
       })
     },
     submitBackupJob() {
@@ -444,7 +447,19 @@ export default {
     },
     associate(row) {
       this.selectedJob = row
-    }
+    },
+    onContentChange(e) {
+      this.basicFormData.machineType = undefined
+      this.basicFormData.platform = undefined
+      this.basicFormData.env = undefined
+      this.basicFormData.backupSoftware = undefined
+      const rule = cascadeRule[e]
+      if (rule) {
+        for(const k in rule) {
+          this.basicFormData[k] = rule[k]
+        }
+      }
+    },
   }
 };
 </script>
