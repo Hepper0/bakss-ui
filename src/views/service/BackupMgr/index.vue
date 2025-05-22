@@ -371,7 +371,7 @@ export default {
         backupIP: undefined,
         backupPort: 22
       },
-      remoteJobList: remoteBackupList,
+      remoteJobList: [], // remoteBackupList,
       selectedJob: undefined,
       backupServer: undefined,
       veeamServerOptions: [],

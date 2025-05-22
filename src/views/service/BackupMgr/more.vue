@@ -162,8 +162,8 @@
                   </span>
                 </div>
               </template>
-              <div class="collapse-panel" id="jobDetail" v-loading="jobDetailLoading">
-                <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
+              <div class="collapse-panel" id="jobDetail">
+                <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0" v-loading="jobDetailLoading">
                   <el-collapse-item :name="1">
                     <template slot="title">
                       <div style="width: 100%">
@@ -221,7 +221,7 @@
                                 {{ backupStrategy.scheduleDateType }}
                               </el-form-item>
                             </el-col>
-                            <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'On these days') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
+                            <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'selectedDays') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
                           </el-row>
                         </el-form>
                       </div>
@@ -490,10 +490,11 @@ export default {
         jobKey: this.jobName,
         remark: this.backupStrategyReason,
         backupServer: this.basicInfo.backupServer,
+        backupSoftware: this.basicInfo.backupSoftware
       }
       // 禁用备份策略
       if (this.strategyOperation === 1) {
-        if (this.backupStrategy.isScheduleEnabled === 1) {
+        if (this.backupStrategy.isScheduleEnabled) {
           // this.strategyDialogTitle = '禁用备份策略'
           data.type = 2
           data.appType = DISABLE_STRATEGY

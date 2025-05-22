@@ -39,7 +39,7 @@
         </el-col>
         <el-col :span="8">
           <el-form-item label="处理速度: ">
-            {{ jobSession.progress.avgSpeed }}
+            {{ prettyDataSize(jobSession.progress.avgSpeed) }}
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -369,7 +369,12 @@ export default {
       const  progress = jobSession.progress
       jobSession.processedData = this.prettyDataSize(progress.processedSize) + '/' + this.prettyDataSize(progress.totalSize)
       jobSession.processedObjects = progress.processedObjects + '/' + progress.totalObjects
-      jobSession.duration = prettyDate(((new Date(jobSession.endTime).getTime() - new Date(jobSession.creationTime).getTime())) / 1000)
+      if (jobSession.endTime && jobSession.creationTime) {
+        jobSession.duration = prettyDate(((new Date(jobSession.endTime).getTime() - new Date(jobSession.creationTime).getTime())) / 1000)
+      } else {
+        jobSession.duration = '-'
+      }
+
       return jobSession
     },
     prettyDataSize(dataSize) {
