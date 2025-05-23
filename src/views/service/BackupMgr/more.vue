@@ -306,7 +306,7 @@
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.result === 0" type="success">成功</el-tag>
                   <el-tag v-else-if="scope.row.result === 1" type="warning">告警</el-tag>
-                  <el-tag v-else type="danger">失败</el-tag>
+                  <el-tag v-else-if="scope.row.result === 2" type="danger">失败</el-tag>
                 </template>
               </el-table-column>
               <el-table-column label="操作">
@@ -474,6 +474,7 @@ export default {
         jobKey: this.jobName,
         appType: this.backupExecType,
         backupServer: this.basicInfo.backupServer,
+        backupSoftware: this.basicInfo.backupSoftware,
         remark: this.backupExecReason
       }
       if (this.backupExecType === BACKUP_AT_TIME) {

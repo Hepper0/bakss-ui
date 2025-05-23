@@ -1,12 +1,12 @@
 <template>
-  <ApplyDetailTemplate :form-data="formData">
-  </ApplyDetailTemplate>
+  <VMIndex :form-data="formData">
+  </VMIndex>
 </template>
 
 <script>
 import { getApplication, getCreateBackupApplication } from '@/api/application/application'
 import { APPLY_TYPE } from '@/views/common/config'
-import ApplyDetailTemplate from "./ApplyDetail/VMIndex"
+import VMIndex from "./ApplyDetail/VMIndex"
 
 export default {
   name: "CreateBackup",
@@ -30,7 +30,7 @@ export default {
     }
   },
   components: {
-    ApplyDetailTemplate
+    VMIndex
   },
   inject: [ 'getAppBasicInfo' ],
   mounted() {
