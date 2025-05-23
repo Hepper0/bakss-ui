@@ -14,7 +14,7 @@
           <el-col :span="20">
             <el-radio-group size="mini" v-model="backupExecType">
               <el-radio-button :label="BACKUP_RIGHT_NOW" name="rightNow">立即备份</el-radio-button>
-              <el-radio-button :label="BACKUP_AT_TIME" name="atTime">定时备份</el-radio-button>
+              <el-radio-button v-show="false" :label="BACKUP_AT_TIME" name="atTime">定时备份</el-radio-button>
             </el-radio-group>
           </el-col>
         </el-row>
