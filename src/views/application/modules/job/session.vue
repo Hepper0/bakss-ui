@@ -394,6 +394,7 @@ export default {
       })
       getSessionDetail(sessionId, this.server).then(resp => {
         loading.close()
+        this.selectedTask = undefined
         this.jobSession = resp.data
         this.parseSessionInfo(this.jobSession)
         this.$emit('loaded', this.jobSession)

@@ -11,7 +11,7 @@
           <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label" :value="item.value" />
         </el-select>
         <div class="panel-table-wrapper" style="background-color: #f1f1f1">
-          <el-table :data="remoteJobList">
+          <el-table :data="remoteJobList" v-loading="remoteBackupLoading">
             <el-table-column prop="name" label="任务名称"></el-table-column>
             <el-table-column prop="type" label="任务类型"></el-table-column>
             <el-table-column prop="description" label="任务描述"></el-table-column>
@@ -375,7 +375,8 @@ export default {
       selectedJob: undefined,
       backupServer: undefined,
       veeamServerOptions: [],
-      selectedServer: undefined
+      selectedServer: undefined,
+      remoteBackupLoading: false
     };
   },
   components: {
@@ -469,7 +470,9 @@ export default {
       this.selectedServer = undefined
     },
     syncBackupJob() {
+      this.remoteBackupLoading = true
       listJob(null, 1, 0, this.selectedServer).then(resp => {
+        this.remoteBackupLoading = false
         this.remoteJobList = resp.data
       })
     },

@@ -516,7 +516,11 @@ export default {
       this.vcLoading = true
       listHost(1, 100, this.backupFormData.backupServer).then(resp => {
         this.vcLoading = false
-        this.vcOptions = resp.data.filter(r => r.type === 1).map(r => {
+        let vcList = resp.data.filter(r => r.type === 1)
+        if (vcList.length === 0) {
+          vcList = resp.data.filter(r => r.type === 6)
+        }
+        this.vcOptions = vcList.map(r => {
           return { label: r.name, value: r.name }
         })
       }).catch(e => {

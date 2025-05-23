@@ -66,7 +66,7 @@ export function prettyDate(t) {
   const h = parseInt(t % day / hour)
   const m = parseInt(t % hour / minute)
   const s = parseInt( t % minute)
-  return t > minute ? (d ? d + '天' : '') + (h? h + '小时': '') + (m? m+'分钟': '') + (s? s + '秒': '') : t + '秒'
+  return t > minute ? (d ? d + '天' : '') + (h? h + '小时': '') + (m? m+'分': '') + (s? s + '秒': '') : t + '秒'
 }
 
 /**
