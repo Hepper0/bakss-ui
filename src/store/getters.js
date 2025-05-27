@@ -16,5 +16,14 @@ const getters = {
   topbarRouters:state => state.permission.topbarRouters,
   defaultRoutes:state => state.permission.defaultRoutes,
   sidebarRouters:state => state.permission.sidebarRouters,
+  backupContent:state => state.config.backupContent,
+  applicationType:state => state.config.applicationType,
+  approvalStatus:state => state.config.approvalStatus,
+  jobType:state => state.config.jobType,
+  env:state => state.config.env,
+  costType:state => state.config.costType,
+  flowStatus:state => state.config.flowStatus,
+  machineType:state => state.config.machineType,
+  dataCenter:state => state.config.dataCenter,
 }
 export default getters

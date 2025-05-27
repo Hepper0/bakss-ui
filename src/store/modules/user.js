@@ -51,8 +51,17 @@ const user = {
     },
 
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    GetInfo({ commit, state, dispatch }) {
       return new Promise((resolve, reject) => {
+        dispatch('getBackupContentList')
+        dispatch('getApplicationTypeList')
+        dispatch('getApprovalStatusList')
+        dispatch('getCostTypeList')
+        dispatch('getDataCenterList')
+        dispatch('getEnvList')
+        dispatch('getFlowStatusList')
+        dispatch('getJobTypeList')
+        dispatch('getMachineTypeList')
         getInfo().then(res => {
           const user = res.user
           const avatar = (user.avatar == "" || user.avatar == null) ? require("@/assets/images/profile.jpg") : process.env.VUE_APP_BASE_API + user.avatar;

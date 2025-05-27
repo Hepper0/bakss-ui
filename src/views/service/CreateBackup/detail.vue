@@ -356,7 +356,7 @@ export default {
       platformRules,
       backupRules,
       otherRules,
-      backupContentOptions,
+      // backupContentOptions,
       dataCenterOptions,
       platformOptions,
       envOptions,
@@ -429,8 +429,16 @@ export default {
     user: function () {
       return this.$store.getters.user
     },
+    backupContentOptions: function () {
+      // return [{label: 1, value: 1}]
+      return this.$store.getters.backupContent && this.$store.getters.backupContent.map(r => {
+        return { label: r.dictLabel, value: r.dictValue }
+      })
+    }
   },
   mounted() {
+    console.log('backupContent', this.$store.getters.backupContent)
+    // console.log('backupContent')
     // getVCList()
     // listRepository().then(resp => {
     //   this.repositoryDataList = resp.rows
