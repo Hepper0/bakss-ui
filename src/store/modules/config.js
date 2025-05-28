@@ -6,13 +6,14 @@ export default {
   state: {
     approvalStatus: undefined,
     applicationType: undefined,
-    backupContent: [],
+    backupContent: undefined,
     flowStatus: undefined,
     jobType: undefined,
     env: undefined,
     costType: undefined,
     dataCenter: undefined,
-    machineType: undefined
+    machineType: undefined,
+    platform: undefined
   },
   mutations: {
     SET_APPLICATION_TYPE: (state, data) => {
@@ -70,7 +71,7 @@ export default {
     },
     getBackupContentList: function ({ state, commit }) {
       return new Promise((resolve, reject) => {
-        if (state.backupContent.length === 0) {
+        if (state.backupContent === undefined) {
           getDicts('backup_content').then(resp => {
             commit('SET_BACKUP_CONTENT', resp.data)
             console.log('state.backupContent', state.backupContent)
@@ -151,6 +152,18 @@ export default {
           }).catch(e => reject(e))
         } else {
           resolve(state.machineType)
+        }
+      })
+    },
+    getPlatformList: function ({ state, commit }) {
+      return new Promise((resolve, reject) => {
+        if (state.platform === undefined) {
+          getDicts('platform').then(resp => {
+            state.platform = resp.data
+            resolve(resp.data)
+          }).catch(e => reject(e))
+        } else {
+          resolve(state.platform)
         }
       })
     },

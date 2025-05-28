@@ -357,11 +357,11 @@ export default {
       backupRules,
       otherRules,
       // backupContentOptions,
-      dataCenterOptions,
-      platformOptions,
-      envOptions,
+      // dataCenterOptions,
+      // platformOptions,
+      // envOptions,
       backupSoftwareOptions,
-      machineTypeOptions,
+      // machineTypeOptions,
       scheduleDateTypeOptions,
       scheduleDayOptions,
       veeamServerOptions: [],
@@ -430,10 +430,19 @@ export default {
       return this.$store.getters.user
     },
     backupContentOptions: function () {
-      // return [{label: 1, value: 1}]
-      return this.$store.getters.backupContent && this.$store.getters.backupContent.map(r => {
-        return { label: r.dictLabel, value: r.dictValue }
-      })
+      return this.getConfig('backupContent')
+    },
+    machineTypeOptions: function () {
+      return this.getConfig('machineType')
+    },
+    envOptions: function () {
+      return this.getConfig('env')
+    },
+    platformOptions: function () {
+      return this.getConfig('platform')
+    },
+    dataCenterOptions: function () {
+      return this.getConfig('dataCenter')
     }
   },
   mounted() {
@@ -548,6 +557,11 @@ export default {
         }
       }).catch(e => this.vmLoading = false)
     },
+    getConfig(type) {
+      return this.$store.getters[type] && this.$store.getters[type].map(r => {
+        return { label: r.dictLabel, value: r.dictValue }
+      })
+    }
   }
 }
 </script>

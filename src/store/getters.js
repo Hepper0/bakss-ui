@@ -25,5 +25,6 @@ const getters = {
   flowStatus:state => state.config.flowStatus,
   machineType:state => state.config.machineType,
   dataCenter:state => state.config.dataCenter,
+  platform:state => state.config.platform,
 }
 export default getters

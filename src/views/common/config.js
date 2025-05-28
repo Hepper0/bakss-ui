@@ -64,8 +64,8 @@ export const getComponentType = (appType) => {
 
 // 通用配置
 export const MACHINE_TYPE = { vm: '虚拟机' , physical: '物理机' }
-export const DATA_CENTER = {catl: '宁德时代/CATL'}
-export const COST_TYPE = {costCenter: '成本中心'}
+export const DATA_CENTER = { CATL: '宁德时代/CATL' }
+export const COST_TYPE = { costCenter: '成本中心' }
 export const ENV = { prod: '生产', dev: '非生产' }
 
 export const JOB_TYPE = {

@@ -62,6 +62,7 @@ const user = {
         dispatch('getFlowStatusList')
         dispatch('getJobTypeList')
         dispatch('getMachineTypeList')
+        dispatch('getPlatformList')
         getInfo().then(res => {
           const user = res.user
           const avatar = (user.avatar == "" || user.avatar == null) ? require("@/assets/images/profile.jpg") : process.env.VUE_APP_BASE_API + user.avatar;
