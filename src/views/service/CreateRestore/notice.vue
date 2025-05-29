@@ -101,7 +101,7 @@ export default {
   name: "index",
   data: function () {
     return {
-      count: 10,
+      count: 1,
       checked: false
     }
   },
