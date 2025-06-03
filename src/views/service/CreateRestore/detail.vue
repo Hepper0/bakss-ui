@@ -36,7 +36,7 @@
           <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="虚机" prop="vmName">
-                <el-select disabled v-model="formData.vmName" :style="{width: '80%'}" @change="onContentChange">
+                <el-select disabled v-model="formData.vmName" :style="{width: '80%'}">
                   <el-option v-for="(item, index) in vmOptions" :key="index" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
@@ -81,7 +81,7 @@
           <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="主机" prop="host">
-                <el-select v-model="formData.host" :style="{width: '80%'}" @change="onContentChange">
+                <el-select v-model="formData.host" :style="{width: '80%'}">
                   <el-option v-for="(item, index) in hostOptions" :key="index" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
@@ -146,6 +146,11 @@
 </template>
 
 <script>
+import { listBackup, getBackupPoint, getBackupPointDetail } from '@/api/veeam/backup'
+import { listBackup as listJob } from '@/api/service/backup'
+import { listHost, getHostEntity, getHostDatastore, getHostResourcePool, getHostFolder } from '@/api/veeam/host'
+import { applyCreateRestore } from '@/api/application/apply'
+
 export default {
   name: "detail",
   data: function () {
@@ -167,21 +172,111 @@ export default {
         reason: undefined,
         nicsEnabled: true,
         powerUp: true,
-      }
+      },
+      jobList: [],
+      backupList: [],
+      pointList: [],
+      selectedPoint: undefined,
+      selectedJob: undefined,
+      hostOptions: [],
+      resourcePoolOptions: [],
+      datastoreOptions: [],
+      vmOptions: [],
+      folderOptions: []
     }
   },
   computed: {
     backupContentOptions: function () {
       return this.getConfig('backupContent')
     },
+    backupJobOptions: function() {
+      return this.jobList.map(j => {
+        return { label: j.appName, value: j.appName }
+      })
+    },
+    backupOptions: function () {
+      return this.backupList.map(b => {
+        return { label: b.dirPath, value: b.id }
+      })
+    },
+    appType: function () {
+      const t = this.getConfig('applicationType').filter(c => c.dictLabel === '创建恢复')
+      return t && t.dictValue
+    }
+  },
+  mounted () {
+    this.fetchOptions()
   },
   methods: {
-    onContentChange() {
-
+    onContentChange(e) {
+      this.getJobList(e)
+    },
+    onJobChange(e) {
+      const j = this.jobList.find(j => j.appName === e)
+      this.selectedJob = j
+      j && this.getBackupList(j.appName)
+    },
+    onBackupChange(e) {
+      getBackupPoint(e, this.selectedJob.backupServer).then(resp => {
+        this.pointList = resp.data
+      })
+    },
+    onPointChange(e) {
+      const p = this.pointList.find(p => p.id === e)
+      this.selectedPoint = p
     },
     getConfig(type) {
       return this.$store.getters[type] && this.$store.getters[type].map(r => {
         return { label: r.dictLabel, value: r.dictValue }
+      })
+    },
+    getBackupList(jobName) {
+      listBackup(jobName, 1, 0, this.selectedJob.backupServer)
+    },
+    getJobList(backupContent) {
+      listJob({backupContent}).then(resp => {
+        this.jobList = resp.rows
+      })
+    },
+    submit() {
+      const data = {
+        backupId: this.selectedJob.id,
+        jobKey: this.selectedJob.appName,
+        appType: this.appType,
+        backupServer: this.selectedJob.backupServer,
+        backupSoftware: this.selectedJob.backupSoftware,
+        remark: this.formData.reason
+      }
+      Object.assign(data, this.formData)
+      applyCreateRestore(data).then(() => {
+        this.$message.success('提交成功!')
+        this.$router.push({ path: '/application' })
+      })
+    },
+    fetchOptions() {
+      listHost().then(resp => {
+        let vcList = resp.data.filter(r => r.type === 1)
+        if (vcList.length === 0) {
+          vcList = resp.data.filter(r => r.type === 6)
+        }
+        this.hostOptions = vcList.map(r => {
+          return { label: r.name, value: r.name }
+        })
+      })
+      getHostDatastore().then(resp => {
+        this.hostOptions = resp.data.map(r => {
+          return { label: r.name, value: r.name }
+        })
+      })
+      getHostResourcePool().then(resp => {
+        this.resourcePoolOptions = resp.data.map(r => {
+          return { label: r.name, value: r.name }
+        })
+      })
+      getHostFolder().then(resp => {
+        this.folderOptions = resp.data.map(r => {
+          return { label: r.name, value: r.name }
+        })
       })
     }
   }

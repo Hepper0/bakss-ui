@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 
-export function listBackup(page, pageSize, server) {
+export function listBackup(jobName, page, pageSize, server) {
   return request({
     url: '/veeam/backup/list',
     method: 'get',
     params: {
+      jobName,
       page,
       pageSize
     },
