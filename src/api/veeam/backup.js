@@ -52,12 +52,12 @@ export function getBackupDetail(ID, server) {
   })
 }
 
-export function getBackupPointDetail(ID, backupId, server) {
+export function getBackupPointDetail(pointId, backupId, server) {
   return request({
     url: '/veeam/backup/pointDetail',
     method: 'get',
     params: {
-      ID,
+      pointId,
       backupId
     },
     headers: {
@@ -66,11 +66,11 @@ export function getBackupPointDetail(ID, backupId, server) {
   })
 }
 
-export function getBackupPoint(ID, server) {
+export function getBackupPoint(backupId, vmName, server) {
   return request({
     url: '/veeam/backup/point',
     method: 'get',
-    params: { ID },
+    params: { backupId, vmName },
     headers: {
       server
     }

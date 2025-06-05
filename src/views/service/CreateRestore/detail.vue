@@ -14,8 +14,6 @@
                 </el-select>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="备份任务" prop="jobName">
                 <el-select v-model="formData.jobName" :style="{width: '80%'}" @change="onJobChange">
@@ -41,8 +39,6 @@
                 </el-select>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="备份" prop="backupId">
                 <el-select v-model="formData.backupId" :style="{width: '80%'}" @change="onBackupChange">
@@ -50,8 +46,6 @@
                 </el-select>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="还原点" prop="pointId">
                 <el-select v-model="formData.pointId" :style="{width: '80%'}" @change="onPointChange">
@@ -86,29 +80,25 @@
                 </el-select>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="目录" prop="vmFolder">
-                <el-input :style="{width: '80%'}" v-model="formData.vmFolder"></el-input>
+                <el-select :style="{width: '80%'}" v-model="formData.vmFolder">
+                  <el-option v-for="(item, index) in folderOptions" :key="index" :label="item.label" :value="item.value" />
+                </el-select>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="资源池" prop="resourcePool">
-                <el-input :style="{width: '80%'}" v-model="formData.resourcePool"></el-input>
+                <el-select :style="{width: '80%'}" v-model="formData.resourcePool">
+                  <el-option v-for="(item, index) in resourcePoolOptions" :key="index" :label="item.label" :value="item.value" />
+                </el-select>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item prop="redirectWriteCache">
                 <el-checkbox v-model="formData.redirectWriteCache">重定向写缓存</el-checkbox>
               </el-form-item>
             </el-col>
-          </el-form>
-          <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="数据存储" prop="datastoreName">
                 <el-select :disabled="!formData.redirectWriteCache" :style="{width: '80%'}" v-model="formData.datastoreName">
@@ -142,12 +132,16 @@
         </el-form>
       </div>
     </el-card>
+    <el-row style="display: flex; justify-content: right">
+      <el-button @click="resetForm" size="small" type="primary">重置</el-button>
+      <el-button @click="submit" size="small" type="success">提交</el-button>
+    </el-row>
   </div>
 </template>
 
 <script>
 import {getBackupPoint, listBackup} from '@/api/veeam/backup'
-import {listBackup as listJob} from '@/api/service/backup'
+import {myBackup as listJob} from '@/api/service/backup'
 import {getHostDatastore, getHostFolder, getHostResourcePool} from '@/api/veeam/host'
 import {applyCreateRestore} from '@/api/application/apply'
 
@@ -159,7 +153,7 @@ export default {
         backupId: undefined,
         pointId: undefined,
         restoreMode: 1,
-        restoreVMtags: undefined,
+        restoreVmTags: false,
         vmName: undefined,
         host: undefined,
         vmFolder: undefined,
@@ -174,15 +168,15 @@ export default {
         powerUp: true,
       },
       jobList: [],
-      backupList: [],
-      pointList: [],
+      backupList: [{dirPath: 'backup1111', id: 'backup1111'}],
+      pointList: [{creationTime: 'point1111', id: 'point1111'}],
       selectedPoint: undefined,
       selectedJob: undefined,
-      hostOptions: [],
-      resourcePoolOptions: [],
-      datastoreOptions: [],
-      vmOptions: [],
-      folderOptions: []
+      hostOptions: [{label: 'host1111', value: 'host1111'}],
+      resourcePoolOptions: [{label: 'resource11', value: 'resource11'}],
+      datastoreOptions: [{label: 'datastore11', value: 'datastore11'}],
+      vmOptions: [{label: 'vm11', value: 'vm11'}],
+      folderOptions: [{label: 'folder11', value: 'folder11'}]
     }
   },
   computed: {
@@ -199,12 +193,19 @@ export default {
         return { label: b.dirPath, value: b.id }
       })
     },
+    pointOptions: function () {
+      return this.pointList.map(p => {
+        return { label: p.creationTime, value: p.id }
+      })
+    },
     appType: function () {
-      const t = this.getConfig('applicationType').filter(c => c.dictLabel === '创建恢复')
-      return t && t.dictValue
+      const t = this.getConfig('applicationType').find(c => c.label === '创建恢复')
+      return t && t.value
     }
   },
   mounted () {
+    console.log('applicationType', this.getConfig('applicationType'))
+    console.log('appType', this.appType)
   },
   methods: {
     onContentChange(e) {
@@ -228,7 +229,7 @@ export default {
       }
     },
     onBackupChange(e) {
-      getBackupPoint(e, this.selectedJob.backupServer).then(resp => {
+      getBackupPoint(e, this.formData.vmName, this.selectedJob.backupServer).then(resp => {
         this.pointList = resp.data
       })
     },
@@ -241,7 +242,9 @@ export default {
       })
     },
     getBackupList(jobName) {
-      listBackup(jobName, 1, 0, this.selectedJob.backupServer)
+      listBackup(jobName, 1, 0, this.selectedJob.backupServer).then(resp => {
+        this.backupList = resp.data
+      })
     },
     getJobList(backupContent) {
       listJob({backupContent}).then(resp => {
