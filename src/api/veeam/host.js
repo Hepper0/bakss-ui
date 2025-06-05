@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function listHost(page, pageSize, server) {
+export function listHost(page=1, pageSize=0, server) {
   return request({
     url: '/veeam/host/list',
     method: 'get',

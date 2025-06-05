@@ -36,7 +36,7 @@
           <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
               <el-form-item label="虚机" prop="vmName">
-                <el-select disabled v-model="formData.vmName" :style="{width: '80%'}">
+                <el-select v-model="formData.vmName" :style="{width: '80%'}">
                   <el-option v-for="(item, index) in vmOptions" :key="index" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
@@ -80,7 +80,7 @@
         <el-row v-show="formData.restoreMode === 2">
           <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
-              <el-form-item label="主机" prop="host">
+              <el-form-item label="主机" prop="host" @change="fetchOptions">
                 <el-select v-model="formData.host" :style="{width: '80%'}">
                   <el-option v-for="(item, index) in hostOptions" :key="index" :label="item.label" :value="item.value" />
                 </el-select>
@@ -146,10 +146,10 @@
 </template>
 
 <script>
-import { listBackup, getBackupPoint, getBackupPointDetail } from '@/api/veeam/backup'
-import { listBackup as listJob } from '@/api/service/backup'
-import { listHost, getHostEntity, getHostDatastore, getHostResourcePool, getHostFolder } from '@/api/veeam/host'
-import { applyCreateRestore } from '@/api/application/apply'
+import {getBackupPoint, listBackup} from '@/api/veeam/backup'
+import {listBackup as listJob} from '@/api/service/backup'
+import {getHostDatastore, getHostFolder, getHostResourcePool} from '@/api/veeam/host'
+import {applyCreateRestore} from '@/api/application/apply'
 
 export default {
   name: "detail",
@@ -205,7 +205,6 @@ export default {
     }
   },
   mounted () {
-    this.fetchOptions()
   },
   methods: {
     onContentChange(e) {
@@ -213,8 +212,20 @@ export default {
     },
     onJobChange(e) {
       const j = this.jobList.find(j => j.appName === e)
-      this.selectedJob = j
-      j && this.getBackupList(j.appName)
+      if (j) {
+        this.selectedJob = j
+        this.getBackupList(j.appName)
+        this.getJobDetail(j.appName, j.backupServer).then(resp => {
+          this.selectedJob = Object.assign(this.selectedJob, resp.data)
+          this.vmOptions = resp.data.selectedVmObjects.map(v => {
+            return { label: v.name, value: v.name }
+          })
+          if (this.vmOptions[0]) {
+            this.formData.vmName = this.vmOptions[0].value
+            this.formData.host = this.vmOptions[0].path.split('\\')[0]
+          }
+        })
+      }
     },
     onBackupChange(e) {
       getBackupPoint(e, this.selectedJob.backupServer).then(resp => {
@@ -222,8 +233,7 @@ export default {
       })
     },
     onPointChange(e) {
-      const p = this.pointList.find(p => p.id === e)
-      this.selectedPoint = p
+      this.selectedPoint = this.pointList.find(p => p.id === e)
     },
     getConfig(type) {
       return this.$store.getters[type] && this.$store.getters[type].map(r => {
@@ -256,26 +266,17 @@ export default {
       })
     },
     fetchOptions() {
-      listHost().then(resp => {
-        let vcList = resp.data.filter(r => r.type === 1)
-        if (vcList.length === 0) {
-          vcList = resp.data.filter(r => r.type === 6)
-        }
-        this.hostOptions = vcList.map(r => {
-          return { label: r.name, value: r.name }
-        })
-      })
-      getHostDatastore().then(resp => {
+      getHostDatastore(this.formData.host, this.selectedJob.backupServer).then(resp => {
         this.hostOptions = resp.data.map(r => {
           return { label: r.name, value: r.name }
         })
       })
-      getHostResourcePool().then(resp => {
+      getHostResourcePool(this.formData.host, this.selectedJob.backupServer).then(resp => {
         this.resourcePoolOptions = resp.data.map(r => {
           return { label: r.name, value: r.name }
         })
       })
-      getHostFolder().then(resp => {
+      getHostFolder(this.formData.host, this.selectedJob.backupServer).then(resp => {
         this.folderOptions = resp.data.map(r => {
           return { label: r.name, value: r.name }
         })
