@@ -240,11 +240,13 @@ export default {
     },
     submit() {
       const data = {
+        restoreType: 1,
         backupId: this.selectedJob.id,
         jobKey: this.selectedJob.appName,
         appType: this.appType,
         backupServer: this.selectedJob.backupServer,
         backupSoftware: this.selectedJob.backupSoftware,
+        backupContent: this.selectedJob.backupContent,
         remark: this.formData.reason
       }
       Object.assign(data, this.formData)
