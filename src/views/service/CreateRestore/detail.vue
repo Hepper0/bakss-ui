@@ -8,9 +8,9 @@
         <el-row>
           <el-form ref="basicForm" :model="formData" :rules="rules" size="medium" label-width="120px">
             <el-col :span="8">
-              <el-form-item label="备份内容" prop="backupContent">
-                <el-select v-model="formData.backupContent" :style="{width: '80%'}" @change="onContentChange">
-                  <el-option v-for="(item, index) in backupContentOptions" :key="index" :label="item.label" :value="item.value" />
+              <el-form-item label="备份类型" prop="jobType">
+                <el-select v-model="formData.jobType" :style="{width: '80%'}" @change="onContentChange">
+                  <el-option v-for="(item, index) in jobTypeOptions" :key="index" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -180,8 +180,8 @@ export default {
     }
   },
   computed: {
-    backupContentOptions: function () {
-      return this.getConfig('backupContent')
+    jobTypeOptions: function () {
+      return this.getConfig('jobType')
     },
     backupJobOptions: function() {
       return this.jobList.map(j => {
@@ -204,8 +204,6 @@ export default {
     }
   },
   mounted () {
-    console.log('applicationType', this.getConfig('applicationType'))
-    console.log('appType', this.appType)
   },
   methods: {
     onContentChange(e) {
@@ -246,8 +244,8 @@ export default {
         this.backupList = resp.data
       })
     },
-    getJobList(backupContent) {
-      listJob({backupContent}).then(resp => {
+    getJobList(jobType) {
+      listJob({jobType}).then(resp => {
         this.jobList = resp.rows
       })
     },
@@ -259,7 +257,7 @@ export default {
         appType: this.appType,
         backupServer: this.selectedJob.backupServer,
         backupSoftware: this.selectedJob.backupSoftware,
-        backupContent: this.selectedJob.backupContent,
+        jobType: this.selectedJob.jobType,
         remark: this.formData.reason
       }
       Object.assign(data, this.formData)

@@ -7,9 +7,9 @@
       <div class="card-panel-content">
         <el-form ref="basicForm" :model="basicFormData" :rules="rules" size="medium" label-width="120px">
           <el-col :span="8">
-            <el-form-item label="备份内容" prop="backupContent">
-              <el-select v-model="basicFormData.backupContent" :style="{width: '80%'}" @change="onContentChange">
-                <el-option v-for="(item, index) in backupContentOptions" :key="index" :label="item.label" :value="item.value" />
+            <el-form-item label="备份类型" prop="jobType">
+              <el-select v-model="basicFormData.jobType" :style="{width: '80%'}" @change="onContentChange">
+                <el-option v-for="(item, index) in jobTypeOptions" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -202,7 +202,7 @@
 import { listConfig } from "@/api/veeam/basic"
 import { getHostEntity, listHost } from '@/api/veeam/host'
 import { listRepository } from '@/api/veeam/repo'
-import { applyCreateBackup } from '@/api/application/apply'
+import { applyCreateBackup } from '../../../api/application/apply'
 import { CREATE_BACKUP, MACHINE_TYPE, COST_TYPE, DATA_CENTER } from '@/views/common/config'
 import { deepClone } from "@/utils";
 import { parseTime } from "@/utils/ruoyi"
@@ -210,7 +210,7 @@ import { Loading } from 'element-ui'
 
 
 const rules = {
-  backupContent: [{
+  jobType: [{
     required: true,
     message: '请选择备份内容',
     trigger: 'blur'
@@ -367,7 +367,7 @@ export default {
       veeamServerOptions: [],
       remark: undefined,
       formData: {
-        backupContent: undefined,
+        jobType: undefined,
         machineType: undefined,
         dataCenter: undefined,
         backupSoftware: undefined,
@@ -381,7 +381,7 @@ export default {
         remark: undefined
       },
       basicFormData: {
-        backupContent: undefined,
+        jobType: undefined,
         machineType: undefined,
         dataCenter: undefined,
         backupSoftware: undefined,
@@ -424,7 +424,7 @@ export default {
   },
   computed: {
     cascadeRule: function () {
-      return cascadeRule[this.basicFormData.backupContent]
+      return cascadeRule[this.basicFormData.jobType]
     },
     user: function () {
       return this.$store.getters.user
@@ -443,15 +443,12 @@ export default {
     },
     dataCenterOptions: function () {
       return this.getConfig('dataCenter')
+    },
+    jobTypeOptions: function () {
+      return this.getConfig('jobType')
     }
   },
   mounted() {
-    console.log('backupContent', this.$store.getters.backupContent)
-    // console.log('backupContent')
-    // getVCList()
-    // listRepository().then(resp => {
-    //   this.repositoryDataList = resp.rows
-    // })
     // name要拼接appId, 放在后端处理
     this.backupFormData.description = "Created by Bakss\\" + this.user.name + " at " + parseTime(new Date().getTime(), '{y}-{m}-{d} {h}:{i}')
     listConfig().then(resp => {
@@ -489,7 +486,7 @@ export default {
     },
     resetForm() {
       this.formData = {
-        backupContent: undefined,
+        jobType: undefined,
         machineType: undefined,
         dataCenter: undefined,
         backupSoftware: undefined,
