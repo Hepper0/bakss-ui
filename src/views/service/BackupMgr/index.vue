@@ -472,9 +472,8 @@ export default {
     syncBackupJob() {
       this.remoteBackupLoading = true
       listJob(null, 1, 0, this.selectedServer).then(resp => {
-        this.remoteBackupLoading = false
         this.remoteJobList = resp.data
-      })
+      }).finally(() => this.remoteBackupLoading = false)
     },
     cancelSync() {
       this.syncBackupJobVisible = false

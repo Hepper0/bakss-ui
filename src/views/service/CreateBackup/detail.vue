@@ -527,7 +527,7 @@ export default {
           this.repositoryLoading = false
           return { label: r.name, value: r.name }
         })
-      }).catch(e => this.repositoryLoading = false)
+      }).finally(e => this.repositoryLoading = false)
     },
     getVCList() {
       this.vcLoading = true
@@ -540,13 +540,16 @@ export default {
         this.vcOptions = vcList.map(r => {
           return { label: r.name, value: r.name }
         })
-      }).catch(e => {
+      }).finally(e => {
         this.vcLoading = false
       })
     },
     getVMList(name) {
       this.vmLoading = true
-      if (this.vmCache[name]) return this.vmCache[name]
+      if (this.vmCache[name]) {
+        this.vmLoading = false
+        return this.vmCache[name]
+      }
       getHostEntity(name, 'HostAndVms', this.backupFormData.backupServer).then(resp => {
         this.vmLoading = false
         this.vmObjectsOptions = resp.data.filter(r => r.type === 'Vm').map(r => {
@@ -555,7 +558,7 @@ export default {
         if (this.vmCache[name] === undefined) {
           this.vmCache[name] = this.vmObjectsOptions
         }
-      }).catch(e => this.vmLoading = false)
+      }).finally(e => this.vmLoading = false)
     },
     getConfig(type) {
       return this.$store.getters[type] && this.$store.getters[type].map(r => {
