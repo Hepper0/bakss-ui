@@ -53,29 +53,10 @@
     </el-card>
     <el-card class="card-panel">
       <div slot="header" class="clearfix">
-        <span>操作系统</span>
-      </div>
-      <div class="card-panel-content">
-        <el-form ref="platformForm" :model="platformFormData" :rules="platformRules" size="medium" label-width="120px">
-          <el-col :span="8">
-            <el-form-item label="备份IP" prop="backupIP">
-              <el-input v-model="platformFormData.backupIP" placeholder="请输入" :style="{width: '80%'}"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="远程端口" prop="backupPort">
-              <el-input v-model="platformFormData.backupPort" placeholder="请输入" :style="{width: '80%'}"/>
-            </el-form-item>
-          </el-col>
-        </el-form>
-      </div>
-    </el-card>
-    <el-card class="card-panel">
-      <div slot="header" class="clearfix">
         <span>备份信息</span>
       </div>
       <div class="card-panel-content">
-        <el-form ref="backupForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px" :loading="true">
+        <el-form ref="backupInfoForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px" :loading="true">
           <el-row>
             <el-col :span="8">
               <el-form-item label="任务名称" prop="appName">
@@ -92,34 +73,11 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-row>
-            <el-col :span="8">
-              <el-form-item id="repository" label="仓库" prop="repository">
-                <el-select v-model="backupFormData.repository" placeholder="请选择仓库" :style="{width: '80%'}" :loading="repositoryLoading" :disabled="backupFormData.backupServer === undefined">
-                  <el-option v-for="(item, index) in repositoryOptions" :key="index" :label="item.label"
-                             :value="item.value"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="VC名称" prop="vCenter">
-                <el-select id="vCenter" v-model="backupFormData.vCenter" placeholder="请选择" @change="onVCChange"
-                           :style="{width: '80%'}" :loading="vcLoading" :disabled="backupFormData.backupServer === undefined">
-                  <el-option v-for="(item, index) in vcOptions" :key="index" :label="item.label"
-                             :value="item.value"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item id="vm" label="VM名称" prop="vmObjects">
-                <el-select v-model="backupFormData.vmObjects" placeholder="请选择" multiple clearable
-                           :style="{width: '80%'}" :loading="vmLoading" :disabled="backupFormData.vCenter === undefined">
-                  <el-option v-for="(item, index) in vmObjectsOptions" :key="index" :label="item.label"
-                             :value="item.value"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
+        </el-form>
+        <backup-vm ref="backupDetail" v-if="backupFormData.jobType === 0" :form-data="backupFormData"></backup-vm>
+        <backup-agent ref="backupDetail" v-else-if="[12002, 12003].includes(backupFormData.jobType)" :form-data="backupFormData"></backup-agent>
+        <backup-nas ref="backupDetail" v-else-if="[13000].includes(backupFormData.jobType)" :form-data="backupFormData"></backup-nas>
+        <el-form ref="scheduleForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px" :loading="true">
           <el-row>
             <el-col :span="8">
               <el-form-item id="schedule" label="备份时间" prop="scheduleTime">
@@ -135,7 +93,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item id="schedule" label="备份计划类型" prop="scheduleDateType">
+              <el-form-item id="scheduleDateType" label="备份计划类型" prop="scheduleDateType">
                 <el-select v-model="backupFormData.scheduleDateType" placeholder="请选择" :style="{width: '80%'}" :loading="repositoryLoading">
                   <el-option v-for="(item, index) in scheduleDateTypeOptions" :key="index" :label="item.label"
                              :value="item.value"></el-option>
@@ -143,7 +101,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8" v-if="backupFormData.scheduleDateType === 'selectedDays'">
-              <el-form-item id="schedule" label="备份日期" prop="scheduleDay">
+              <el-form-item id="scheduleDay" label="备份日期" prop="scheduleDay">
                 <el-select v-model="backupFormData.scheduleDay" placeholder="请选择" :style="{width: '80%'}" :loading="repositoryLoading" multiple>
                   <el-option v-for="(item, index) in scheduleDayOptions" :key="index" :label="item.label"
                              :value="item.value"></el-option>
@@ -206,7 +164,9 @@ import { applyCreateBackup } from '../../../api/application/apply'
 import { CREATE_BACKUP, MACHINE_TYPE, COST_TYPE, DATA_CENTER } from '@/views/common/config'
 import { deepClone } from "@/utils";
 import { parseTime } from "@/utils/ruoyi"
-import { Loading } from 'element-ui'
+import BackupVM from './module/vm'
+import BackupAgent from './module/agent'
+import BackupNAS from './module/nas'
 
 
 const rules = {
@@ -241,38 +201,11 @@ const rules = {
     trigger: 'blur'
   }],
 }
-const platformRules = {
-  backupIP: [{
-    required: true,
-    message: '请输入',
-    trigger: 'blur'
-  }],
-    backupPort: [{
-    required: true,
-    message: '请输入',
-    trigger: 'blur'
-  }],
-}
+
 const backupRules = {
   appName: [{
     required: true,
     message: '请输入',
-    trigger: 'blur'
-  }],
-  vCenter: [{
-    required: true,
-    message: '请选择',
-    trigger: 'blur'
-  }],
-  vmObjects: [{
-    required: true,
-    type: 'array',
-    message: '请至少选择一个VC',
-    trigger: 'change'
-  }],
-  repository: [{
-    required: true,
-    message: '请选择仓库',
     trigger: 'blur'
   }],
   backupServer: [{
@@ -303,16 +236,6 @@ const backupRules = {
   }]
 }
 const otherRules = {
-  // costType: [{
-  //   required: true,
-  //   message: '请选择成本方式',
-  //   trigger: 'blur'
-  // }],
-  // costNumber: [{
-  //   required: true,
-  //   message: '请输入成本编号',
-  //   trigger: 'blur'
-  // }],
   remark: [{
     required: true,
     message: '请输入申请理由',
@@ -320,20 +243,7 @@ const otherRules = {
   }]
 }
 
-const backupContentOptions = [
-  {label: 'VMware', value: 'VMware'},
-  {label: 'MySQL', value: 'MySQL'},
-  {label: 'SQL Server', value: 'SQL Server'},
-  {label: 'PostgreSQL', value: 'PostgreSQL'},
-  {label: 'Oracle', value: 'Oracle'},
-  {label: 'FileSystem', value: 'FileSystem'},
-]
-
-const dataCenterOptions = [{label: 'CATL/宁德时代', value: 'catl'}]
-const platformOptions = [{label: 'Windows', value: 'Windows'}, {label: 'Linux', value: 'Linux'}]
-const envOptions = [{label: '生产', value: 'prod'}, {label: '非生产', value: 'dev'},]
 const backupSoftwareOptions = [{label: 'Veeam', value: 'Veeam'}]
-const machineTypeOptions = [{label: '虚拟机', value: 'vm'}, {label: '物理机', value: 'physical'},]
 const scheduleDateTypeOptions = [{label: 'EveryDay', value: 'everyday'}, {label: 'On Weekdays', value: 'weekdays'}, { label: 'On these days', value: 'selectedDays'}]
 const scheduleDayOptions = [
   {label: 'Monday', value: 'Monday'},
@@ -343,8 +253,6 @@ const scheduleDayOptions = [
   {label: 'Friday', value: 'Friday'},
   {label: 'Saturday', value: 'Saturday'},
   {label: 'Sunday', value: 'Sunday'}]
-
-// const veeamServerOptions = [{ label: '192.168.1.104:8888', value: '192.168.1.104:8888' }, { label: '192.168.1.101:8888', value: '192.168.1.101:8888'}]
 
 const cascadeRule = { MySQL: {}, VMware: {machineType: 'vm', platform: 'Windows'}}
 
@@ -356,12 +264,7 @@ export default {
       platformRules,
       backupRules,
       otherRules,
-      // backupContentOptions,
-      // dataCenterOptions,
-      // platformOptions,
-      // envOptions,
       backupSoftwareOptions,
-      // machineTypeOptions,
       scheduleDateTypeOptions,
       scheduleDayOptions,
       veeamServerOptions: [],
@@ -421,6 +324,11 @@ export default {
       vmLoading: false,
       repositoryLoading: false
     }
+  },
+  components: {
+    BackupVM,
+    BackupAgent,
+    BackupNAS
   },
   computed: {
     cascadeRule: function () {
@@ -513,6 +421,7 @@ export default {
     onServerChange() {
       this.backupFormData.vCenter = undefined
       this.backupFormData.repository = undefined
+      this.backupFormData.vmObjects = undefined
       this.getVCList()
       this.getRepositoryList()
     },
