@@ -191,25 +191,8 @@
                               </el-form-item>
                             </el-col>
                           </el-row>
-                          <el-row>
-                            <el-col :span="8">
-                              <el-form-item label="VCenter: ">
-                                {{ basicInfo.vCenter }}
-                              </el-form-item>
-                            </el-col>
-                            <el-col :span="8">
-                              <el-form-item label="虚拟机: ">
-                                <span v-if="backupStrategy.selectedVmObjects">
-                                  <el-tag :key="idx" v-for="(v, idx) in backupStrategy.selectedVmObjects.map(v => v.name)"> {{ v }}</el-tag>
-                                </span>
-                              </el-form-item>
-                            </el-col>
-                            <el-col :span="8">
-                              <el-form-item label="仓库: ">
-                                {{ backupStrategy.repository }}
-                              </el-form-item>
-                            </el-col>
-                          </el-row>
+                          <v-m-detail v-if="basicInfo.jobType === 0" :backup-detail="backupStrategy"></v-m-detail>
+                          <agent-detail v-else-if="[12002, 12003].includes(basicInfo.jobType)" :backup-detail="backupStrategy"></agent-detail>
                           <el-row>
                             <el-col :span="8">
                               <el-form-item label="备份时间: ">
@@ -323,12 +306,14 @@
 </template>
 
 <script>
-import { applyStrategy, applyBackup } from '@/api/application/apply'
-import { getBackup } from '@/api/service/backup'
-import { listSession, getSessionDetail } from '@/api/veeam/session'
-import { getJobDetail } from '@/api/veeam/job'
+import { applyStrategy, applyBackup } from '../../../api/application/apply'
+import { getBackup } from '../../../api/service/backup'
+import { listSession } from '../../../api/veeam/session'
+import { getJobDetail, getAgentJobDetail } from '../../../api/veeam/job'
 import { JOB_TYPE } from "../../common/config";
 import Session from "@/views/application/modules/job/session";
+import VMDetail from "./module/vm";
+import AgentDetail from "./module/agent";
 
 const BACKUP_EXEC_RIGHT_NOW = 1
 const BACKUP_EXEC_AT_TIME = 2
@@ -363,7 +348,7 @@ const JOB_RESULT = {
 
 export default {
   name: "more",
-  components: {Session},
+  components: {AgentDetail, VMDetail, Session},
   data() {
     return {
       JOB_TYPE,
@@ -444,7 +429,17 @@ export default {
   watch: {
     jobName: function (val) {
       if (val !== undefined) {
-        this.getJobDetail()
+        if (this.basicInfo.jobType) {
+          switch (this.basicInfo.jobType) {
+            case 0:
+              this.getJobDetail()
+              break
+            case 12002:
+            case 12003:
+              this.getAgentJobDetail()
+          }
+        }
+
         this.getBackupHistory()
       }
     }
@@ -528,11 +523,6 @@ export default {
     onChangeDate (e) {
       console.log(e)
     },
-    getSessionDetail(id) {
-      getSessionDetail(id, this.basicInfo.backupServer).then(resp => {
-
-      })
-    },
     getJobDetail() {
       this.jobDetailLoading = true
       getJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
@@ -542,34 +532,46 @@ export default {
         const vmObjects = jobInfo['selectedVmObjects']
         if (vmObjects[0]) {
           const path = vmObjects[0].path
-          jobInfo.Vcenter = path.split('\\')[0]
+          jobInfo.vCenter = path.split('\\')[0]
         }
-        const schedule = jobInfo['schedule']
-        if (schedule) {
-          jobInfo.isScheduleEnabled = schedule.isScheduleEnabled
-          const policy = schedule['policy']
-          jobInfo.policy = policy
-          const options = schedule['options' + policy]
-          switch (policy) {
-            case 'Daily':
-              jobInfo.scheduleTime = options['startDateTimeLocal']
-              jobInfo.scheduleDateType = options['dayNumberInMonth']
-              jobInfo.scheduleDay = options['dayOfWeek']
-              break
-            case 'Monthly':
-              const dayInMonth = options['dayInMonth']
-              jobInfo.scheduleTime = options['time']
-              jobInfo.scheduleDateType = dayInMonth['dayNumberInMonth'] + ',' + dayInMonth['dayOfWeek']
-              jobInfo.scheduleDay = options['months']
-              break
-            case 'Periodically':
-              break
-            case 'Continuous':
-              break
-          }
-        }
+        this.setSchedule(jobInfo)
         this.backupStrategy = jobInfo
       }).catch(e => this.jobDetailLoading = false)
+    },
+    getAgentJobDetail() {
+      this.jobDetailLoading = true
+      getAgentJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
+        this.jobDetailLoading = false
+        const jobInfo = resp.data
+        this.setSchedule(jobInfo)
+        this.backupStrategy = jobInfo
+      }).catch(e => this.jobDetailLoading = false)
+    },
+    setSchedule(jobInfo) {
+      const schedule = jobInfo['schedule']
+      if (schedule) {
+        jobInfo.isScheduleEnabled = schedule.isScheduleEnabled
+        const policy = schedule['policy']
+        jobInfo.policy = policy
+        const options = schedule['options' + policy]
+        switch (policy) {
+          case 'Daily':
+            jobInfo.scheduleTime = options['startDateTimeLocal']
+            jobInfo.scheduleDateType = options['dayNumberInMonth']
+            jobInfo.scheduleDay = options['dayOfWeek']
+            break
+          case 'Monthly':
+            const dayInMonth = options['dayInMonth']
+            jobInfo.scheduleTime = options['time']
+            jobInfo.scheduleDateType = dayInMonth['dayNumberInMonth'] + ',' + dayInMonth['dayOfWeek']
+            jobInfo.scheduleDay = options['months']
+            break
+          case 'Periodically':
+            break
+          case 'Continuous':
+            break
+        }
+      }
     },
     showSessionDetail(sessionId) {
       this.sessionDetailVisible = true

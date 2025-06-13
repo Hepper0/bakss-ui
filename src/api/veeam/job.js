@@ -91,3 +91,14 @@ export function updateJob(data, server) {
     }
   })
 }
+
+export function getAgentJobDetail(name, server) {
+  return request({
+    url: '/veeam/agentJob/detail',
+    method: 'get',
+    params: { name },
+    headers: {
+      server
+    }
+  })
+}
