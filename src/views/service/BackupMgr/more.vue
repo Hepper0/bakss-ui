@@ -95,51 +95,41 @@
       </div>
       <el-form label-width="100px">
         <el-row :gutter="20">
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="任务名称">
-              <el-input v-model="jobName" disabled></el-input>
+              <el-input style="width: 80%" v-model="jobName" disabled></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="备份软件">
-              <el-select v-model="basicInfo.backupSoftware" disabled style="width: 100%">
+              <el-select style="width: 80%" v-model="basicInfo.backupSoftware" disabled>
                 <el-option label="Veeam" value="Veeam"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="备份类型">
-              <el-input v-model="basicInfo.backupType" disabled></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="备份IP">
-              <el-input v-model="basicInfo.backupIp" disabled></el-input>
+              <el-input style="width: 80%" v-model="basicInfo.jobType" disabled></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="6">
-            <el-form-item label="Master IP">
-              <el-input v-model="basicInfo.masterIp" disabled></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="备份内容">
-              <el-input v-model="basicInfo.backupContent" disabled></el-input>
+              <el-input style="width: 80%" v-model="basicInfo.backupContent" disabled></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="环境">
-              <el-select v-model="basicInfo.env" disabled style="width: 100%">
+              <el-select style="width: 80%" v-model="basicInfo.env" disabled>
                 <el-option label="NetBackup" value="NetBackup"></el-option>
                 <el-option label="NetWorker" value="NetWorker"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="操作系统">
-              <el-select v-model="basicInfo.platform" disabled style="width: 100%">
+              <el-select style="width: 80%" v-model="basicInfo.platform" disabled>
                 <el-option label="Windows" value="Windows"></el-option>
                 <el-option label="Linux" value="Linux"></el-option>
                 <el-option label="MacOs" value="MacOs"></el-option>
@@ -152,69 +142,68 @@
 
     <!-- 备份策略 -->
     <div class="panel-container">
-          <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
-            <el-collapse-item :name="1">
-              <template slot="title">
-                <div style="font-size: 14px;">
-                  <i class="header-icon el-icon-location" style="color: red; margin-left: 15px"></i>
-                  <span style="font-family: 'Microsoft YaHei', sans-serif;">
-                    备份策略
-                  </span>
+      <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0">
+        <el-collapse-item :name="1">
+          <template slot="title">
+            <div style="font-size: 14px;">
+              <i class="header-icon el-icon-location" style="color: red; margin-left: 15px"></i>
+              <span style="font-family: 'Microsoft YaHei', sans-serif;">
+                备份策略
+              </span>
+            </div>
+          </template>
+          <div class="collapse-panel" id="jobDetail">
+            <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0" v-loading="jobDetailLoading">
+              <el-collapse-item :name="1">
+                <template slot="title">
+                  <div style="width: 100%">
+                    <span style="font-size: 14px; margin-left: 20px">
+                      <span style="font-family: 'Microsoft YaHei', sans-serif;">
+                        {{ jobName }}
+                      </span>
+                    </span>
+                    <span style="float: right; margin-right: 15px">
+                      <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">{{ backupStrategy.isScheduleEnabled ? '禁用' : '启用' }}备份</el-button>
+                      <el-button @click.stop="showStrategyDialog(true, 2)" type="danger" size="mini">删除</el-button>
+                    </span>
+                  </div>
+                </template>
+                <div class="collapse-panel">
+                  <div style="background-color: #f1f1f1; border-radius: 8px; padding: 15px 30px">
+                    <el-row style="padding: 0 10px">
+                      <el-button size="mini" type="primary" style="float: right" @click="showBackupOnceDialog(true)">一次性备份</el-button>
+                    </el-row>
+                    <el-form label-width="120px">
+                      <el-row>
+                        <el-col :span="8">
+                          <el-form-item label="备份服务器: ">
+                            {{ basicInfo.backupServer && basicInfo.backupServer.replace('http://', '').replace(':8888', '') }}
+                          </el-form-item>
+                        </el-col>
+                      </el-row>
+                      <v-m-detail v-if="basicInfo.jobType === 0" :backup-detail="backupStrategy"></v-m-detail>
+                      <agent-detail v-else-if="[12002, 12003].includes(basicInfo.jobType)" :backup-detail="backupStrategy"></agent-detail>
+                      <el-row>
+                        <el-col :span="8">
+                          <el-form-item label="备份时间: ">
+                            {{ backupStrategy.scheduleTime }}
+                          </el-form-item>
+                        </el-col>
+                        <el-col :span="8">
+                          <el-form-item label="备份计划类型: ">
+                            {{ backupStrategy.scheduleDateType }}
+                          </el-form-item>
+                        </el-col>
+                        <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'selectedDays') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
+                      </el-row>
+                    </el-form>
+                  </div>
                 </div>
-              </template>
-              <div class="collapse-panel" id="jobDetail">
-                <el-collapse :value="1" class="panel-container-raw" style="padding: 2px; border-bottom: 0" v-loading="jobDetailLoading">
-                  <el-collapse-item :name="1">
-                    <template slot="title">
-                      <div style="width: 100%">
-                        <span style="font-size: 14px; margin-left: 20px">
-                          <span style="font-family: 'Microsoft YaHei', sans-serif;">
-                            {{ jobName }}
-                          </span>
-                        </span>
-                        <span style="float: right; margin-right: 15px">
-                          <el-button @click.stop="showStrategyDialog(true, 1)" type="warning" size="mini">{{ backupStrategy.isScheduleEnabled ? '禁用' : '启用' }}备份</el-button>
-                          <el-button @click.stop="showStrategyDialog(true, 2)" type="danger" size="mini">删除</el-button>
-                        </span>
-                      </div>
-                    </template>
-                    <div class="collapse-panel">
-                      <div style="background-color: #f1f1f1; border-radius: 8px; padding: 15px 30px">
-                        <el-row style="padding: 0 10px">
-                          <el-button size="mini" type="primary" style="float: right" @click="showBackupOnceDialog(true)">一次性备份</el-button>
-                        </el-row>
-                        <el-form label-width="120px">
-                          <el-row>
-                            <el-col :span="8">
-                              <el-form-item label="备份服务器: ">
-                                {{ basicInfo.backupServer }}
-                              </el-form-item>
-                            </el-col>
-                          </el-row>
-                          <v-m-detail v-if="basicInfo.jobType === 0" :backup-detail="backupStrategy"></v-m-detail>
-                          <agent-detail v-else-if="[12002, 12003].includes(basicInfo.jobType)" :backup-detail="backupStrategy"></agent-detail>
-                          <el-row>
-                            <el-col :span="8">
-                              <el-form-item label="备份时间: ">
-                                {{ backupStrategy.scheduleTime }}
-                              </el-form-item>
-                            </el-col>
-                            <el-col :span="8">
-                              <el-form-item label="备份计划类型: ">
-                                {{ backupStrategy.scheduleDateType }}
-                              </el-form-item>
-                            </el-col>
-                            <el-col v-show="(backupStrategy.policy === 'Daily' && backupStrategy.scheduleDateType === 'selectedDays') || backupStrategy.policy === 'Monthly'" :span="8">备份日期: {{ backupStrategy.scheduleDay }}</el-col>
-                          </el-row>
-                        </el-form>
-                      </div>
-                    </div>
-                  </el-collapse-item>
-                </el-collapse>
-              </div>
-            </el-collapse-item>
-          </el-collapse>
-
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
     </div>
 
     <!-- 备份历史 -->

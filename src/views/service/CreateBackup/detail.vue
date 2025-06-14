@@ -15,7 +15,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="机器类型" prop="machineType" label-width="120px">
-              <el-select v-model="basicFormData.machineType" placeholder="请输入任务名称" :disabled="cascadeRule && cascadeRule['machineType'] !== undefined" :style="{width: '80%'}">
+              <el-select v-model="basicFormData.machineType" placeholder="请输入任务名称" :disabled="cascadeRule && cascadeRule['basic'] && cascadeRule['basic']['machineType'] !== undefined" :style="{width: '80%'}">
                 <el-option v-for="(item, index) in machineTypeOptions" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
@@ -36,7 +36,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="操作系统类型" prop="platform" label-width="120px">
-              <el-select v-model="basicFormData.platform" :style="{width: '80%'}" :disabled="cascadeRule && cascadeRule['platform'] !== undefined">
+              <el-select v-model="basicFormData.platform" :style="{width: '80%'}" :disabled="cascadeRule && cascadeRule['basic'] && cascadeRule['basic']['platform'] !== undefined">
                 <el-option v-for="(item, index) in platformOptions" :key="index" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
@@ -74,9 +74,10 @@
             </el-col>
           </el-row>
         </el-form>
-        <backup-vm ref="backupDetail" v-if="backupFormData.jobType === 0" :form-data="backupFormData"></backup-vm>
-        <backup-agent ref="backupDetail" v-else-if="[12002, 12003].includes(backupFormData.jobType)" :form-data="backupFormData"></backup-agent>
-        <backup-nas ref="backupDetail" v-else-if="[13000].includes(backupFormData.jobType)" :form-data="backupFormData"></backup-nas>
+        <backup-vm ref="backupDetail" v-if="backupFormData.backupServer && basicFormData.jobType === '0'" :form-data="backupFormData"></backup-vm>
+        <backup-agent ref="backupDetail" v-else-if="backupFormData.backupServer && ['12002', '12003'].includes(basicFormData.jobType)" :form-data="backupFormData"></backup-agent>
+        <backup-nas ref="backupDetail" v-else-if="backupFormData.backupServer && ['13000'].includes(basicFormData.jobType)" :form-data="backupFormData"></backup-nas>
+        <el-divider content-position="left">计划</el-divider>
         <el-form ref="scheduleForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px" :loading="true">
           <el-row>
             <el-col :span="8">
@@ -164,7 +165,7 @@ import { applyCreateBackup } from '../../../api/application/apply'
 import { CREATE_BACKUP, MACHINE_TYPE, COST_TYPE, DATA_CENTER } from '@/views/common/config'
 import { deepClone } from "@/utils";
 import { parseTime } from "@/utils/ruoyi"
-import BackupVM from './module/vm'
+import BackupVm from './module/vm'
 import BackupAgent from './module/agent'
 import BackupNAS from './module/nas'
 
@@ -254,14 +255,27 @@ const scheduleDayOptions = [
   {label: 'Saturday', value: 'Saturday'},
   {label: 'Sunday', value: 'Sunday'}]
 
-const cascadeRule = { MySQL: {}, VMware: {machineType: 'vm', platform: 'Windows'}}
+const cascadeRule =
+  { 0: {
+      basic: { machineType: 'vm', platform: 'Windows' },
+    },
+    12002: {
+      backup: {
+        Type: 'Workstation',
+      }
+    },
+    12003: {
+      backup: {
+        Type: 'Server',
+      }
+    }
+ }
 
 export default {
   name: "detail",
   data: function () {
     return {
       rules,
-      platformRules,
       backupRules,
       otherRules,
       backupSoftwareOptions,
@@ -326,7 +340,7 @@ export default {
     }
   },
   components: {
-    BackupVM,
+    BackupVm,
     BackupAgent,
     BackupNAS
   },
@@ -407,12 +421,25 @@ export default {
       this.basicFormData.platform = undefined
       this.basicFormData.env = undefined
       this.basicFormData.backupSoftware = undefined
-      const rule = cascadeRule[e]
-      if (rule) {
-        for(const k in rule) {
-          this.basicFormData[k] = rule[k]
+      this.$refs.backupDetail && this.$refs.backupDetail.setValues({Type: undefined})
+      this.$nextTick(() => {
+        const rule = cascadeRule[e]
+        if (rule) {
+          const basic = rule['basic']
+          if (basic) {
+            for(const k in basic) {
+              this.basicFormData[k] = basic[k]
+            }
+          }
+          const backup = rule['backup']
+          if (backup) {
+            for(const k in backup) {
+              this.backupFormData[k] = backup[k]
+            }
+            this.$refs.backupDetail && this.$refs.backupDetail.setValues(backup)
+          }
         }
-      }
+      })
     },
     onVCChange(e) {
       this.backupFormData.vmObjects = []

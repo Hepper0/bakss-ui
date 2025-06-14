@@ -99,6 +99,9 @@ export default {
       return new Promise((resolve, reject) => {
         if (state.jobType === undefined) {
           getDicts('job_type').then(resp => {
+            if (resp.data) {
+              resp.data = resp.data.filter(t => ['0', '65', '12002', '12003', '12100', '13000'].includes(t.dictValue))
+            }
             commit('SET_JOB_TYPE', resp.data)
             resolve(resp.data)
           }).catch(e => reject(e))

@@ -1,5 +1,6 @@
 <template>
   <el-form ref="backupForm" :model="formData" :rules="rules" size="medium" label-width="120px">
+    <el-divider content-position="left">表单</el-divider>
     <el-row>
       <el-col :span="8">
         <el-form-item id="repository" label="仓库" prop="repository">
@@ -55,9 +56,10 @@ const rules = {
   }
 
 export default {
-  name: "BackupVM",
+  name: "BackupVm",
   data: function () {
     return {
+      rules,
       repositoryLoading: false,
       vcLoading: false,
       vmLoading: false,
@@ -124,6 +126,12 @@ export default {
       this.formData.vmObjects = undefined
       this.getVCList()
       this.getRepositoryList()
+    },
+    setValues(values) {
+      for(const k in values) {
+        this.formData[k] = values[k]
+      }
+      this.$forceUpdate()
     }
   }
 }

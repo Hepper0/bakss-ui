@@ -85,7 +85,7 @@
       </el-collapse-item>
     </el-collapse>
     <el-row style="width: 100%;text-align: center; margin: 10px 0">
-      <el-button @click="next" :disabled="count !== 0" style="width: 300px">申请 <span v-show="count !== 0">{{ ` (${count})`}}</span></el-button>
+      <el-button @click="next" :disabled="!(count === 0 && checked)" style="width: 300px">申请 <span v-show="count !== 0">{{ ` (${count})`}}</span></el-button>
     </el-row>
     <el-row style="width: 100%; display: flex; justify-content: center">
       <div v-show="false" class="circle">{{ count }}</div>
