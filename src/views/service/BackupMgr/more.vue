@@ -109,7 +109,9 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="备份类型">
-              <el-input style="width: 80%" v-model="basicInfo.jobType" disabled></el-input>
+              <el-select style="width: 80%" v-model="jobType" disabled>
+                <el-option v-for="(item, index) in jobTypeOptions" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -122,8 +124,8 @@
           <el-col :span="8">
             <el-form-item label="环境">
               <el-select style="width: 80%" v-model="basicInfo.env" disabled>
-                <el-option label="NetBackup" value="NetBackup"></el-option>
-                <el-option label="NetWorker" value="NetWorker"></el-option>
+                <el-option label="生产" value="prod"></el-option>
+                <el-option label="非生产" value="dev"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -181,8 +183,10 @@
                           </el-form-item>
                         </el-col>
                       </el-row>
+                      <!--          任务表单            -->
                       <v-m-detail v-if="basicInfo.jobType === 0" :backup-detail="backupStrategy"></v-m-detail>
                       <agent-detail v-else-if="[12002, 12003].includes(basicInfo.jobType)" :backup-detail="backupStrategy"></agent-detail>
+                      <n-a-s-detail v-else-if="[13000].includes(basicInfo.jobType)" :backup-detail="backupStrategy"></n-a-s-detail>
                       <el-row>
                         <el-col :span="8">
                           <el-form-item label="备份时间: ">
@@ -298,11 +302,12 @@
 import { applyStrategy, applyBackup } from '../../../api/application/apply'
 import { getBackup } from '../../../api/service/backup'
 import { listSession } from '../../../api/veeam/session'
-import { getJobDetail, getAgentJobDetail } from '../../../api/veeam/job'
+import { getJobDetail, getAgentJobDetail, getNasJobDetail, getObjectStorageJobDetail, getBackupCopyJobDetail } from '../../../api/veeam/job'
 import { JOB_TYPE } from "../../common/config";
 import Session from "@/views/application/modules/job/session";
 import VMDetail from "./module/vm";
 import AgentDetail from "./module/agent";
+import NASDetail from "./module/nas";
 
 const BACKUP_EXEC_RIGHT_NOW = 1
 const BACKUP_EXEC_AT_TIME = 2
@@ -337,7 +342,7 @@ const JOB_RESULT = {
 
 export default {
   name: "more",
-  components: {AgentDetail, VMDetail, Session},
+  components: {NASDetail, AgentDetail, VMDetail, Session},
   data() {
     return {
       JOB_TYPE,
@@ -403,32 +408,49 @@ export default {
     jobName: function () {
       return this.basicInfo.appName
     },
+    jobType: function () {
+      return this.basicInfo.jobType + ''
+    },
     server: function () {
       return this.basicInfo.backupServer
     },
+    // jobTypeOptions: function () {
+    //   const jobTypeList = []
+    //   for(const k in JOB_TYPE) {
+    //     const jobType = { label: JOB_TYPE[k], value: k }
+    //     jobTypeList.push(jobType)
+    //   }
+    //   return jobTypeList
+    // }
     jobTypeOptions: function () {
-      const jobTypeList = []
-      for(const k in JOB_TYPE) {
-        const jobType = { label: JOB_TYPE[k], value: k }
-        jobTypeList.push(jobType)
-      }
-      return jobTypeList
+      return this.getConfig('jobType')
     }
   },
   watch: {
     jobName: function (val) {
       if (val !== undefined) {
-        if (this.basicInfo.jobType) {
+        if (this.basicInfo.jobType !== undefined) {
           switch (this.basicInfo.jobType) {
             case 0:
               this.getJobDetail()
               break
+            case 65:
+              this.getBackupCopyJobDetail()
+              break
             case 12002:
             case 12003:
               this.getAgentJobDetail()
+              break
+            case 13000: {
+              if (this.basicInfo.jobSourceType === 3) {
+                this.getNasJobDetail()
+              } else if (this.basicInfo.jobSourceType === 7) {
+                this.getObjectStorageJobDetail()
+              }
+              break
+            }
           }
         }
-
         this.getBackupHistory()
       }
     }
@@ -536,6 +558,33 @@ export default {
         this.backupStrategy = jobInfo
       }).catch(e => this.jobDetailLoading = false)
     },
+    getNasJobDetail() {
+      this.jobDetailLoading = true
+      getNasJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
+        this.jobDetailLoading = false
+        const jobInfo = resp.data
+        this.setSchedule(jobInfo)
+        this.backupStrategy = jobInfo
+      }).catch(e => this.jobDetailLoading = false)
+    },
+    getObjectStorageJobDetail() {
+      this.jobDetailLoading = true
+      getObjectStorageJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
+        this.jobDetailLoading = false
+        const jobInfo = resp.data
+        this.setSchedule(jobInfo)
+        this.backupStrategy = jobInfo
+      }).catch(e => this.jobDetailLoading = false)
+    },
+    getBackupCopyJobDetail() {
+      this.jobDetailLoading = true
+      getBackupCopyJobDetail(this.jobName, this.basicInfo.backupServer).then(resp => {
+        this.jobDetailLoading = false
+        const jobInfo = resp.data
+        this.setSchedule(jobInfo)
+        this.backupStrategy = jobInfo
+      }).catch(e => this.jobDetailLoading = false)
+    },
     setSchedule(jobInfo) {
       const schedule = jobInfo['schedule']
       if (schedule) {
@@ -566,6 +615,11 @@ export default {
       this.sessionDetailVisible = true
       this.$nextTick(() => {
         this.sessionDetailSessionId = sessionId
+      })
+    },
+    getConfig(type) {
+      return this.$store.getters[type] && this.$store.getters[type].map(r => {
+        return { label: r.dictLabel, value: r.dictValue }
       })
     }
   }

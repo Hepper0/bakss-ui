@@ -1,6 +1,6 @@
 <template>
   <el-form ref="backupForm" :model="formData" :rules="rules" size="medium" label-width="120px">
-    <el-divider content-position="left">表单</el-divider>
+    <el-divider content-position="left">对象</el-divider>
     <el-row>
       <el-col :span="8">
         <el-form-item id="repository" label="仓库" prop="repository">
@@ -64,9 +64,9 @@ export default {
       vcLoading: false,
       vmLoading: false,
       vmCache: {},
-      repositoryOptions: [],
-      vcOptions: [],
-      vmObjectsOptions: []
+      repositoryOptions:  [{ label: '仓库1', value: 'repository1'}, { label: '仓库2', value: 'repository2'},],
+      vcOptions: [{ label: 'vc1', value:'vc1' }, { label: 'vc2', value:'vc2' }],
+      vmObjectsOptions: [{ label: '虚机1', value: 'vm1'}, { label: '虚机2', value: 'vm2'}, { label: '虚机3', value: 'vm3'},]
     }
   },
   props: {
@@ -81,9 +81,9 @@ export default {
     getRepositoryList() {
       this.repositoryLoading = true
       listRepository(1, 100, this.formData.backupServer).then(resp => {
+        this.repositoryLoading = false
         this.repositoryDataList = resp.data
         this.repositoryOptions = this.repositoryDataList.map(r => {
-          this.repositoryLoading = false
           return { label: r.name, value: r.name }
         })
       }).finally(() => this.repositoryLoading = false)
@@ -132,6 +132,9 @@ export default {
         this.formData[k] = values[k]
       }
       this.$forceUpdate()
+    },
+    validate() {
+      return this.$refs['backupForm'].validate()
     }
   }
 }

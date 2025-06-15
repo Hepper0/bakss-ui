@@ -102,3 +102,37 @@ export function getAgentJobDetail(name, server) {
     }
   })
 }
+
+export function getNasJobDetail(name, server) {
+  return request({
+    url: '/veeam/nasJob/detail',
+    method: 'get',
+    params: { name },
+    headers: {
+      server
+    }
+  })
+}
+
+
+export function getObjectStorageJobDetail(name, server) {
+  return request({
+    url: '/veeam/objectStorageJob/detail',
+    method: 'get',
+    params: { name },
+    headers: {
+      server
+    }
+  })
+}
+
+export function getBackupCopyJobDetail(name, server) {
+  return request({
+    url: '/veeam/backupCopyJob/detail',
+    method: 'get',
+    params: { name },
+    headers: {
+      server
+    }
+  })
+}

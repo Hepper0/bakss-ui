@@ -25,7 +25,7 @@ import BackupPermission from './modules/BackupPermission'
 import CreateBackup from './modules/CreateBackup'
 import CreateRestore from './modules/CreateRestore'
 import ModifyDirectory from './modules/ModifyDirectory'
-import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY, APPLY_TYPE } from '@/views/common/config'
+import { TYPE_STRATEGY,TYPE_BACKUP_ONCE,TYPE_BACKUP_PERMISSION,TYPE_CREATE_BACKUP,TYPE_CREATE_RESTORE,TYPE_MODIFY_DIRECTORY } from '@/views/common/config'
 import { cancelApplication } from '@/api/application/apply'
 import { getApplication } from '@/api/application/application'
 

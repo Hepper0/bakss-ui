@@ -86,7 +86,7 @@ import PanelGroup from './dashboard/PanelGroup'
 import { listApplication } from "@/api/application/application"
 import { getAllTaskList, getTodoTaskList } from "@/api/task"
 import { myBackup } from "@/api/service/backup"
-import { TASK_STATUS_DICT, APPLY_TYPE, REVIEW_STATUS_DICT } from "./common/config"
+import { TASK_STATUS_DICT, REVIEW_STATUS_DICT } from "./common/config"
 
 const recordLimit = 10
 
@@ -99,7 +99,6 @@ export default {
   data() {
     return {
       TASK_STATUS_DICT,
-      APPLY_TYPE,
       REVIEW_STATUS_DICT,
       recentApplications: [],
       recentTask: [],
@@ -107,6 +106,11 @@ export default {
       pendingCount: 0,
       clientCount: 0,
       taskCount: 0
+    }
+  },
+  computed: {
+    APPLY_TYPE: function () {
+      return this.$store.getters['applicationType'] && this.$store.getters['applicationType'].map(r => r.dictLabel)
     }
   },
   mounted() {

@@ -1,6 +1,6 @@
 <template>
-  <el-form ref="backupForm" :model="formData" :rules="rules" size="medium" label-width="120px">
-    <el-divider content-position="left">表单</el-divider>
+  <el-form ref="agentBackupForm" :model="formData" :rules="rules" size="medium" label-width="120px">
+    <el-divider content-position="left">对象</el-divider>
     <el-row>
       <el-col :span="8">
         <el-form-item label="Type" prop="Type">
@@ -11,7 +11,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item id="Mode" label="Mode" prop="Mode">
+        <el-form-item label="Mode" prop="Mode">
           <el-select v-model="formData.Mode" placeholder="请选择" :style="{width: '80%'}">
             <el-option v-for="(item, index) in modeOptions" :key="index" :label="item.label"
                        :value="item.value"></el-option>
@@ -20,7 +20,7 @@
       </el-col>
       <el-col :span="8">
         <el-form-item label="OSPlatform" prop="OSPlatform">
-          <el-select v-model="formData.OSPlatform" placeholder="请选择仓库" :style="{width: '80%'}" >
+          <el-select v-model="formData.OSPlatform" placeholder="请选择仓库" :style="{width: '80%'}">
             <el-option v-for="(item, index) in platformOptions" :key="index" :label="item.label"
                        :value="item.value"></el-option>
           </el-select>
@@ -31,7 +31,7 @@
       <el-col :span="8">
         <el-form-item label="BackupType" prop="BackupType">
           <el-select v-model="formData.BackupType" placeholder="请选择"
-                     :style="{width: '80%'}" >
+                     :style="{width: '80%'}">
             <el-option v-for="(item, index) in backupTypeOptions" :key="index" :label="item.label"
                        :value="item.value"></el-option>
           </el-select>
@@ -104,8 +104,8 @@ export default {
       rules,
       repositoryLoading: false,
       pgLoading: false,
-      repositoryOptions: [],
-      pgObjectsOptions: [],
+      repositoryOptions: [{ label: '仓库1', value: 'repository1'},],
+      pgObjectsOptions: [{ label: 'pg', value: 'pg'},],
       typeOptions: [],
       modeOptions: [],
       backupTypeOptions: []
@@ -121,7 +121,8 @@ export default {
           Type: undefined,
           Server: undefined,
           Mode: undefined,
-          OSPlatform: undefined
+          OSPlatform: undefined,
+          repository: undefined
         }
       }
     }
@@ -162,7 +163,7 @@ export default {
       }).finally(() => this.repositoryLoading = false)
     },
     getPgObjects() {
-      this.vcLoading = true
+      this.pgLoading = true
       listProtestGroup(1, 100, this.formData.backupServer).then(resp => {
         this.pgLoading = false
         this.pgObjectsOptions = resp.data.map(r => {
@@ -179,10 +180,11 @@ export default {
     refresh() {
       this.formData.pgObjects = []
       this.formData.BackupType = undefined
-      this.formData.Type = undefined
+      // this.formData.Type = undefined
       this.formData.Server = undefined
       this.formData.Mode = undefined
       this.formData.OSPlatform = undefined
+      this.formData.repository = undefined
       this.getPgObjects()
       this.getRepositoryList()
     },
@@ -195,6 +197,12 @@ export default {
       for(const k in values) {
         this.formData[k] = values[k]
       }
+      this.$forceUpdate()
+    },
+    validate() {
+      return this.$refs['agentBackupForm'].validate()
+    },
+    update() {
       this.$forceUpdate()
     }
   }

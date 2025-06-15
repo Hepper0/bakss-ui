@@ -28,7 +28,7 @@
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
           <el-table-column prop="appType" label="申请类型">
             <template v-slot="{ row }">
-              <span>{{ APPLY_TYPE[row.appType] }}</span>
+              <span>{{ applicationTypeOptions[row.appType] }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="appUser" label="申请人"></el-table-column>
@@ -66,7 +66,7 @@
 
 <script>
 import { listApplication } from '@/api/application/application'
-import { APPLY_TYPE, CANCEL_APPLICATION, getComponentType } from '@/views/common/config'
+import { CANCEL_APPLICATION, getComponentType } from '@/views/common/config'
 
 const reviewStatus = ['待审批', '审批同意', '审批不同意']
 const reviewColor = ['#ffba00', '#42d885', '#ff4949']
@@ -80,7 +80,6 @@ export default {
       reviewStatus,
       reviewColor,
       CANCEL_APPLICATION,
-      APPLY_TYPE,
       backupStatus,
       backupColor,
       column: undefined,
@@ -100,6 +99,9 @@ export default {
     user: function () {
       return this.$store.getters.user
     },
+    applicationTypeOptions: function () {
+      return this.getConfig('applicationType')
+    }
   },
   mounted() {
     this.getList()
@@ -127,6 +129,9 @@ export default {
     },
     reset() {
       this.data = undefined
+    },
+    getConfig(type) {
+      return this.$store.getters[type] && this.$store.getters[type].map(r => r.dictLabel)
     }
   }
 };

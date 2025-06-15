@@ -12,12 +12,12 @@
     </el-col>
     <el-col :span="8">
       <el-form-item label="OSPlatform: ">
-        {{ backupDetail.OSPlatform }}
+        {{ backupDetail.osplatform || backupDetail.OSPlatform }}
       </el-form-item>
     </el-col>
     <el-col :span="8">
       <el-form-item label="BackupType: ">
-        {{ backupDetail.BackupType }}
+        {{ backupDetail.backupType }}
       </el-form-item>
     </el-col>
     <el-col :span="8">

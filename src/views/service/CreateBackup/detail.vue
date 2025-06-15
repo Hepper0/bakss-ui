@@ -59,17 +59,17 @@
         <el-form ref="backupInfoForm" :model="backupFormData" :rules="backupRules" size="medium" label-width="120px" :loading="true">
           <el-row>
             <el-col :span="8">
-              <el-form-item label="任务名称" prop="appName">
-                <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '80%'}">
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
               <el-form-item label="Veeam Server" prop="backupServer">
                 <el-select v-model="backupFormData.backupServer" placeholder="请选择" :style="{width: '80%'}" @change="onServerChange">
                   <el-option v-for="(item, index) in veeamServerOptions" :key="index" :label="item.label"
                              :value="item.value"></el-option>
                 </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="任务名称" prop="appName">
+                <el-input v-model="backupFormData.appName" placeholder="请输入" :style="{width: '80%'}">
+                </el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -260,11 +260,13 @@ const cascadeRule =
       basic: { machineType: 'vm', platform: 'Windows' },
     },
     12002: {
+      basic: { machineType: 'physical' },
       backup: {
         Type: 'Workstation',
       }
     },
     12003: {
+      basic: { machineType: 'physical' },
       backup: {
         Type: 'Server',
       }
@@ -305,10 +307,6 @@ export default {
         platform: undefined,
         env: undefined
       },
-      platformFormData: {
-        backupIP: undefined,
-        backupPort: 22
-      },
       backupFormData: {
         appName: undefined,
         backupServer: undefined,
@@ -318,7 +316,11 @@ export default {
         description: undefined,
         scheduleTime: '22:00',
         scheduleDateType: 'everyday',
-        scheduleDay: undefined
+        scheduleDay: undefined,
+        Type: undefined,
+        Mode: undefined,
+        BackupType: undefined,
+        OSPlatform: undefined
       },
       otherFormData: {
         costType: undefined,
@@ -381,7 +383,10 @@ export default {
   },
   methods: {
     submitForm() {
-      const validateList = [this.$refs['basicForm'].validate(), this.$refs['platformForm'].validate(), this.$refs['backupForm'].validate(), this.$refs['otherForm'].validate()]
+      const validateList = [this.$refs['basicForm'].validate(), this.$refs['backupInfoForm'].validate(), this.$refs['otherForm'].validate()]
+      if (this.$refs['backupDetail']) {
+        validateList.push(this.$refs['backupDetail'].validate())
+      }
       Promise.all(validateList).then(validates => {
         for (const v of validates) {
           if (!v) return
@@ -390,11 +395,16 @@ export default {
           appType: CREATE_BACKUP
         }
         Object.assign(data, this.basicFormData)
-        Object.assign(data, this.platformFormData)
         Object.assign(data, this.backupFormData)
         Object.assign(data, this.otherFormData)
         const backupInfo = deepClone(this.backupFormData)
-        backupInfo.vmObjects = backupInfo.vmObjects.toString()
+        if (backupInfo.vmObjects) {
+          backupInfo.vmObjects = backupInfo.vmObjects.toString()
+        }
+        if (backupInfo.pgObjects) {
+          backupInfo.pgObjects = backupInfo.pgObjects.toString()
+        }
+
         data['backupInfo'] = backupInfo
         // 备份计划是通用的放在外层
         if (data.scheduleDateType === 'selectedDays' && data.scheduleDay) {
@@ -421,6 +431,7 @@ export default {
       this.basicFormData.platform = undefined
       this.basicFormData.env = undefined
       this.basicFormData.backupSoftware = undefined
+      // this.$refs.backupDetail && this.$refs.backupDetail.refresh()
       this.$refs.backupDetail && this.$refs.backupDetail.setValues({Type: undefined})
       this.$nextTick(() => {
         const rule = cascadeRule[e]
@@ -441,54 +452,10 @@ export default {
         }
       })
     },
-    onVCChange(e) {
-      this.backupFormData.vmObjects = []
-      this.getVMList(e)
-    },
     onServerChange() {
-      this.backupFormData.vCenter = undefined
-      this.backupFormData.repository = undefined
-      this.backupFormData.vmObjects = undefined
-      this.getVCList()
-      this.getRepositoryList()
-    },
-    getRepositoryList() {
-      this.repositoryLoading = true
-      listRepository(1, 100, this.backupFormData.backupServer).then(resp => {
-        this.repositoryDataList = resp.data
-        this.repositoryOptions = this.repositoryDataList.map(r => {
-          this.repositoryLoading = false
-          return { label: r.name, value: r.name }
-        })
-      }).catch(e => this.repositoryLoading = false)
-    },
-    getVCList() {
-      this.vcLoading = true
-      listHost(1, 100, this.backupFormData.backupServer).then(resp => {
-        this.vcLoading = false
-        let vcList = resp.data.filter(r => r.type === 1)
-        if (vcList.length === 0) {
-          vcList = resp.data.filter(r => r.type === 6)
-        }
-        this.vcOptions = vcList.map(r => {
-          return { label: r.name, value: r.name }
-        })
-      }).catch(e => {
-        this.vcLoading = false
+      this.$nextTick(() => {
+        this.$refs.backupDetail && this.$refs.backupDetail.refresh()
       })
-    },
-    getVMList(name) {
-      this.vmLoading = true
-      if (this.vmCache[name]) return this.vmCache[name]
-      getHostEntity(name, 'HostAndVms', this.backupFormData.backupServer).then(resp => {
-        this.vmLoading = false
-        this.vmObjectsOptions = resp.data.filter(r => r.type === 'Vm').map(r => {
-          return { label: r.name, value: r.id }
-        })
-        if (this.vmCache[name] === undefined) {
-          this.vmCache[name] = this.vmObjectsOptions
-        }
-      }).catch(e => this.vmLoading = false)
     },
     getConfig(type) {
       return this.$store.getters[type] && this.$store.getters[type].map(r => {

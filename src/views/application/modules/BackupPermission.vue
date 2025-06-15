@@ -72,12 +72,6 @@ export default {
         }
       })
     })
-    // this.formData.id = this.$route.query.id
-    // getApplication(this.formData.id).then(resp => {
-    //   const data = resp.data
-    //   this.formData.appTypeZh = APPLY_TYPE[data.appType]
-    //   Object.assign(this.formData, data)
-    // })
   },
   methods: {
   }

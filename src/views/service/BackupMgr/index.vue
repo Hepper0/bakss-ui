@@ -80,25 +80,6 @@
             </el-form>
           </div>
         </el-card>
-        <el-card class="card-panel">
-          <div slot="header" class="clearfix">
-            <span>操作系统</span>
-          </div>
-          <div class="card-panel-content">
-            <el-form ref="platformForm" :model="platformFormData" :rules="platformRules" size="medium" label-width="120px">
-              <el-col :span="8">
-                <el-form-item label="备份IP" prop="backupIP">
-                  <el-input v-model="platformFormData.backupIP" placeholder="请输入" :style="{width: '80%'}"/>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="远程端口" prop="backupPort">
-                  <el-input v-model="platformFormData.backupPort" placeholder="请输入" :style="{width: '80%'}"/>
-                </el-form-item>
-              </el-col>
-            </el-form>
-          </div>
-        </el-card>
       </div>
       <span slot="footer" class="dialog-footer" style="display: flex; justify-content: right; border-top: 1px solid #f1f1f1; padding-top: 10px">
         <span v-if="selectedJob">
@@ -474,7 +455,7 @@ export default {
       listJob(null, 1, 0, this.selectedServer).then(resp => {
         this.remoteBackupLoading = false
         this.remoteJobList = resp.data
-      })
+      }).catch(e => this.remoteBackupLoading = false)
     },
     cancelSync() {
       this.syncBackupJobVisible = false
@@ -485,7 +466,7 @@ export default {
       this.syncBackupJob()
     },
     submitBackupJob() {
-      const validateList = [this.$refs['basicForm'].validate(), this.$refs['platformForm'].validate()]
+      const validateList = [this.$refs['basicForm'].validate()]
       Promise.all(validateList).then(validates => {
         for (const v of validates) {
           if (!v) return
@@ -493,6 +474,8 @@ export default {
         let data = deepClone(this.basicFormData)
         data = Object.assign(data, this.platformFormData)
         data.appName = this.selectedJob.name
+        data.jobType = this.selectedJob.type
+        data.jobSourceType = this.selectedJob.jobSourceType
         data.backupJobKey = this.selectedJob.name
         data.backupServer = this.selectedServer
         if (this.selectedServer === undefined) {

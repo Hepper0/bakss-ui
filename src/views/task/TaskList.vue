@@ -70,7 +70,6 @@ export default {
   name: "TaskList",
   data: function () {
     return {
-      APPLY_TYPE,
       TASK_STATUS_DICT,
       conditionType: undefined,
       conditionValue: undefined,
@@ -93,6 +92,9 @@ export default {
     },
     tableData: function () {
       return this.taskList.slice((this.pageNum - 1) * this.pageSize, this.pageNum *this.pageSize)
+    },
+    APPLY_TYPE: function () {
+      return this.$store.getters['applicationType'] && this.$store.getters['applicationType'].map(r => r.dictLabel)
     }
   },
   props: {

@@ -5,7 +5,6 @@
 
 <script>
 import { getApplication, getCreateBackupApplication } from '@/api/application/application'
-import { APPLY_TYPE } from '@/views/common/config'
 import VMIndex from "./ApplyDetail/VMIndex"
 
 export default {
@@ -15,6 +14,7 @@ export default {
       formData: {
         id: undefined,
         backupContent: undefined,
+        jobType: undefined,
         machineType: undefined,
         dataCenter: undefined,
         backupSoftware: undefined,

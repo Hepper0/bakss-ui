@@ -8,7 +8,7 @@
         <el-table :data="backupList" size="small">
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
           <el-table-column prop="clientName" label="客户端名称"></el-table-column>
-          <el-table-column prop="backupContent" label="备份内容"></el-table-column>
+          <el-table-column prop="jobTypeZh" label="备份类型"></el-table-column>
           <el-table-column prop="appName" label="应用名称"></el-table-column>
           <el-table-column prop="backupIP" label="备份IP"></el-table-column>
           <el-table-column prop="platform" label="操作系统类型" />
@@ -124,6 +124,9 @@ export default {
     },
     tableData: function () {
       return this.backupList.slice((this.pageNum - 1) * this.pageSize, this.pageNum * this.pageSize)
+    },
+    jobTypeOptions: function () {
+      return this.getConfig('jobType')
     }
   },
   mounted() {
@@ -164,6 +167,12 @@ export default {
       let params = ids.map(id => 'ids='+id).join('&')
       listBackupByIds(params).then(resp => {
         this.backupList = resp.rows
+        this.backupList.forEach((r => {
+          const t = this.jobTypeOptions.find(j => parseInt(j.value) === r.jobType)
+          if (t) {
+            r.jobTypeZh = t.label
+          }
+        }))
         this.total = resp.total
         // this.pageSize = this.total
       })
@@ -173,6 +182,11 @@ export default {
     },
     getList() {
 
+    },
+    getConfig(type) {
+      return this.$store.getters[type] && this.$store.getters[type].map(r => {
+        return { label: r.dictLabel, value: r.dictValue }
+      })
     }
   }
 }

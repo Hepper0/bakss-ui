@@ -9,8 +9,8 @@
         <el-input size="small" disabled v-model="data.appType" class="form-item"></el-input>
       </el-col>
       <el-col :span="6">
-        <div class="form-item">备份内容</div>
-        <el-input size="small" disabled v-model="data.backupContent" class="form-item"></el-input>
+        <div class="form-item">备份类型</div>
+        <el-input size="small" disabled v-model="data.jobTypeZh" class="form-item"></el-input>
       </el-col>
       <el-col :span="6">
         <div class="form-item">机器类型</div>
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { MACHINE_TYPE, COST_TYPE, DATA_CENTER, APPLY_TYPE } from '@/views/common/config'
+import { MACHINE_TYPE, COST_TYPE, DATA_CENTER } from '@/views/common/config'
 import { deepClone } from "../../../../utils";
 
 const scheduleDateTypeOptions = {'everyday': 'EveryDay', 'weekdays': 'On Weekdays', 'selectedDays': 'On these days'}
@@ -76,6 +76,7 @@ export default {
       type: Object,
       default: function () {
         return {
+          jobType: undefined,
           backupContent: undefined,
           machineType: undefined,
           dataCenter: undefined,
@@ -99,8 +100,26 @@ export default {
       data.dataCenter = DATA_CENTER[data.dataCenter]
       data.costType = COST_TYPE[data.costType]
       data.scheduleDateType = scheduleDateTypeOptions[data.scheduleDateType]
-      data.appType = APPLY_TYPE[data.appType]
+      data.appType = this.APPLY_TYPE[data.appType]
+      console.log('jobTypeOptions', this.jobTypeOptions)
+      const t = this.jobTypeOptions.find(j => parseInt(j.value) === data.jobType)
+      if (t) {
+        data.jobTypeZh = t.label
+      }
       return data
+    },
+    jobTypeOptions: function () {
+      return this.getConfig('jobType')
+    },
+    APPLY_TYPE: function () {
+      return this.$store.getters['applicationType'] && this.$store.getters['applicationType'].map(r => r.dictLabel)
+    }
+  },
+  methods: {
+    getConfig(type) {
+      return this.$store.getters[type] && this.$store.getters[type].map(r => {
+        return { label: r.dictLabel, value: r.dictValue }
+      })
     }
   }
 }
