@@ -48,7 +48,7 @@
       </el-col>
       <el-col :span="8">
         <el-form-item id="repository" label="仓库" prop="repository">
-          <el-select v-model="formData.repository" placeholder="请选择仓库" :style="{width: '80%'}" :loading="repositoryLoading">
+          <el-select v-model="formData.backupRepositoryName" placeholder="请选择仓库" :style="{width: '80%'}" :loading="repositoryLoading">
             <el-option v-for="(item, index) in repositoryOptions" :key="index" :label="item.label"
                        :value="item.value"></el-option>
           </el-select>
@@ -122,7 +122,7 @@ export default {
           Server: undefined,
           Mode: undefined,
           OSPlatform: undefined,
-          repository: undefined
+          backupRepositoryName: undefined
         }
       }
     }
@@ -184,7 +184,7 @@ export default {
       this.formData.Server = undefined
       this.formData.Mode = undefined
       this.formData.OSPlatform = undefined
-      this.formData.repository = undefined
+      this.formData.backupRepositoryName = undefined
       this.getPgObjects()
       this.getRepositoryList()
     },

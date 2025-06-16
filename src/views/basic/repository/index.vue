@@ -178,7 +178,7 @@
 </template>
 
 <script>
-import { listRepository, getRepositoryDetail, deleteRepository } from "@/api/veeam/repo";
+import { listRepository, getRepositoryDetail, deleteRepository } from "../../../api/veeam/repo";
 import { listConfig } from "@/api/veeam/basic"
 
 export default {
@@ -241,7 +241,7 @@ export default {
     getList() {
       this.loading = true;
       listRepository(1, 0, this.queryParams.server).then(response => {
-        this.repositoryList = response.rows;
+        this.repositoryList = response.data;
         this.total = response.total;
         this.loading = false;
       });
