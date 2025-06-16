@@ -93,7 +93,7 @@
       <!-- 搜索栏 -->
       <el-row :gutter="10">
         <el-col :span="10">
-          <query-condition @update="(params) => this.queryParams = params"/>
+          <query-condition :hidden-columns="['appType']" @update="(params) => this.queryParams = params"/>
 <!--          <el-select style="width: 30%;margin-right: 15px" size="mini" clearable v-model="queryParams.backupSoftware" placeholder="请选择">-->
 <!--            <el-option label="ID" value="ID"></el-option>-->
 <!--            <el-option label="NetWorker" value="NetWorker"></el-option>-->
@@ -115,12 +115,17 @@
       <div class="panel-table-wrapper" style="background-color: #f1f1f1">
         <el-table v-loading="loading" size="small" :data="tableData" @selection-change="handleSelectionChange" stripe>
           <el-table-column type="selection" width="45"></el-table-column>
+          <el-table-column prop="id" label="ID" show-overflow-tooltip></el-table-column>
           <el-table-column prop="backupSoftware" label="备份软件"></el-table-column>
-<!--          <el-table-column prop="softwareVersion" label="软件版本"></el-table-column>-->
+          <el-table-column prop="jobType" label="任务类型">
+            <template v-slot="{ row }">
+              {{ jobTypeMap[row.jobType] }}
+            </template>
+          </el-table-column>
           <el-table-column prop="appName" label="任务名"></el-table-column>
           <el-table-column prop="backupContent" label="备份内容"></el-table-column>
           <el-table-column prop="vCenter" label="VCenter主机名"></el-table-column>
-          <el-table-column prop="backupIP" label="备份IP"></el-table-column>
+<!--          <el-table-column prop="backupIP" label="备份IP"></el-table-column>-->
 <!--          <el-table-column prop="appName" label="应用名称"></el-table-column>-->
           <el-table-column prop="platform" label="操作系统类型"></el-table-column>
           <el-table-column prop="owner" label="负责人"></el-table-column>
@@ -367,6 +372,13 @@ export default {
     cascadeRule: function () {
       return cascadeRule[this.basicFormData.backupContent]
     },
+    jobTypeMap: function () {
+      const jobTypeMap = {}
+      this.$store.getters['jobType'] && this.$store.getters['jobType'].forEach(r => {
+        jobTypeMap[r.dictValue] = r.dictLabel
+      })
+      return jobTypeMap
+    }
   },
   mounted() {
     this.getList()

@@ -2,7 +2,7 @@
   <span>
     <el-col :span="22">
       <el-row v-for="c in conditionList" style="display: flex;">
-        <condition v-show="c.valid" style="width: 93%" @update="onConditionChange($event, c)"/>
+        <condition :hidden-columns="hiddenColumns" v-show="c.valid" style="width: 93%" @update="onConditionChange($event, c)"/>
          <el-button
            v-show="c.id !== 0 && c.valid"
            style="width: 5%"
@@ -46,11 +46,18 @@ export default {
       }
     }
   },
+  props: {
+    hiddenColumns: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    }
+  },
   methods: {
     append() {
       this.conditionList.push({ id: this.idx, type: undefined, value: undefined, valid: true })
       this.idx++
-      console.log('condition list', this.conditionList)
     },
     remove(id) {
       console.log('remove', id)
