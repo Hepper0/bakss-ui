@@ -406,6 +406,9 @@ export default {
         if (backupInfo.pgObjects) {
           backupInfo.pgObjects = backupInfo.pgObjects.toString()
         }
+        if (backupInfo.paths) {
+          backupInfo.paths = backupInfo.paths.toString()
+        }
 
         data['backupInfo'] = backupInfo
         // 备份计划是通用的放在外层
