@@ -167,7 +167,7 @@ import { deepClone } from "@/utils";
 import { parseTime } from "@/utils/ruoyi"
 import BackupVm from './module/vm'
 import BackupAgent from './module/agent'
-import BackupNAS from './module/nas'
+import BackupNas from './module/nas'
 
 
 const rules = {
@@ -313,7 +313,6 @@ export default {
         backupServer: undefined,
         vCenter: undefined,
         vmObjects: [],
-        backupRepositoryName: undefined,
         repository: undefined,
         description: undefined,
         scheduleTime: '22:00',
@@ -346,7 +345,7 @@ export default {
   components: {
     BackupVm,
     BackupAgent,
-    BackupNAS
+    BackupNas
   },
   computed: {
     cascadeRule: function () {
@@ -386,13 +385,14 @@ export default {
   methods: {
     submitForm() {
       const validateList = [this.$refs['basicForm'].validate(), this.$refs['backupInfoForm'].validate(), this.$refs['otherForm'].validate()]
-      if (this.$refs['backupDetail']) {
-        validateList.push(this.$refs['backupDetail'].validate())
-      }
+      // if (this.$refs['backupDetail']) {
+      //   validateList.push(this.$refs['backupDetail'].validate())
+      // }
       Promise.all(validateList).then(validates => {
         for (const v of validates) {
           if (!v) return
         }
+        if (!this.$refs['backupDetail'].validate()) return
         const data = {
           appType: CREATE_BACKUP
         }
@@ -406,8 +406,8 @@ export default {
         if (backupInfo.pgObjects) {
           backupInfo.pgObjects = backupInfo.pgObjects.toString()
         }
-        if (backupInfo.paths) {
-          backupInfo.paths = backupInfo.paths.toString()
+        if (backupInfo.folderPaths) {
+          backupInfo.folderPaths = backupInfo.folderPaths.toString()
         }
 
         data['backupInfo'] = backupInfo
@@ -436,7 +436,6 @@ export default {
       this.basicFormData.platform = undefined
       this.basicFormData.env = undefined
       this.basicFormData.backupSoftware = undefined
-      // this.$refs.backupDetail && this.$refs.backupDetail.refresh()
       this.$refs.backupDetail && this.$refs.backupDetail.setValues({Type: undefined})
       this.$nextTick(() => {
         const rule = cascadeRule[e]
