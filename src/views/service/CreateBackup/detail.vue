@@ -385,14 +385,17 @@ export default {
   methods: {
     submitForm() {
       const validateList = [this.$refs['basicForm'].validate(), this.$refs['backupInfoForm'].validate(), this.$refs['otherForm'].validate()]
-      // if (this.$refs['backupDetail']) {
-      //   validateList.push(this.$refs['backupDetail'].validate())
-      // }
+      if (this.$refs['backupDetail'] && this.basicFormData.jobType !== '13000') {
+        validateList.push(this.$refs['backupDetail'].validate())
+      }
       Promise.all(validateList).then(validates => {
         for (const v of validates) {
           if (!v) return
         }
-        if (!this.$refs['backupDetail'].validate()) return
+        if (this.basicFormData.jobType === '13000') {
+          if (!this.$refs['backupDetail'].validate()) return
+        }
+
         const data = {
           appType: CREATE_BACKUP
         }

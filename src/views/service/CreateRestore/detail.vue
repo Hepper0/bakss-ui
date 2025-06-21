@@ -140,10 +140,11 @@
 </template>
 
 <script>
-import {getBackupPoint, listBackup} from '@/api/veeam/backup'
-import {myBackup as listJob} from '@/api/service/backup'
-import {getHostDatastore, getHostFolder, getHostResourcePool} from '@/api/veeam/host'
-import {applyCreateRestore} from '@/api/application/apply'
+import { getBackupPoint, listBackup } from '@/api/veeam/backup'
+import { myBackup as listJob } from '@/api/service/backup'
+import { getHostDatastore, getHostFolder, getHostResourcePool } from '@/api/veeam/host'
+import { applyCreateRestore } from '@/api/application/apply'
+import { getJobDetail } from '../../../api/veeam/job'
 
 export default {
   name: "detail",
@@ -214,14 +215,14 @@ export default {
       if (j) {
         this.selectedJob = j
         this.getBackupList(j.appName)
-        this.getJobDetail(j.appName, j.backupServer).then(resp => {
+        getJobDetail(j.appName, j.backupServer).then(resp => {
           this.selectedJob = Object.assign(this.selectedJob, resp.data)
           this.vmOptions = resp.data.selectedVmObjects.map(v => {
             return { label: v.name, value: v.name }
           })
           if (this.vmOptions[0]) {
             this.formData.vmName = this.vmOptions[0].value
-            this.formData.host = this.vmOptions[0].path.split('\\')[0]
+            this.formData.host = this.vmOptions[0].name.split('\\')[0]
           }
         })
       }
